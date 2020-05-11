@@ -38,20 +38,20 @@ void setOutput(const uint8_t& sensorId, const uint8_t& cmd = Toggle::FLIP, bool 
 
 // Sensors[index]
   auto sensor = getSensor(sensorId);
-  uint8_t index = getIndex(sensor.id);
+  uint8_t index = getIndex(sensorId);
 
   // check whether flip state of sensor
-  uint8_t state = (cmd == Toggle::FLIP) ? !loadState(sensor.id) : cmd; // OFF -> ON
-//  saveState(sensor.id, state); // ON
+  uint8_t state = (cmd == Toggle::FLIP) ? !loadState(sensorId) : cmd; // OFF -> ON
+//  saveState(sensorId, state); // ON
 
     if(cmd == Toggle::FLIP && actAsPushButton) {
         relayAsPushButton(sensor.pin, sensor.activelow);
-        state = !loadState(sensor.id); // ON -> OFF / OFF -> ON
+        state = !loadState(sensorId); // ON -> OFF / OFF -> ON
     } else if (cmd == Toggle::FLIP && !actAsPushButton) {
         relayAsLatchButton(sensor.pin, sensor.activelow);
-    }
 
-    saveState(sensor.id, state);
+
+    saveState(sensorId, state);
     send(msgs[index].set(state)); // OFF / ON
 }
 
