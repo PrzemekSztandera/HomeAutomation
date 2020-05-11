@@ -128,7 +128,7 @@ SensorsStruct getSensor(void* pSensorId){
   return Sensors[index];
 }
 
-OneButton *getButtons(void* pSensorId){
+OneButton getButtons(void* pSensorId){
     return getSensor(pSensorId).buttons;
 }
 

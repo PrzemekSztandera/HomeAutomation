@@ -90,7 +90,11 @@ void receive(const MyMessage &message) {
   // We only expect one type of message from controller. But we better check anyway.
   if (message.type==V_STATUS) {
 
+    const uint8_t idx = getIndex(message.sensor);
+    const bool value = message.getBool();
+    
     // Store state in eeprom and send message
-    flipSwitch(message.getSensor());
+    flipSwitch(message.sensor);
+    checkRelayState(message.sensor);
   }
 }
