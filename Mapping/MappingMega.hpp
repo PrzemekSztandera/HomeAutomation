@@ -80,15 +80,16 @@ typedef struct {
   const uint8_t id;
   const char* description;
   const uint8_t pin;
-  bool activelow;
+  bool activeLow;
   OneButton buttons [];
+  uint8_t buttonPins [];
 } SensorsStruct;
 
 SensorsStruct Sensors [] = {
-//  Child ID           description              pin activelow isOn relatedButtons
-  { SALOON_1_ID,       "Salon Glowne",          9, true, {saloonMain}}, // 23
-  { SALOON_2_ID,       "Salon Kinkiety",        10, true, {saloonSide}}, // 25
-  { DINING_ROOM_1_ID,  "Jadalnia Glowne",       11, true, {diningRoomMain}}, // 27
+//  Child ID           description              pin activeLow isOn relatedButtons
+  { SALOON_1_ID,       "Salon Glowne",          9, true, {saloonMain}, {2}}, // 23
+  { SALOON_2_ID,       "Salon Kinkiety",        10, true, {saloonSide}, {3}}, // 25
+  { DINING_ROOM_1_ID,  "Jadalnia Glowne",       11, true, {diningRoomMain}, {4}}, // 27
 //  { DINING_ROOM_2_ID,  "Jadalnia Kinkiety",     12, false }, // 29
 //  { BEDROOM_1_ID,      "Sypialnia Glowne",      13, false }, // 31
 //  { BEDROOM_2_ID,      "Sypialnia Kinkiety",    33, false },
@@ -132,4 +133,6 @@ OneButton getButtons(void* pSensorId){
     return getSensor(pSensorId).buttons;
 }
 
-
+uint8_t *getButtonPins(void* pSensorId){
+    return getSensor(pSensorId).buttonPins;
+}

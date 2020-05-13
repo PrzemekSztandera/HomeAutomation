@@ -39,7 +39,7 @@ void setup() {
     }
 
     // inverse state if sensors/relay is Active Low
-    bool bState = (sensor.activelow) ? Toggle::ON : Toggle::OFF;
+    bool bState = (sensor.activeLow) ? Toggle::ON : Toggle::OFF;
     digitalWrite(sensor.pin, bState);
   }
   setupButtons();

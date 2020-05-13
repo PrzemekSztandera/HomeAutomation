@@ -42,15 +42,13 @@ void setOutput(const uint8_t& sensorId, const uint8_t& cmd = Toggle::FLIP, bool 
 
   // check whether flip state of sensor
   uint8_t state = (cmd == Toggle::FLIP) ? !loadState(sensorId) : cmd; // OFF -> ON
-//  saveState(sensorId, state); // ON
 
     if(cmd == Toggle::FLIP && actAsPushButton) {
-        relayAsPushButton(sensor.pin, sensor.activelow);
-        state = !loadState(sensorId); // ON -> OFF / OFF -> ON
+        relayAsPushButton(sensor.pin, sensor.activeLow);
     } else if (cmd == Toggle::FLIP && !actAsPushButton) {
-        relayAsLatchButton(sensor.pin, sensor.activelow);
-
-
+        relayAsLatchButton(sensor.pin, sensor.activeLow);
+        saveState(sensorId, state); // ON
+    }
     saveState(sensorId, state);
     send(msgs[index].set(state)); // OFF / ON
 }
@@ -63,20 +61,24 @@ void checkRelayState(const uint8_t& sensorId, bool actAsPushButton = true) {
 
     uint8_t state = loadState(sensorId);
     const uint8_t buttonsSize = sizeof(getButtons(sensorId)) / sizeof(OneButton);
+    const uint8_t buttonPinsSize = sizeof(getButtonPins(sensorId)) / sizeof(uint8_t);
     if(actAsPushButton) {
-        for (uint8_t i = 0; i < buttonsSize; i++) {
-            OneButton buttons [buttonsSize] = getButtons(sensorId);
-            if(!buttons[i].isLongPressed()) {
-                saveState(sensorId, !state);
-                send(msgs[index].set(!state));
+        for (uint8_t i = 0; i < buttonPinsSize; i++) {
+            uint8_t *buttonPins = getButtonPins(sensorId);
+            if(digitalRead(buttonPins[i]) == 0) {
+                state = Toggle::OFF;
+                saveState(sensorId, state);
+                send(msgs[index].set(state));
             }
         }
     } else {
-        if((sensor.activelow && digitalRead(sensor.pin) == HIGH) || (!sensor.activelow && digitalRead(sensor.pin) == LOW)) {
-            saveState(sensorId, !state);
-            send(msgs[index].set(!state));
+        if((sensor.activeLow && digitalRead(sensor.pin) == HIGH) || (!sensor.activeLow && digitalRead(sensor.pin) == LOW)) {
+            state = Toggle::OFF;
+            saveState(sensorId, state);
+            send(msgs[index].set(state));
         }
     }
+
 }
 
 //void setState(const uint8_t& sensorId, const uint8_t& cmd = Toggle::OFF, bool actAsPushButton = true) {
@@ -117,9 +119,8 @@ void setupButtons() {
     
   diningRoomMain.attachLongPressStart(setStateON, DINING_ROOM_1_ID);
   diningRoomMain.attachLongPressStop(setStateOFF, DINING_ROOM_1_ID);
-    
+  saloonMain.attachClick(flipSwitch, DINING_ROOM_1_ID);
 }
-
 
 
 
