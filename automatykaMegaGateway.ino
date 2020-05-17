@@ -10,6 +10,7 @@
 
 // Enable serial gateway
 #define MY_GATEWAY_SERIAL
+#define MY_DEBUG
 
 // Define a lower baud rate for Arduino's running on 8 MHz (Arduino Pro Mini 3.3V & SenseBender)
 #if F_CPU == 16000000L
@@ -26,6 +27,7 @@
 // sensor[1] -> msgs[1]
 // etc.
 void setup() {
+  Serial.begin(115200);
   for(uint8_t i = 0; i < maxSensors; i++) {
     auto sensor = Sensors[i];
     pinMode(sensor.pin, OUTPUT);
@@ -43,6 +45,8 @@ void setup() {
     digitalWrite(sensor.pin, bState);
   }
   setupButtons();
+      Serial.println("Setup() function called");
+
 }
 
 void presentation() {
@@ -54,6 +58,8 @@ void presentation() {
     auto sensor = Sensors[i];
     present(sensor.id, S_BINARY, sensor.description);
     send(msgs[i].set(loadState(sensor.id)));
+    Serial.println("Presentation() function called");
+
   }
 }
 
@@ -84,17 +90,18 @@ void loop() {
 //  gate.tick();
 //  attic1.tick();
 //  attic2.tick();
+
 }
 
 void receive(const MyMessage &message) {
+  
   // We only expect one type of message from controller. But we better check anyway.
   if (message.type==V_STATUS) {
-
+    Serial.println("Calling receive()");
     const uint8_t idx = getIndex(message.sensor);
     const bool value = message.getBool();
-    
-    // Store state in eeprom and send message
+  
+    Serial.println("Calling flipSwitch()");
     flipSwitch(message.sensor);
-    checkRelayState(message.sensor);
   }
 }
