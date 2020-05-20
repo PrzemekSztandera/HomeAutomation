@@ -79,16 +79,17 @@ const uint8_t ATTIC_2_ID        = 82;
 typedef struct {
   const uint8_t id;
   const char* description;
-  const uint8_t pin;
+  const uint8_t switchPin;
   bool activeLow;
-  const uint8_t buttonPin;
+  const uint8_t latchRelayPin;
+  bool isButton;
 } SensorsStruct;
 
 SensorsStruct Sensors [] = {
 //  Child ID           description              pin activeLow isOn relatedButtons
-  { SALOON_1_ID,       "Salon Glowne",          9, true, 2}, // 23
-  { SALOON_2_ID,       "Salon Kinkiety",        10, true, 3}, // 25
-  { DINING_ROOM_1_ID,  "Jadalnia Glowne",       11, true, 4}, // 27
+  { SALOON_1_ID,       "Salon Glowne",          9, true, 2, true}, // 23
+  { SALOON_2_ID,       "Salon Kinkiety",        10, true, 3, true}, // 25
+  { DINING_ROOM_1_ID,  "Jadalnia Glowne",       11, true, 4, false}, // 27
 //  { DINING_ROOM_2_ID,  "Jadalnia Kinkiety",     12, false }, // 29
 //  { BEDROOM_1_ID,      "Sypialnia Glowne",      13, false }, // 31
 //  { BEDROOM_2_ID,      "Sypialnia Kinkiety",    33, false },
@@ -128,3 +129,30 @@ SensorsStruct getSensor(void* pSensorId){
   return Sensors[index];
 }
 
+void readLatchRelayButtons() {
+    saloonMain.tick();
+    saloonSide.tick();
+    diningRoomMain.tick();
+//  diningRoomSide.tick();
+//  bedroomMain.tick();
+//  bedroomSide.tick();
+//  kid1Main.tick();
+//  kid2Main.tick();
+//  bathroom1.tick();
+//  bathroom2.tick();
+//  bathroom1Fan.tick();
+//  bathroom2Fan.tick();
+//  kitchenMain.tick();
+//  kitchenSide.tick();
+//  entrance.tick();
+//  landing.tick();
+//  corridor.tick();
+//  hall.tick();
+//  terraceMain.tick();
+//  terraceBack.tick();
+//  outside.tick();
+//  garden.tick();
+//  gate.tick();
+//  attic1.tick();
+//  attic2.tick();
+}

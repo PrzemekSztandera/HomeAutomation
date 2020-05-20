@@ -26,14 +26,16 @@
 // sensor[0] -> msgs[0]
 // sensor[1] -> msgs[1]
 // etc.
+
 void setup() {
   Serial.begin(115200);
+  
   for(uint8_t i = 0; i < maxSensors; i++) {
     auto sensor = Sensors[i];
-    pinMode(sensor.pin, OUTPUT);
+    pinMode(sensor.switchPin, OUTPUT);
     msgs[i] = MyMessage(sensor.id, V_STATUS);
     uint8_t currentState = loadState(sensor.id);
-
+        
     // Check whether EEPROM cell was used before
     if (!(currentState == 0 || 1)) {
       currentState = Toggle::OFF;
@@ -42,11 +44,10 @@ void setup() {
 
     // inverse state if sensors/relay is Active Low
     bool bState = (sensor.activeLow) ? Toggle::ON : Toggle::OFF;
-    digitalWrite(sensor.pin, bState);
+    digitalWrite(sensor.switchPin, bState);
   }
   setupButtons();
       Serial.println("Setup() function called");
-
 }
 
 void presentation() {
@@ -64,44 +65,21 @@ void presentation() {
 }
 
 void loop() {
-//   Keep sensing buttons
-  saloonMain.tick();
-  saloonSide.tick();
-  diningRoomMain.tick();
-//  diningRoomSide.tick();
-//  bedroomMain.tick();
-//  bedroomSide.tick();
-//  kid1Main.tick();
-//  kid2Main.tick();
-//  bathroom1.tick();
-//  bathroom2.tick();
-//  bathroom1Fan.tick();
-//  bathroom2Fan.tick();
-//  kitchenMain.tick();
-//  kitchenSide.tick();
-//  entrance.tick();
-//  landing.tick();
-//  corridor.tick();
-//  hall.tick();
-//  terraceMain.tick();
-//  terraceBack.tick();
-//  outside.tick();
-//  garden.tick();
-//  gate.tick();
-//  attic1.tick();
-//  attic2.tick();
 
+  readLatchRelayButtons();
+  
 }
 
 void receive(const MyMessage &message) {
+  Serial.println("Calling receive()");
   
   // We only expect one type of message from controller. But we better check anyway.
   if (message.type==V_STATUS) {
-    Serial.println("Calling receive()");
-    const uint8_t idx = getIndex(message.sensor);
-    const bool value = message.getBool();
+    auto sensor = message.getSensor();
   
-    Serial.println("Calling flipSwitch()");
-    flipSwitch(message.sensor);
+    Serial.println("Calling setOutput() from receive()");
+    switchRelay(sensor);
   }
+  
+  Serial.println("End of receive method");
 }
