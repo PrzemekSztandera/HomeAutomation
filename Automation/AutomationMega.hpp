@@ -18,7 +18,7 @@ void myDelay(long interval) {
 }
 
 // relay acts as a click button
-void relayAsPushButton(int pin) {
+void clickRelay(int pin) {
     uint8_t state = digitalRead(pin);
     unsigned long currentMillis = millis();
     digitalWrite(pin, !state);
@@ -26,8 +26,8 @@ void relayAsPushButton(int pin) {
     digitalWrite(pin, state);
 }
 
-// relay acts as a latch button
-void relayAsLatchButton(int pin) {
+// relay acts as a press button
+void pressRelay(int pin) {
     uint8_t pinState = digitalRead(pin);
     digitalWrite(pin, !pinState);
 }
@@ -44,27 +44,24 @@ void updateRelayStateAndSendMessage(const uint8_t &sensorId, bool pullUpActive =
     uint8_t index = getIndex(sensor.id);
     uint8_t state = 2;
 
-    if (sensor.isButton) {
-        state = digitalRead(sensor.latchRelayPin);
+    if (sensor.hasSignalPin) {
+        state = digitalRead(sensor.signalPin);
         if(pullUpActive) {
             saveState(sensorId, !state);
         } else {
             saveState(sensorId, state);
         }
         Serial.print(" and pin: ");
-        Serial.println(sensor.latchRelayPin);
+        Serial.println(sensor.signalPin);
     } else {
-        state = !digitalRead(sensor.switchPin);
-//        if (sensor.activeLow && digitalRead(sensor.switchPin) == 1) {
-//            state = Toggle::OFF;
-//        } else if (!sensor.activeLow && digitalRead(sensor.switchPin) == 0) {
-//            state = Toggle::OFF;
-//        }
-
+        state = digitalRead(sensor.relayPin);
+        if (sensor.activeLow) {
+            state = !state;
+        }
         saveState(sensorId, state);
 
         Serial.print(" and pin: ");
-        Serial.println(sensor.switchPin);
+        Serial.println(sensor.relayPin);
     }
     send(msgs[index].set(loadState(sensorId)));
 
@@ -113,8 +110,8 @@ void switchRelay(const uint8_t &sensorId, const uint8_t &cmd = Toggle::FLIP) {
     uint8_t state = (cmd == Toggle::FLIP) ? !loadState(sensorId) : cmd; // OFF -> ON
     saveState(sensorId, state);
 
-    if (cmd == Toggle::FLIP && sensor.isButton) {
-        relayAsPushButton(sensor.switchPin);
+    if (cmd == Toggle::FLIP && sensor.hasSignalPin) {
+        clickRelay(sensor.relayPin);
 
         // Debug
         Serial.print("Calling relayAsPushButton(); ");
@@ -128,29 +125,12 @@ void switchRelay(const uint8_t &sensorId, const uint8_t &cmd = Toggle::FLIP) {
         }
         // End of Debug
 
-    } else if (cmd == Toggle::FLIP && !sensor.isButton) {
-        relayAsLatchButton(sensor.switchPin);
-//        saveState(sensorId, state); // ON
+    } else if (cmd == Toggle::FLIP && !sensor.hasSignalPin) {
+        pressRelay(sensor.relayPin);
 
         // Debug
         Serial.print("Calling relayAsLatchButton(); ");
         Serial.print("Sensor State: ");
-        if(loadState(sensorId) == 2) {
-            Serial.println("FLIP");
-        } else if (loadState(sensorId) == 1) {
-            Serial.println("ON");
-        } else if (loadState(sensorId) == 0) {
-            Serial.println("OFF");
-        }
-        // End of Debug
-    } else {
-        saveState(sensorId, state);
-
-        // Debug
-        Serial.print("Setting state for OneButton.tick(): ");
-        Serial.print(sensor.description);
-        Serial.print(", ");
-        Serial.print("Sensor State after Button.tick(): ");
         if(loadState(sensorId) == 2) {
             Serial.println("FLIP");
         } else if (loadState(sensorId) == 1) {
@@ -164,30 +144,66 @@ void switchRelay(const uint8_t &sensorId, const uint8_t &cmd = Toggle::FLIP) {
 }
 
 
-void setRelayON(void *pSensorId) {
-    switchRelay(pSensorId, Toggle::ON);
+void setOutputON(void *pSensorId) {
+    saveState(pSensorId, Toggle::ON);
+    auto sensor = getSensor(pSensorId);
+    // Debug
+    Serial.print("Setting state for OneButton.tick(): ");
+    Serial.print(sensor.description);
+    Serial.print(", ");
+    Serial.print("Sensor State after Button.tick(): ");
+    if(loadState(sensor.id) == 2) {
+        Serial.println("FLIP");
+    } else if (loadState(sensor.id) == 1) {
+        Serial.println("ON");
+    } else if (loadState(sensor.id) == 0) {
+        Serial.println("OFF");
+    }
+    // End of Debug
+    updateRelayStateAndSendMessage(pSensorId);
 }
 
-void setRelayOFF(void *pSensorId) {
-    switchRelay(pSensorId, Toggle::OFF);
+void setOutputOFF(void *pSensorId) {
+    saveState(pSensorId, Toggle::OFF);
+    auto sensor = getSensor(pSensorId);
+    // Debug
+    Serial.print("Setting state for OneButton.tick(): ");
+    Serial.print(sensor.description);
+    Serial.print(", ");
+    Serial.print("Sensor State after Button.tick(): ");
+    if(loadState(sensor.id) == 2) {
+        Serial.println("FLIP");
+    } else if (loadState(sensor.id) == 1) {
+        Serial.println("ON");
+    } else if (loadState(sensor.id) == 0) {
+        Serial.println("OFF");
+    }
+    // End of Debug
+    updateRelayStateAndSendMessage(pSensorId);
 }
 
-void setRelay(void *pSensorId) {
+void flipOutput(void *pSensorId) {
     switchRelay(pSensorId);
 }
 
-void setupButtons() {
-    // Setup the button.
-    saloonMain.attachLongPressStart(setRelayON, SALOON_1_ID);
-    saloonMain.attachLongPressStop(setRelayOFF, SALOON_1_ID);
-    saloonMain.attachClick(setRelay, SALOON_1_ID);
+void masterClickButton() {
+    flipOutput(SALOON_1_ID);
+    flipOutput(SALOON_2_ID);
+    flipOutput(DINING_ROOM_1_ID);
+}
 
-    saloonSide.attachLongPressStart(setRelayON, SALOON_2_ID);
-    saloonSide.attachLongPressStop(setRelayOFF, SALOON_2_ID);
+// Setup the buttons and relays. Do not assign LongPress and Click to the same sensor
+void setupClickButtons() {
 
-//    diningRoomMain.attachLongPressStart(setRelayON, DINING_ROOM_1_ID);
-//    diningRoomMain.attachLongPressStop(setRelayOFF, DINING_ROOM_1_ID);
-    diningRoomMain.attachClick(setRelay, DINING_ROOM_1_ID);
+    button2.attachClick(flipOutput, SALOON_1_ID);
+    button4.attachClick(flipOutput, DINING_ROOM_1_ID);
+    masterButton7.attachClick(masterClickButton);
+}
+
+void setupPressButtons() {
+
+    button3.attachLongPressStart(setOutputON, SALOON_2_ID);
+    button3.attachLongPressStop(setOutputOFF, SALOON_2_ID);
 }
 
 

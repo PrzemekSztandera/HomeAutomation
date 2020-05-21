@@ -23,31 +23,61 @@ const bool ActiveLow = true;
 // Remember that names should be consistent with main loop in gateway.ino
 //Constructor
 //OneButton(int pin, int active = LOW, bool pullupActive = true);
-OneButton saloonMain(2, true);
-OneButton saloonSide(3, true);
-OneButton diningRoomMain(4, true);
-//OneButton diningRoomSide(5, true);
-//OneButton bedroomMain(6, true);
-//OneButton bedroomSide(0, true);
-//OneButton kid1Main(0, true);
-//OneButton kid2Main(0, true);
-//OneButton bathroom1(0, true);
-//OneButton bathroom2(0, true);
-//OneButton bathroom1Fan(0, true);
-//OneButton bathroom2Fan(0, true);
-//OneButton kitchen1(0, true);
-//OneButton kitchen2(0, true);
-//OneButton entrance(0, true);
-//OneButton landing(0, true);
-//OneButton corridor(0, true);
-//OneButton hall(0, true);
-//OneButton terrace1(0, true);
-//OneButton terrace2(0, true);
-//OneButton outside(0, true);
-//OneButton garden(0, true);
-//OneButton gate(0, true);
-//OneButton attic1(0, true);
-//OneButton attic2(0, true);
+OneButton button2(2, true);
+OneButton button3(3, true);
+OneButton button4(4, true);
+//OneButton diningRoomSideRelay(5, true);
+//OneButton bedroomMainRelay(6, true);
+//OneButton bedroomSideRelay(0, true);
+//OneButton kid1MainRelay(0, true);
+//OneButton kid2MainRelay(0, true);
+//OneButton bathroom1Relay(0, true);
+//OneButton bathroom2Relay(0, true);
+//OneButton bathroom1FanButton(0, true);
+//OneButton bathroom2FanButton(0, true);
+//OneButton kitchen1Relay(0, true);
+//OneButton kitchen2Relay(0, true);
+//OneButton entranceRelay(0, true);
+//OneButton landingRelay(0, true);
+//OneButton corridorRelay(0, true);
+//OneButton hallRelay(0, true);
+//OneButton terrace1Relay(0, true);
+//OneButton terrace2Relay(0, true);
+//OneButton outsideRelay(0, true);
+//OneButton gardenRelay(0, true);
+//OneButton gateRelay(0, true);
+//OneButton attic1Relay(0, true);
+//OneButton attic2Relay(0, true);
+OneButton masterButton7(7, true);
+
+void readButtons() {
+    button2.tick();
+    button3.tick();
+    button4.tick();
+//  diningRoomSideRelay.tick();
+//  bedroomMainRelay.tick();
+//  bedroomSideRelay.tick();
+//  kid1MainRelay.tick();
+//  kid2MainRelay.tick();
+//  bathroom1Relay.tick();
+//  bathroom2Relay.tick();
+//  bathroom1FanButton.tick();
+//  bathroom2FanButton.tick();
+//  kitchenMainRelay.tick();
+//  kitchenSideRelay.tick();
+//  entranceRelay.tick();
+//  landingRelay.tick();
+//  corridorRelay.tick();
+//  hallRelay.tick();
+//  terraceMainRelay.tick();
+//  terraceBackRelay.tick();
+//  outsideRelay.tick();
+//  gardenRelay.tick();
+//  gateRelay.tick();
+//  attic1Relay.tick();
+//  attic2Relay.tick();
+    masterButton7.tick();
+}
 
 // Child ID declaration of relays
 const uint8_t SALOON_1_ID       = 11;
@@ -75,21 +105,22 @@ const uint8_t GARDEN_ID         = 74;
 const uint8_t GATE_ID           = 75;
 const uint8_t ATTIC_1_ID        = 81;
 const uint8_t ATTIC_2_ID        = 82;
+const uint8_t MASTER            = 83;
 
 typedef struct {
   const uint8_t id;
   const char* description;
-  const uint8_t switchPin;
+  const uint8_t relayPin; // pin to switch latch relay-button with module relay
   bool activeLow;
-  const uint8_t latchRelayPin;
-  bool isButton;
+  const uint8_t signalPin; // pin to read the state of latch relay-button for sensor
+  bool hasSignalPin; // true if has latch relay-button assign to read the state from
 } SensorsStruct;
 
 SensorsStruct Sensors [] = {
-//  Child ID           description              pin activeLow isOn relatedButtons
-  { SALOON_1_ID,       "Salon Glowne",          9, true, 2, true}, // 23
+//  Child ID           description   relayPin / activeLow / signalPin / hasSignalPin
+  { SALOON_1_ID,       "Salon Glowne",          9, true, -1, false}, // 23
   { SALOON_2_ID,       "Salon Kinkiety",        10, true, 3, true}, // 25
-  { DINING_ROOM_1_ID,  "Jadalnia Glowne",       11, true, 4, false}, // 27
+  { DINING_ROOM_1_ID,  "Jadalnia Glowne",       11, false, -1, false}, // 27
 //  { DINING_ROOM_2_ID,  "Jadalnia Kinkiety",     12, false }, // 29
 //  { BEDROOM_1_ID,      "Sypialnia Glowne",      13, false }, // 31
 //  { BEDROOM_2_ID,      "Sypialnia Kinkiety",    33, false },
@@ -112,6 +143,7 @@ SensorsStruct Sensors [] = {
 //  { GATE_ID,           "Brama",                 0, false },
 //  { ATTIC_1_ID,        "Strych 1",              0, false },
 //  { ATTIC_2_ID,        "Strych 2",              0, false },
+//  { MASTER,            "Master",                0, false },
 };
 const uint8_t maxSensors = sizeof(Sensors) / sizeof(SensorsStruct);
 MyMessage msgs[maxSensors];
@@ -127,32 +159,4 @@ SensorsStruct getSensor(void* pSensorId){
   const uint8_t sensorId = static_cast<uint8_t>(reinterpret_cast<intptr_t>(pSensorId));
   uint8_t index = getIndex(sensorId);
   return Sensors[index];
-}
-
-void readLatchRelayButtons() {
-    saloonMain.tick();
-    saloonSide.tick();
-    diningRoomMain.tick();
-//  diningRoomSide.tick();
-//  bedroomMain.tick();
-//  bedroomSide.tick();
-//  kid1Main.tick();
-//  kid2Main.tick();
-//  bathroom1.tick();
-//  bathroom2.tick();
-//  bathroom1Fan.tick();
-//  bathroom2Fan.tick();
-//  kitchenMain.tick();
-//  kitchenSide.tick();
-//  entrance.tick();
-//  landing.tick();
-//  corridor.tick();
-//  hall.tick();
-//  terraceMain.tick();
-//  terraceBack.tick();
-//  outside.tick();
-//  garden.tick();
-//  gate.tick();
-//  attic1.tick();
-//  attic2.tick();
 }

@@ -32,21 +32,25 @@ void setup() {
   
   for(uint8_t i = 0; i < maxSensors; i++) {
     auto sensor = Sensors[i];
-    pinMode(sensor.switchPin, OUTPUT);
+    pinMode(sensor.relayPin, OUTPUT);
     msgs[i] = MyMessage(sensor.id, V_STATUS);
     uint8_t currentState = loadState(sensor.id);
         
     // Check whether EEPROM cell was used before
     if (!(currentState == 0 || 1)) {
-      currentState = Toggle::OFF;
+      currentState = LOW;
       saveState(sensor.id, currentState);
     }
 
     // inverse state if sensors/relay is Active Low
-    bool bState = (sensor.activeLow) ? Toggle::ON : Toggle::OFF;
-    digitalWrite(sensor.switchPin, bState);
+    bool bState = (sensor.activeLow) ? !currentState : currentState;
+    if(sensor.hasSignalPin) {
+      bState = (sensor.activeLow) ? HIGH : LOW;
+    }
+    digitalWrite(sensor.relayPin, bState);
   }
-  setupButtons();
+  setupClickButtons();
+  setupPressButtons();
       Serial.println("Setup() function called");
 }
 
@@ -66,7 +70,7 @@ void presentation() {
 
 void loop() {
 
-  readLatchRelayButtons();
+  readButtons();
   
 }
 
