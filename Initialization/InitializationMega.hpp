@@ -9,7 +9,8 @@
 void initializeRelayPins() {
     for (uint8_t i = 0; i < maxSensors; i++) {
         auto sensor = Sensors[i];
-        pinMode(sensor.relayPin, OUTPUT);
+        auto relay = getRelay(sensor.id);
+        pinMode(relay.pin, OUTPUT);
         msgs[i] = MyMessage(sensor.id, V_STATUS);
         uint8_t currentState = loadState(sensor.id);
 
@@ -20,11 +21,11 @@ void initializeRelayPins() {
         }
 
         // inverse state if sensors/relay is Active Low
-        bool bState = (sensor.lowLevelTrigger) ? !currentState : currentState;
+        bool bState = (relay.lowLevelTrigger) ? !currentState : currentState;
         if (sensor.hasSignalPin) {
-            bState = (sensor.lowLevelTrigger) ? HIGH : LOW;
+            bState = (relay.lowLevelTrigger) ? HIGH : LOW;
         }
-        digitalWrite(sensor.relayPin, bState);
+        digitalWrite(relay.pin, bState);
     }
 }
 

@@ -42,6 +42,7 @@ void updateRelayStateAndSendMessage(const uint8_t &sensorId, bool pullUpActive =
 
     auto sensor = getSensor(sensorId);
     uint8_t index = getIndex(sensor.id);
+    auto relay = getRelay(sensorId);
     uint8_t state = 2;
 
     if (sensor.hasSignalPin) {
@@ -54,14 +55,14 @@ void updateRelayStateAndSendMessage(const uint8_t &sensorId, bool pullUpActive =
         Serial.print(" and pin: ");
         Serial.println(sensor.signalPin);
     } else {
-        state = digitalRead(sensor.relayPin);
-        if (sensor.lowLevelTrigger) {
+        state = digitalRead(relay.pin);
+        if (relay.lowLevelTrigger) {
             state = !state;
         }
         saveState(sensorId, state);
 
         Serial.print(" and pin: ");
-        Serial.println(sensor.relayPin);
+        Serial.println(relay.pin);
     }
     send(msgs[index].set(loadState(sensorId)));
 
@@ -105,13 +106,14 @@ void switchRelay(const uint8_t &sensorId, const uint8_t &cmd = Toggle::FLIP) {
 
     auto sensor = getSensor(sensorId);
     uint8_t index = getIndex(sensorId);
+    auto relay = getRelay(sensorId);
 
     // check whether flip state of sensor
     uint8_t state = (cmd == Toggle::FLIP) ? !loadState(sensorId) : cmd; // OFF -> ON
     saveState(sensorId, state);
 
     if (cmd == Toggle::FLIP && sensor.hasSignalPin) {
-        clickRelay(sensor.relayPin);
+        clickRelay(relay.pin);
 
         // Debug
         Serial.print("Calling relayAsPushButton(); ");
@@ -126,7 +128,7 @@ void switchRelay(const uint8_t &sensorId, const uint8_t &cmd = Toggle::FLIP) {
         // End of Debug
 
     } else if (cmd == Toggle::FLIP && !sensor.hasSignalPin) {
-        pressRelay(sensor.relayPin);
+        pressRelay(relay.pin);
 
         // Debug
         Serial.print("Calling relayAsLatchButton(); ");

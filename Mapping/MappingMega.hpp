@@ -108,25 +108,30 @@ const uint8_t ATTIC_2_ID = 82;
 const uint8_t MASTER = 83;
 
 typedef struct {
+    const uint8_t pin;
     const bool lowLevelTrigger;
-    const uint8_t relayPin;
 } Relay;
+
+Relay relay9 = {9, true};
+Relay relay10 = {10, true};
+Relay relay11 = {11, false};
+Relay relay12 = {12, true};
+
 
 typedef struct {
     const uint8_t id;
     const char *description;
-    const uint8_t relayPin; // pin to switch latch relay-button with module relay
     const uint8_t signalPin; // pin to read the state of latch relay-button for sensor
-    bool lowLevelTrigger;
     bool hasSignalPin; // true if has latch relay-button assign to read the state from
+    Relay relay;
 } SensorsStruct;
 
 SensorsStruct Sensors[] = {
-//  Child ID           description   relayPin / activeLow / signalPin / hasSignalPin
-        {SALOON_1_ID,      "Salon Glowne",      9, -1, true, false}, // 23
-        {SALOON_2_ID,      "Salon Kinkiety",    10, 3, true, true}, // 25
-        {DINING_ROOM_1_ID, "Jadalnia Glowne",   11, -1, false, false}, // 27
-        {DINING_ROOM_2_ID, "Jadalnia Kinkiety", 12, -1, true, false}, // 29
+//  Child ID               description       signalPin / hasSignalPin / relay
+        {SALOON_1_ID,      "Salon Glowne",      -1, false, relay9}, // 23
+        {SALOON_2_ID,      "Salon Kinkiety",     3, true, relay10}, // 25
+        {DINING_ROOM_1_ID, "Jadalnia Glowne",   -1, false, relay11}, // 27
+        {DINING_ROOM_2_ID, "Jadalnia Kinkiety", -1, false, relay12}, // 29
 //  { BEDROOM_1_ID,      "Sypialnia Glowne",      13, false }, // 31
 //  { BEDROOM_2_ID,      "Sypialnia Kinkiety",    33, false },
 //  { KID1_BEDROOM_ID,   "Pokoj Wojtek",          35, false },
@@ -164,4 +169,9 @@ SensorsStruct getSensor(void *pSensorId) {
     const uint8_t sensorId = static_cast<uint8_t>(reinterpret_cast<intptr_t>(pSensorId));
     uint8_t index = getIndex(sensorId);
     return Sensors[index];
+}
+
+Relay getRelay(void *pSensorId) {
+    auto sensor = getSensor(pSensorId);
+    return sensor.relay;
 }
