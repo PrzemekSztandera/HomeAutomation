@@ -22,6 +22,7 @@
 #include "./Mapping/MappingMega.hpp"
 #include "./Automation/AutomationMega.hpp"
 #include "./Initialization/InitializationMega.hpp"
+//#include "./Relay/Relay.hpp"
 // TODO: as this should be fixed, refactor to keep index fixed
 // sensor[0] -> msgs[0]
 // sensor[1] -> msgs[1]
@@ -54,8 +55,6 @@ void receive(const MyMessage &message) {
     // We only expect one type of message from controller. But we better check anyway.
     if (message.type == V_STATUS) {
         auto sensor = message.getSensor();
-
-        Serial.println("Calling setOutput() from receive()");
         switchRelay(sensor);
     }
 

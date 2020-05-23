@@ -11,13 +11,13 @@
 #pragma once
 
 #include <OneButton.h>
+#include "../Relay/Relay.hpp"
 
 namespace Toggle {
     const uint8_t OFF = 0;
     const uint8_t ON = 1;
     const uint8_t FLIP = 2;
 }
-const bool ActiveLow = true;
 
 // Pushbuttons declaration
 // Remember that names should be consistent with main loop in gateway.ino
@@ -107,16 +107,11 @@ const uint8_t ATTIC_1_ID = 81;
 const uint8_t ATTIC_2_ID = 82;
 const uint8_t MASTER = 83;
 
-typedef struct {
-    const uint8_t pin;
-    const bool lowLevelTrigger;
-} Relay;
-
-Relay relay9 = {9, true};
-Relay relay10 = {10, true};
-Relay relay11 = {11, false};
-Relay relay12 = {12, true};
-
+//Relay(uint8_t pin, bool lowLevelTrigger = false)
+Relay relay9(9, true);
+Relay relay10(10, true);
+Relay relay11(11, false);
+Relay relay12(12, true);
 
 typedef struct {
     const uint8_t id;
@@ -127,7 +122,7 @@ typedef struct {
 } SensorsStruct;
 
 SensorsStruct Sensors[] = {
-//  Child ID               description       signalPin / hasSignalPin / relay
+//  Child ID               description   signalPin / hasSignalPin / relay
         {SALOON_1_ID,      "Salon Glowne",      -1, false, relay9}, // 23
         {SALOON_2_ID,      "Salon Kinkiety",     3, true, relay10}, // 25
         {DINING_ROOM_1_ID, "Jadalnia Glowne",   -1, false, relay11}, // 27
