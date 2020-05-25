@@ -84,49 +84,57 @@ const uint8_t SALOON_1_ID = 11;
 const uint8_t SALOON_2_ID = 12;
 const uint8_t DINING_ROOM_1_ID = 13;
 const uint8_t DINING_ROOM_2_ID = 14;
-const uint8_t BEDROOM_1_ID = 21;
-const uint8_t BEDROOM_2_ID = 22;
-const uint8_t KID1_BEDROOM_ID = 23;
-const uint8_t KID2_BEDROOM_ID = 24;
-const uint8_t BATHROOM_1_ID = 31;
-const uint8_t BATHROOM_2_ID = 32;
-const uint8_t FAN_BATHROOM_1_ID = 41;
-const uint8_t FAN_BATHROOM_2_ID = 42;
-const uint8_t KITCHEN_1_ID = 51;
-const uint8_t KITCHEN_2_ID = 52;
-const uint8_t ENTRANCE_ID = 61;
-const uint8_t LANDING_ID = 62;
-const uint8_t CORRIDOR_ID = 63;
-const uint8_t HALL_ID = 64;
-const uint8_t TERRACE_MAIN_ID = 71;
-const uint8_t TERRACE_BACK_ID = 72;
-const uint8_t HOUSE_OUTSIDE_ID = 73;
-const uint8_t GARDEN_ID = 74;
-const uint8_t GATE_ID = 75;
-const uint8_t ATTIC_1_ID = 81;
-const uint8_t ATTIC_2_ID = 82;
-const uint8_t MASTER = 83;
+//const uint8_t BEDROOM_1_ID = 21;
+//const uint8_t BEDROOM_2_ID = 22;
+//const uint8_t KID1_BEDROOM_ID = 23;
+//const uint8_t KID2_BEDROOM_ID = 24;
+//const uint8_t BATHROOM_1_ID = 31;
+//const uint8_t BATHROOM_2_ID = 32;
+//const uint8_t FAN_BATHROOM_1_ID = 41;
+//const uint8_t FAN_BATHROOM_2_ID = 42;
+//const uint8_t KITCHEN_1_ID = 51;
+//const uint8_t KITCHEN_2_ID = 52;
+//const uint8_t ENTRANCE_ID = 61;
+//const uint8_t LANDING_ID = 62;
+//const uint8_t CORRIDOR_ID = 63;
+//const uint8_t HALL_ID = 64;
+//const uint8_t TERRACE_MAIN_ID = 71;
+//const uint8_t TERRACE_BACK_ID = 72;
+//const uint8_t HOUSE_OUTSIDE_ID = 73;
+//const uint8_t GARDEN_ID = 74;
+//const uint8_t GATE_ID = 75;
+//const uint8_t ATTIC_1_ID = 81;
+//const uint8_t ATTIC_2_ID = 82;
+//const uint8_t MASTER = 83;
 
 //Relay(uint8_t pin, bool lowLevelTrigger = false)
-Relay relay9(9, true);
+//Relay relay9(9, true);
 Relay relay10(10, true);
-Relay relay11(11, false);
+//Relay relay11(11, false);
 Relay relay12(12, true);
 
 typedef struct {
     const uint8_t id;
     const char *description;
     const uint8_t signalPin; // pin to read the state of latch relay-button for sensor
-    bool hasSignalPin; // true if has latch relay-button assign to read the state from
+    bool hasPin; // true if has latch relay-button assign to read the state from
     Relay relay;
+
+    uint8_t getPin() {
+        return signalPin;
+    }
+
+    bool hasSignalPin() {
+        return hasPin;
+    }
 } SensorsStruct;
 
 SensorsStruct Sensors[] = {
 //  Child ID               description   signalPin / hasSignalPin / relay
-        {SALOON_1_ID,      "Salon Glowne",      -1, false, relay9}, // 23
+//        {SALOON_1_ID,      "Salon Glowne",      -1, false, relay9}, // 23
         {SALOON_2_ID,      "Salon Kinkiety",     3, true, relay10}, // 25
-        {DINING_ROOM_1_ID, "Jadalnia Glowne",   -1, false, relay11}, // 27
-        {DINING_ROOM_2_ID, "Jadalnia Kinkiety", -1, false, relay12}, // 29
+//        {DINING_ROOM_1_ID, "Jadalnia Glowne",   -1, false, relay11}, // 27
+        {DINING_ROOM_2_ID, "Jadalnia Kinkiety",  5, true, relay12}, // 29
 //  { BEDROOM_1_ID,      "Sypialnia Glowne",      13, false }, // 31
 //  { BEDROOM_2_ID,      "Sypialnia Kinkiety",    33, false },
 //  { KID1_BEDROOM_ID,   "Pokoj Wojtek",          35, false },

@@ -22,7 +22,7 @@ void initializeRelayPins() {
 
         // inverse state if sensors/relay is Active Low
         bool bState = (relay.isLowLevelTrigger()) ? !currentState : currentState;
-        if (sensor.hasSignalPin) {
+        if (sensor.hasSignalPin()) {
             bState = (relay.isLowLevelTrigger()) ? HIGH : LOW;
         }
         digitalWrite(relay.getPin(), bState);
