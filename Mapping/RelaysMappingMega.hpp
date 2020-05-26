@@ -19,67 +19,28 @@ namespace Toggle {
     const uint8_t FLIP = 2;
 }
 
-// Pushbuttons declaration
-// Remember that names should be consistent with main loop in gateway.ino
-//Constructor
-//OneButton(int pin, int active = LOW, bool pullupActive = true);
+// Push buttons declaration
+// OneButton(int pin, int active = LOW, bool pullupActive = true);
 OneButton button2(2, true);
 OneButton button3(3, true);
 OneButton button4(4, true);
-//OneButton diningRoomSideRelay(5, true);
-//OneButton bedroomMainRelay(6, true);
-//OneButton bedroomSideRelay(0, true);
-//OneButton kid1MainRelay(0, true);
-//OneButton kid2MainRelay(0, true);
-//OneButton bathroom1Relay(0, true);
-//OneButton bathroom2Relay(0, true);
-//OneButton bathroom1FanButton(0, true);
-//OneButton bathroom2FanButton(0, true);
-//OneButton kitchen1Relay(0, true);
-//OneButton kitchen2Relay(0, true);
-//OneButton entranceRelay(0, true);
-//OneButton landingRelay(0, true);
-//OneButton corridorRelay(0, true);
-//OneButton hallRelay(0, true);
-//OneButton terrace1Relay(0, true);
-//OneButton terrace2Relay(0, true);
-//OneButton outsideRelay(0, true);
-//OneButton gardenRelay(0, true);
-//OneButton gateRelay(0, true);
-//OneButton attic1Relay(0, true);
-//OneButton attic2Relay(0, true);
 OneButton masterButton7(7, true);
 
 void readButtons() {
     button2.tick();
     button3.tick();
     button4.tick();
-//  diningRoomSideRelay.tick();
-//  bedroomMainRelay.tick();
-//  bedroomSideRelay.tick();
-//  kid1MainRelay.tick();
-//  kid2MainRelay.tick();
-//  bathroom1Relay.tick();
-//  bathroom2Relay.tick();
-//  bathroom1FanButton.tick();
-//  bathroom2FanButton.tick();
-//  kitchenMainRelay.tick();
-//  kitchenSideRelay.tick();
-//  entranceRelay.tick();
-//  landingRelay.tick();
-//  corridorRelay.tick();
-//  hallRelay.tick();
-//  terraceMainRelay.tick();
-//  terraceBackRelay.tick();
-//  outsideRelay.tick();
-//  gardenRelay.tick();
-//  gateRelay.tick();
-//  attic1Relay.tick();
-//  attic2Relay.tick();
     masterButton7.tick();
 }
 
-// Child ID declaration of relays
+// Relays declaration
+// Relay(uint8_t pin, bool lowLevelTrigger = false)
+Relay relay10(10, true);
+Relay relay11(11, false);
+Relay relay12(12, true);
+
+
+// Child ID declaration of RelaysStruct
 const uint8_t SALOON_1_ID = 11;
 const uint8_t SALOON_2_ID = 12;
 const uint8_t DINING_ROOM_1_ID = 13;
@@ -107,18 +68,20 @@ const uint8_t DINING_ROOM_2_ID = 14;
 //const uint8_t ATTIC_2_ID = 82;
 //const uint8_t MASTER = 83;
 
-//Relay(uint8_t pin, bool lowLevelTrigger = false)
-//Relay relay9(9, true);
-Relay relay10(10, true);
-//Relay relay11(11, false);
-Relay relay12(12, true);
-
 typedef struct {
     const uint8_t id;
     const char *description;
     const uint8_t signalPin; // pin to read the state of latch relay-button for sensor
     bool hasPin; // true if has latch relay-button assign to read the state from
     Relay relay;
+
+    uint8_t getId() {
+        return id;
+    }
+
+    char *getDescription() {
+        return description;
+    }
 
     uint8_t getPin() {
         return signalPin;
@@ -127,13 +90,13 @@ typedef struct {
     bool hasSignalPin() {
         return hasPin;
     }
-} SensorsStruct;
+} RelayStruct;
 
-SensorsStruct Sensors[] = {
+RelayStruct Relays[] = {
 //  Child ID               description   signalPin / hasSignalPin / relay
 //        {SALOON_1_ID,      "Salon Glowne",      -1, false, relay9}, // 23
         {SALOON_2_ID,      "Salon Kinkiety",     3, true, relay10}, // 25
-//        {DINING_ROOM_1_ID, "Jadalnia Glowne",   -1, false, relay11}, // 27
+        {DINING_ROOM_1_ID, "Jadalnia Glowne",    4, true, relay11}, // 27
         {DINING_ROOM_2_ID, "Jadalnia Kinkiety",  5, true, relay12}, // 29
 //  { BEDROOM_1_ID,      "Sypialnia Glowne",      13, false }, // 31
 //  { BEDROOM_2_ID,      "Sypialnia Kinkiety",    33, false },
@@ -158,23 +121,23 @@ SensorsStruct Sensors[] = {
 //  { ATTIC_2_ID,        "Strych 2",              0, false },
 //  { MASTER,            "Master",                0, false },
 };
-const uint8_t maxSensors = sizeof(Sensors) / sizeof(SensorsStruct);
-MyMessage msgs[maxSensors];
+const uint8_t maxRelays = sizeof(Relays) / sizeof(RelayStruct);
+MyMessage msgs[maxRelays];
 
 byte getIndex(uint8_t sensorId) {
-    for (uint8_t i = 0; i < maxSensors; i++) {
-        if (Sensors[i].id == sensorId) return (i);
+    for (uint8_t i = 0; i < maxRelays; i++) {
+        if (Relays[i].id == sensorId) return (i);
     }
     return (-1);
 }
 
-SensorsStruct getSensor(void *pSensorId) {
+RelayStruct getRelayStruct(void *pSensorId) {
     const uint8_t sensorId = static_cast<uint8_t>(reinterpret_cast<intptr_t>(pSensorId));
     uint8_t index = getIndex(sensorId);
-    return Sensors[index];
+    return Relays[index];
 }
 
 Relay getRelay(void *pSensorId) {
-    auto sensor = getSensor(pSensorId);
-    return sensor.relay;
+    auto relayStruct = getRelayStruct(pSensorId);
+    return relayStruct.relay;
 }

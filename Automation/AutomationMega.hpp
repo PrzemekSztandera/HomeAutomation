@@ -10,7 +10,7 @@
 
 #pragma once
 
-#include "../Mapping/MappingMega.hpp"
+#include "../Mapping/RelaysMappingMega.hpp"
 
 void myDelay(long interval) {
     unsigned long currentMillis = millis();
@@ -33,30 +33,24 @@ void pressRelay(int pin) {
 }
 
 ////----------------------------------------------------------------------------------------------------
-//uint8_t signalState;
-//uint8_t relayState;
-//
-//void setUpPinChecker() {
-//    signalState = 0;
-//    relayState = 0;
-//}
+
 
 void updateRelayStateAndSendMessage(const uint8_t &sensorId, bool pullUpActive = true) {
     // Debug
     Serial.print("Calling updateRelayStateAndSendMessage() for sensor: ");
-    Serial.println(sensorId);
+    Serial.print(sensorId);
     // End of Debug
 
-    auto sensor = getSensor(sensorId);
-    uint8_t index = getIndex(sensor.id);
+    auto relayStruct = getRelayStruct(sensorId);
+    uint8_t index = getIndex(relayStruct.getId());
     auto relay = getRelay(sensorId);
 
-    uint8_t signalState = digitalRead(sensor.getPin());
+    uint8_t signalState = digitalRead(relayStruct.getPin());
     uint8_t relayState = digitalRead(relay.getPin());
 
 //    if (uint8_t signalState != sensor.getPin()) {
 
-        if (sensor.hasSignalPin()) {
+        if (relayStruct.hasSignalPin()) {
             if (pullUpActive) {
                 saveState(sensorId, !signalState);
             } else {
@@ -64,7 +58,7 @@ void updateRelayStateAndSendMessage(const uint8_t &sensorId, bool pullUpActive =
             }
 //            signalState = digitalRead(sensor.getPin());
             Serial.print(" and pin: ");
-            Serial.println(sensor.getPin());
+            Serial.println(relayStruct.getPin());
         } else {
             if (relay.isLowLevelTrigger()) {
                 relayState = !relayState;
@@ -77,16 +71,16 @@ void updateRelayStateAndSendMessage(const uint8_t &sensorId, bool pullUpActive =
         }
         send(msgs[index].set(loadState(sensorId)));
 
-        // Debug
-        Serial.print("Sensor State after updateRelayStateAndSendMessage(): ");
-        if (loadState(sensorId) == 2) {
-            Serial.println("FLIP");
-        } else if (loadState(sensorId) == 1) {
-            Serial.println("ON");
-        } else if (loadState(sensorId) == 0) {
-            Serial.println("OFF");
-        }
-        // End of Debug
+//        // Debug
+//        Serial.print("Sensor State after updateRelayStateAndSendMessage(): ");
+//        if (loadState(sensorId) == 2) {
+//            Serial.println("FLIP");
+//        } else if (loadState(sensorId) == 1) {
+//            Serial.println("ON");
+//        } else if (loadState(sensorId) == 0) {
+//            Serial.println("OFF");
+//        }
+//        // End of Debug
 //    }
 
 }
@@ -95,29 +89,29 @@ void updateRelayStateAndSendMessage(const uint8_t &sensorId, bool pullUpActive =
 
 void switchRelay(const uint8_t &sensorId, const uint8_t &cmd = Toggle::FLIP) {
 
-    // Debug
-    Serial.print("Calling setOutput() for sensor: ");
-    Serial.print(sensorId);
-    Serial.print(" with toggle: ");
-    if (cmd == 2) {
-        Serial.print("FLIP");
-    } else if (cmd == 1) {
-        Serial.print("ON");
-    } else if (cmd == 0) {
-        Serial.print("OFF");
-    }
-    Serial.print("; Sensor State Before: ");
-    if (loadState(sensorId) == 2) {
-        Serial.println("FLIP");
-    } else if (loadState(sensorId) == 1) {
-        Serial.println("ON");
-    } else if (loadState(sensorId) == 0) {
-        Serial.println("OFF");
-    }
-    // End of Debug
+//    // Debug
+//    Serial.print("Calling setOutput() for sensor: ");
+//    Serial.print(sensorId);
+//    Serial.print(" with toggle: ");
+//    if (cmd == 2) {
+//        Serial.print("FLIP");
+//    } else if (cmd == 1) {
+//        Serial.print("ON");
+//    } else if (cmd == 0) {
+//        Serial.print("OFF");
+//    }
+//    Serial.print("; Sensor State Before: ");
+//    if (loadState(sensorId) == 2) {
+//        Serial.println("FLIP");
+//    } else if (loadState(sensorId) == 1) {
+//        Serial.println("ON");
+//    } else if (loadState(sensorId) == 0) {
+//        Serial.println("OFF");
+//    }
+//    // End of Debug
 
 
-    auto sensor = getSensor(sensorId);
+    auto relayStruct = getRelayStruct(sensorId);
     uint8_t index = getIndex(sensorId);
     auto relay = getRelay(sensorId);
 
@@ -125,76 +119,56 @@ void switchRelay(const uint8_t &sensorId, const uint8_t &cmd = Toggle::FLIP) {
     uint8_t state = (cmd == Toggle::FLIP) ? !loadState(sensorId) : cmd; // OFF -> ON
     saveState(sensorId, state);
 
-    if (cmd == Toggle::FLIP && sensor.hasSignalPin()) {
+    if (cmd == Toggle::FLIP && relayStruct.hasSignalPin()) {
         clickRelay(relay.getPin());
 
-        // Debug
-        Serial.print("Calling relayAsPushButton(); ");
-        Serial.print("Sensor State: ");
-        if (loadState(sensorId) == 2) {
-            Serial.println("FLIP");
-        } else if (loadState(sensorId) == 1) {
-            Serial.println("ON");
-        } else if (loadState(sensorId) == 0) {
-            Serial.println("OFF");
-        }
-        // End of Debug
+//        // Debug
+//        Serial.print("Calling relayAsPushButton(); ");
+//        Serial.print("Sensor State: ");
+//        if (loadState(sensorId) == 2) {
+//            Serial.println("FLIP");
+//        } else if (loadState(sensorId) == 1) {
+//            Serial.println("ON");
+//        } else if (loadState(sensorId) == 0) {
+//            Serial.println("OFF");
+//        }
+//        // End of Debug
 
-    } else if (cmd == Toggle::FLIP && !sensor.hasSignalPin()) {
+    } else if (cmd == Toggle::FLIP && !relayStruct.hasSignalPin()) {
         pressRelay(relay.getPin());
 
-        // Debug
-        Serial.print("Calling relayAsLatchButton(); ");
-        Serial.print("Sensor State: ");
-        if (loadState(sensorId) == 2) {
-            Serial.println("FLIP");
-        } else if (loadState(sensorId) == 1) {
-            Serial.println("ON");
-        } else if (loadState(sensorId) == 0) {
-            Serial.println("OFF");
-        }
-        // End of Debug
+//        // Debug
+//        Serial.print("Calling relayAsLatchButton(); ");
+//        Serial.print("Sensor State: ");
+//        if (loadState(sensorId) == 2) {
+//            Serial.println("FLIP");
+//        } else if (loadState(sensorId) == 1) {
+//            Serial.println("ON");
+//        } else if (loadState(sensorId) == 0) {
+//            Serial.println("OFF");
+//        }
+//        // End of Debug
     }
-//    updateRelayStateAndSendMessage(sensorId);
+
+    updateRelayStateAndSendMessage(sensorId);
 }
 
-
-void setOutputON(void *pSensorId) {
-    saveState(pSensorId, Toggle::ON);
-    auto sensor = getSensor(pSensorId);
-    // Debug
-    Serial.print("Setting state for OneButton.tick(): ");
-    Serial.print(sensor.description);
-    Serial.print(", ");
-    Serial.print("Sensor State after Button.tick(): ");
-    if (loadState(sensor.id) == 2) {
-        Serial.println("FLIP");
-    } else if (loadState(sensor.id) == 1) {
-        Serial.println("ON");
-    } else if (loadState(sensor.id) == 0) {
-        Serial.println("OFF");
-    }
-    // End of Debug
-//    updateRelayStateAndSendMessage(pSensorId);
-}
-
-void setOutputOFF(void *pSensorId) {
-    saveState(pSensorId, Toggle::OFF);
-    auto sensor = getSensor(pSensorId);
-    // Debug
-    Serial.print("Setting state for OneButton.tick(): ");
-    Serial.print(sensor.description);
-    Serial.print(", ");
-    Serial.print("Sensor State after Button.tick(): ");
-    if (loadState(sensor.id) == 2) {
-        Serial.println("FLIP");
-    } else if (loadState(sensor.id) == 1) {
-        Serial.println("ON");
-    } else if (loadState(sensor.id) == 0) {
-        Serial.println("OFF");
-    }
-    // End of Debug
-//    updateRelayStateAndSendMessage(pSensorId);
+void readAndUpdateState(void *pSensorId) {
+    updateRelayStateAndSendMessage(pSensorId);
+//    // Debug
+//    auto sensor = getSensor(pSensorId);
+//    Serial.print("Setting state for OneButton.tick(): ");
+//    Serial.print(sensor.description);
+//    Serial.print(", ");
+//    Serial.print("Sensor State after Button.tick(): ");
+//    if (loadState(sensor.id) == 2) {
+//        Serial.println("FLIP");
+//    } else if (loadState(sensor.id) == 1) {
+//        Serial.println("ON");
+//    } else if (loadState(sensor.id) == 0) {
+//        Serial.println("OFF");
+//    }
+//    // End of Debug
 }
 
 void flipOutput(void *pSensorId) {
@@ -207,10 +181,6 @@ void masterClickButton() {
     flipOutput(DINING_ROOM_1_ID);
 }
 
-void updateState(void *pSensorId) {
-    updateRelayStateAndSendMessage(pSensorId);
-}
-
 // Setup the buttons and relays. Do not assign LongPress and Click to the same sensor
 void setupClickButtons() {
 
@@ -221,8 +191,8 @@ void setupClickButtons() {
 
 void setupPressButtons() {
 
-    button3.attachLongPressStart(updateState, SALOON_2_ID);
-    button3.attachLongPressStop(updateState, SALOON_2_ID);
+    button3.attachLongPressStart(readAndUpdateState, SALOON_2_ID);
+    button3.attachLongPressStop(readAndUpdateState, SALOON_2_ID);
 }
 
 

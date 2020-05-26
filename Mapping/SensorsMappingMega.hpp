@@ -1,0 +1,74 @@
+//
+// Created by Przemyslaw Sztandera on 26/05/2020.
+//
+
+#pragma once
+
+#include <BME280I2C.h>
+#include <Wire.h>
+#include <DallasTemperature.h>
+#include <OneWire.h>
+
+// Bosh sensor BME280
+BME280I2C bme;
+
+// Dallas temp sensor DS18B20
+#define ONE_WIRE_BUS 7
+OneWire oneWire(ONE_WIRE_BUS);
+DallasTemperature sensors(&oneWire);
+// Address of 1 DS18B20s
+uint8_t sensor1[8] = {0x28, 0xC8, 0xF3, 0x79, 0xA2, 0x00, 0x03, 0xA8};
+
+
+// Child ID declaration of RelaysStruct
+const uint8_t SALOON_TEMP = 101;
+const uint8_t SALOON_BARO = 102;
+const uint8_t SALOON_HUM = 103;
+const uint8_t SALOON_DALLAS_TEMP = 104;
+
+typedef struct {
+    const uint8_t id;
+    const char *description;
+    const uint8_t variableType;
+    const uint8_t presentationType;
+
+    uint8_t getId() {
+        return id;
+    }
+
+    char *getDescription() {
+        return description;
+    }
+
+    uint8_t getVariableType() {
+        return variableType;
+    }
+
+    uint8_t getPresentationType() {
+        return presentationType;
+    }
+} SensorStruct;
+
+SensorStruct Sensors[] = {
+        {SALOON_TEMP, "Salon Temperatura", V_TEMP, S_TEMP},
+        {SALOON_BARO, "Salon Cisnienie", V_PRESSURE, S_BARO},
+        {SALOON_HUM, "Salon Wilgotnosc", V_HUM, S_HUM},
+        {SALOON_DALLAS_TEMP, "Salon Temperatura", V_TEMP, S_TEMP},
+};
+
+const uint8_t maxSensors = sizeof(Sensors) / sizeof(SensorStruct);
+MyMessage sensorMsgs[maxSensors];
+
+byte getSensorIndex(uint8_t sensorId) {
+    for (uint8_t i = 0; i < maxSensors; i++) {
+        if (Sensors[i].id == sensorId) return (i);
+    }
+    return (-1);
+}
+
+SensorStruct getSensorStruct(void *pSensorId) {
+    const uint8_t sensorId = static_cast<uint8_t>(reinterpret_cast<intptr_t>(pSensorId));
+    uint8_t index = getSensorIndex(sensorId);
+    return Sensors[index];
+}
+
