@@ -10,14 +10,14 @@
 
 #pragma once
 
-#include "../Mapping/RelaysMappingMega.hpp"
+#include "../Initialization/InitializationMega.hpp"
 
 void myDelay(long interval) {
     unsigned long currentMillis = millis();
     while (millis() - currentMillis < interval) {}
 }
 
-// relay acts as a click button
+// Relay acts as a click button
 void clickRelay(int pin) {
     uint8_t state = digitalRead(pin);
     unsigned long currentMillis = millis();
@@ -26,7 +26,7 @@ void clickRelay(int pin) {
     digitalWrite(pin, state);
 }
 
-// relay acts as a press button
+// Relay acts as a press button
 void pressRelay(int pin) {
     uint8_t pinState = digitalRead(pin);
     digitalWrite(pin, !pinState);
@@ -35,41 +35,38 @@ void pressRelay(int pin) {
 ////----------------------------------------------------------------------------------------------------
 
 
-void updateRelayStateAndSendMessage(const uint8_t &sensorId, bool pullUpActive = true) {
+void updateRelayStateAndSendMessage(const uint8_t sensorId, bool pullUpActive = true) {
     // Debug
     Serial.print("Calling updateRelayStateAndSendMessage() for sensor: ");
     Serial.print(sensorId);
     // End of Debug
 
     auto relayStruct = getRelayStruct(sensorId);
-    uint8_t index = getIndex(relayStruct.getId());
     auto relay = getRelay(sensorId);
 
     uint8_t signalState = digitalRead(relayStruct.getPin());
     uint8_t relayState = digitalRead(relay.getPin());
 
-//    if (uint8_t signalState != sensor.getPin()) {
 
-        if (relayStruct.hasSignalPin()) {
-            if (pullUpActive) {
-                saveState(sensorId, !signalState);
-            } else {
-                saveState(sensorId, signalState);
-            }
-//            signalState = digitalRead(sensor.getPin());
-            Serial.print(" and pin: ");
-            Serial.println(relayStruct.getPin());
+    if (relayStruct.hasSignalPin()) {
+        if (pullUpActive) {
+            saveState(sensorId, !signalState);
         } else {
-            if (relay.isLowLevelTrigger()) {
-                relayState = !relayState;
-            }
-            saveState(sensorId, relayState);
-//            relayState = digitalRead(relay.getPin());
-
-            Serial.print(" and pin: ");
-            Serial.println(relay.getPin());
+            saveState(sensorId, signalState);
         }
-        send(msgs[index].set(loadState(sensorId)));
+        Serial.print(" and pin: ");
+        Serial.println(relayStruct.getPin());
+    } else {
+        if (relay.isLowLevelTrigger()) {
+            relayState = !relayState;
+        }
+        saveState(sensorId, relayState);
+
+        Serial.print(" and pin: ");
+        Serial.println(relay.getPin());
+    }
+    uint8_t index = getIndex(relayStruct.getId());
+    send(msgs[index].set(loadState(sensorId)));
 
 //        // Debug
 //        Serial.print("Sensor State after updateRelayStateAndSendMessage(): ");
@@ -85,9 +82,50 @@ void updateRelayStateAndSendMessage(const uint8_t &sensorId, bool pullUpActive =
 
 }
 
-//----------------------------------------------------------------------------------------------------
+void checkButtonsState() {
+    if(millis() - currentMillis2 > 2000) {
+        for (uint8_t i = 0; i < maxRelays; i++) {
+            auto relayStruct = Relays[i];
+            updateRelayStateAndSendMessage(relayStruct.getId());
+        }
+        currentMillis2 = millis();
+        return;
+    }
+}
 
-void switchRelay(const uint8_t &sensorId, const uint8_t &cmd = Toggle::FLIP) {
+////----------------------------------------------------------------------------------------------------
+
+void readButtons() {
+    button2.tick();
+    button3.tick();
+    button4.tick();
+    masterButton7.tick();
+}
+
+void readSensors() {
+    if (millis() - currentMillis > 10000) {
+// Bosh sensor BME280
+        float temp(NAN), hum(NAN), pres(NAN);
+        BME280::TempUnit tempUnit(BME280::TempUnit_Celsius);
+        BME280::PresUnit presUnit(BME280::PresUnit_Pa);
+        bme.read(pres, temp, hum, tempUnit, presUnit);
+        send(sensorMsgs[0].set(temp, 1));
+        send(sensorMsgs[1].set(pres, 0));
+        send(sensorMsgs[2].set(hum, 1));
+
+// Dallas temp sensor DS18B20
+        sensors.requestTemperatures();
+        send(sensorMsgs[3].set(sensors.getTempC(sensor1), 1));
+
+        Serial.println("Server update");
+        currentMillis = millis();
+        return;
+    }
+}
+
+////----------------------------------------------------------------------------------------------------
+
+void switchRelay(const uint8_t sensorId, const uint8_t &cmd = Toggle::FLIP) {
 
 //    // Debug
 //    Serial.print("Calling setOutput() for sensor: ");
@@ -153,8 +191,8 @@ void switchRelay(const uint8_t &sensorId, const uint8_t &cmd = Toggle::FLIP) {
     updateRelayStateAndSendMessage(sensorId);
 }
 
-void readAndUpdateState(void *pSensorId) {
-    updateRelayStateAndSendMessage(pSensorId);
+void readAndUpdateState(uint8_t sensorId) {
+    updateRelayStateAndSendMessage(sensorId);
 //    // Debug
 //    auto sensor = getSensor(pSensorId);
 //    Serial.print("Setting state for OneButton.tick(): ");
@@ -171,8 +209,8 @@ void readAndUpdateState(void *pSensorId) {
 //    // End of Debug
 }
 
-void flipOutput(void *pSensorId) {
-    switchRelay(pSensorId);
+void flipOutput(uint8_t sensorId) {
+    switchRelay(sensorId);
 }
 
 void masterClickButton() {

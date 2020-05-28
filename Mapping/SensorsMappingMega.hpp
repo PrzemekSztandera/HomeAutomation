@@ -1,6 +1,6 @@
-//
-// Created by Przemyslaw Sztandera on 26/05/2020.
-//
+/**
+ * Created by Przemyslaw Sztandera on 21/05/2020.
+ */
 
 #pragma once
 
@@ -28,9 +28,9 @@ const uint8_t SALOON_DALLAS_TEMP = 104;
 
 typedef struct {
     const uint8_t id;
-    const char *description;
-    const uint8_t variableType;
-    const uint8_t presentationType;
+    char *description;
+    const mysensors_data_t variableType;
+    const mysensors_sensor_t presentationType;
 
     uint8_t getId() {
         return id;
@@ -40,20 +40,20 @@ typedef struct {
         return description;
     }
 
-    uint8_t getVariableType() {
+    mysensors_data_t getVariableType() {
         return variableType;
     }
 
-    uint8_t getPresentationType() {
+    mysensors_sensor_t getPresentationType() {
         return presentationType;
     }
 } SensorStruct;
 
 SensorStruct Sensors[] = {
-        {SALOON_TEMP, "Salon Temperatura", V_TEMP, S_TEMP},
-        {SALOON_BARO, "Salon Cisnienie", V_PRESSURE, S_BARO},
-        {SALOON_HUM, "Salon Wilgotnosc", V_HUM, S_HUM},
-        {SALOON_DALLAS_TEMP, "Salon Temperatura", V_TEMP, S_TEMP},
+        {SALOON_TEMP,        "Salon Temperatura", V_TEMP,     S_TEMP},
+        {SALOON_BARO,        "Salon Cisnienie",   V_PRESSURE, S_BARO},
+        {SALOON_HUM,         "Salon Wilgotnosc",  V_HUM,      S_HUM},
+        {SALOON_DALLAS_TEMP, "Salon Temperatura", V_TEMP,     S_TEMP},
 };
 
 const uint8_t maxSensors = sizeof(Sensors) / sizeof(SensorStruct);
@@ -66,8 +66,7 @@ byte getSensorIndex(uint8_t sensorId) {
     return (-1);
 }
 
-SensorStruct getSensorStruct(void *pSensorId) {
-    const uint8_t sensorId = static_cast<uint8_t>(reinterpret_cast<intptr_t>(pSensorId));
+SensorStruct getSensorStruct(uint8_t sensorId) {
     uint8_t index = getSensorIndex(sensorId);
     return Sensors[index];
 }

@@ -26,12 +26,7 @@ OneButton button3(3, true);
 OneButton button4(4, true);
 OneButton masterButton7(7, true);
 
-void readButtons() {
-    button2.tick();
-    button3.tick();
-    button4.tick();
-    masterButton7.tick();
-}
+
 
 // Relays declaration
 // Relay(uint8_t pin, bool lowLevelTrigger = false)
@@ -70,7 +65,7 @@ const uint8_t DINING_ROOM_2_ID = 14;
 
 typedef struct {
     const uint8_t id;
-    const char *description;
+    char *description;
     const uint8_t signalPin; // pin to read the state of latch relay-button for sensor
     bool hasPin; // true if has latch relay-button assign to read the state from
     Relay relay;
@@ -124,6 +119,8 @@ RelayStruct Relays[] = {
 const uint8_t maxRelays = sizeof(Relays) / sizeof(RelayStruct);
 MyMessage msgs[maxRelays];
 
+//    const uint8_t sensorId = static_cast<uint8_t>(reinterpret_cast<intptr_t>(pSensorId));
+
 byte getIndex(uint8_t sensorId) {
     for (uint8_t i = 0; i < maxRelays; i++) {
         if (Relays[i].id == sensorId) return (i);
@@ -131,13 +128,12 @@ byte getIndex(uint8_t sensorId) {
     return (-1);
 }
 
-RelayStruct getRelayStruct(void *pSensorId) {
-    const uint8_t sensorId = static_cast<uint8_t>(reinterpret_cast<intptr_t>(pSensorId));
+RelayStruct getRelayStruct(uint8_t sensorId) {
     uint8_t index = getIndex(sensorId);
     return Relays[index];
 }
 
-Relay getRelay(void *pSensorId) {
-    auto relayStruct = getRelayStruct(pSensorId);
+Relay getRelay(uint8_t sensorId) {
+    auto relayStruct = getRelayStruct(sensorId);
     return relayStruct.relay;
 }
