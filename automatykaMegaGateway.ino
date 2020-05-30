@@ -33,7 +33,6 @@ void setup() {
 }
 
 void presentation() {
-
     // Send the sketch version information to the gateway and Controller
     sendSketchInfo("Gateway", "1.5");
     sendPresentation();
@@ -41,19 +40,15 @@ void presentation() {
 
 
 void loop() {
-
     readButtons();
     checkButtonsState();
     readSensors();
-
 }
 
 void receive(const MyMessage &message) {
     Serial.println("Calling receive()");
-    
     if (message.type == V_STATUS) {
         switchRelay(message.getSensor());
     }
-
     Serial.println("Receive() called");
 }

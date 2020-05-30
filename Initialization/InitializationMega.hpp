@@ -39,10 +39,13 @@ void initializeSensors() {
 
     // Bosh sensor BME280
     Wire.begin();
-    while (!bme.begin()) {
+    if(!bme.begin()) {
         Serial.println("Could not find BME280 sensor!");
-        wait(1000);
     }
+//    while (!bme.begin()) {
+//        Serial.println("Could not find BME280 sensor!");
+//        wait(1000);
+//    }
 
     // bme.chipID(); // Deprecated. See chipModel().
     switch (bme.chipModel()) {
