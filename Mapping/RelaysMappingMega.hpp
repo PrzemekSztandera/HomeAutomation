@@ -66,7 +66,7 @@ const uint8_t DINING_ROOM_2_ID = 14;
 typedef struct {
     const uint8_t id;
     char *description;
-    const uint8_t signalPin; // pin to read the state of latch relay-button for sensor
+    const uint8_t signalPin; // pin to read the state of latch relay-button for relayStruct
     bool hasPin; // true if has latch relay-button assign to read the state from
     Relay relay;
 
@@ -82,6 +82,7 @@ typedef struct {
         return signalPin;
     }
 
+    // State of the relayStruct(sensor) is based on the state of signal pin
     bool hasSignalPin() {
         return hasPin;
     }

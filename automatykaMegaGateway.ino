@@ -26,9 +26,9 @@ void setup() {
     Serial.begin(115200);
     initializeRelays();
     initializeSensors();
+    initializeTimers();
     setupClickButtons();
     setupPressButtons();
-    initializeTimers();
     Serial.println("Setup() called");
 }
 

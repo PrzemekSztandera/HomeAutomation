@@ -21,8 +21,10 @@ void initializeRelays() {
             saveState(relayStruct.getId(), currentState);
         }
 
-        // Inverse state if sensors/relay is Active Low
+        // Inverse state if relay is Active Low and relayStruct uses relay as "press button" - bi stable relay
         bool bState = (relay.isLowLevelTrigger()) ? !currentState : currentState;
+
+        // Assign state if relayStruct uses relay as "click button" - mono stable relay
         if (relayStruct.hasSignalPin()) {
             bState = (relay.isLowLevelTrigger()) ? HIGH : LOW;
         }
