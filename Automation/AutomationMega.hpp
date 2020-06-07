@@ -37,8 +37,8 @@ void pressRelay(int pin) {
 
 void updateRelayStateAndSendMessage(const uint8_t sensorId, bool pullUpActive = true) {
     // Debug
-    Serial.print("Calling updateRelayStateAndSendMessage() for sensor: ");
-    Serial.print(sensorId);
+//    Serial.print("Calling updateRelayStateAndSendMessage() for sensor: ");
+//    Serial.print(sensorId);
     // End of Debug
 
     auto relayStruct = getRelayStruct(sensorId);
@@ -54,16 +54,16 @@ void updateRelayStateAndSendMessage(const uint8_t sensorId, bool pullUpActive = 
         } else {
             saveState(sensorId, signalState);
         }
-        Serial.print(" and pin: ");
-        Serial.println(relayStruct.getPin());
+//        Serial.print(" and pin: ");
+//        Serial.println(relayStruct.getPin());
     } else {
         if (relay.isLowLevelTrigger()) {
             relayState = !relayState;
         }
         saveState(sensorId, relayState);
 
-        Serial.print(" and pin: ");
-        Serial.println(relay.getPin());
+//        Serial.print(" and pin: ");
+//        Serial.println(relay.getPin());
     }
 
     uint8_t index = getIndex(relayStruct.getId());
@@ -93,19 +93,24 @@ void readButtons() {
 void readSensors() {
     if (millis() - currentMillis > 10000) {
 // Bosh sensor BME280
-        float temp(NAN), hum(NAN), pres(NAN);
-        BME280::TempUnit tempUnit(BME280::TempUnit_Celsius);
-        BME280::PresUnit presUnit(BME280::PresUnit_Pa);
-        bme.read(pres, temp, hum, tempUnit, presUnit);
-        send(sensorMsgs[0].set(temp, 1));
-        send(sensorMsgs[1].set(pres, 0));
-        send(sensorMsgs[2].set(hum, 1));
+//        float temp(NAN), hum(NAN), pres(NAN);
+//        BME280::TempUnit tempUnit(BME280::TempUnit_Celsius);
+//        BME280::PresUnit presUnit(BME280::PresUnit_Pa);
+//        bme.read(pres, temp, hum, tempUnit, presUnit);
+//        send(sensorMsgs[0].set(temp, 1));
+//        send(sensorMsgs[1].set(pres, 0));
+//        send(sensorMsgs[2].set(hum, 1));
 
 // Dallas temp sensor DS18B20
         sensors.requestTemperatures();
-        send(sensorMsgs[3].set(sensors.getTempC(sensor1), 1));
+        for (uint8_t i = 0; i < maxSensors; i++) {
+            auto sensorStruct = Sensors[i];
+            if(sensorStruct.getId() == SALOON_DALLAS_TEMP) {
+                send(sensorMsgs[i].set(sensors.getTempC(sensor1), 1));
+            }
+        }
 
-        Serial.println("Server update");
+//        Serial.println("Server update");
         currentMillis = millis();
         return;
     }

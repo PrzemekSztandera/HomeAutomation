@@ -21,9 +21,9 @@ uint8_t sensor1[8] = {0x28, 0xC8, 0xF3, 0x79, 0xA2, 0x00, 0x03, 0xA8};
 
 
 // Child ID declaration of RelaysStruct
-const uint8_t SALOON_TEMP = 101;
-const uint8_t SALOON_BARO = 102;
-const uint8_t SALOON_HUM = 103;
+//const uint8_t SALOON_TEMP = 101;
+//const uint8_t SALOON_BARO = 102;
+//const uint8_t SALOON_HUM = 103;
 const uint8_t SALOON_DALLAS_TEMP = 104;
 
 typedef struct {
@@ -50,9 +50,9 @@ typedef struct {
 } SensorStruct;
 
 SensorStruct Sensors[] = {
-        {SALOON_TEMP,        "Salon Temperatura", V_TEMP,     S_TEMP},
-        {SALOON_BARO,        "Salon Cisnienie",   V_PRESSURE, S_BARO},
-        {SALOON_HUM,         "Salon Wilgotnosc",  V_HUM,      S_HUM},
+//        {SALOON_TEMP,        "Salon Temperatura", V_TEMP,     S_TEMP},
+//        {SALOON_BARO,        "Salon Cisnienie",   V_PRESSURE, S_BARO},
+//        {SALOON_HUM,         "Salon Wilgotnosc",  V_HUM,      S_HUM},
         {SALOON_DALLAS_TEMP, "Salon Temperatura", V_TEMP,     S_TEMP},
 };
 
