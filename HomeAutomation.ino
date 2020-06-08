@@ -24,6 +24,7 @@
 
 void setup() {
     Serial.begin(115200);
+    initializeMCP23017();
     initializeRelays();
     initializeSensors();
     initializeTimers();

@@ -11,7 +11,12 @@ void initializeRelays() {
     for (uint8_t i = 0; i < maxRelays; i++) {
         auto relayStruct = Relays[i];
         auto relay = getRelay(relayStruct.getId());
-        pinMode(relay.getPin(), OUTPUT);
+        if(relay.isMcpPin()) {
+            mcp.pinMode(relay.getPin(), OUTPUT);
+        } else {
+            pinMode(relay.getPin(), OUTPUT);
+        }
+
         msgs[i] = MyMessage(relayStruct.getId(), V_STATUS);
         uint8_t currentState = loadState(relayStruct.getId());
 
@@ -28,7 +33,12 @@ void initializeRelays() {
         if (relayStruct.hasSignalPin()) {
             bState = (relay.isLowLevelTrigger()) ? HIGH : LOW;
         }
-        digitalWrite(relay.getPin(), bState);
+        if(relay.isMcpPin()) {
+            mcp.digitalWrite(relay.getPin(), bState);
+        } else {
+            digitalWrite(relay.getPin(), bState);
+        }
+
     }
     Serial.println("Relays initialized");
 }
@@ -41,7 +51,7 @@ void initializeSensors() {
 
     // Bosh sensor BME280
     Wire.begin();
-    if(!bme.begin()) {
+    if (!bme.begin()) {
         Serial.println("Could not find BME280 sensor!");
     }
 //    while (!bme.begin()) {
@@ -66,12 +76,23 @@ void initializeSensors() {
     Serial.println("Sensors initialized");
 }
 
+//void initializeMcpPins() {
+//    for (uint8_t i = 0; i <= 15; i++) {
+//        mcp.pinMode(i, OUTPUT); // ustaw pin jako wyjście
+//        mcp.digitalWrite(i, HIGH); // ustaw pin na stan wysoki
+//    }
+//}
+
 unsigned long currentMillis = 0;
 unsigned long currentMillis2 = 0;
 
 void initializeTimers() {
     currentMillis = millis();
     currentMillis2 = millis();
+}
+
+void initializeMCP23017() {
+    mcp.begin();
 }
 
 void sendPresentation() {

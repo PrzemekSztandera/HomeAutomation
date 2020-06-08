@@ -17,19 +17,49 @@ void myDelay(long interval) {
     while (millis() - currentMillis < interval) {}
 }
 
+uint8_t readRelayPin(Relay relay) {
+    uint8_t relayState = 2;
+    if(relay.isMcpPin()) {
+        relayState = mcp.digitalRead(relay.getPin());
+    } else {
+        relayState = digitalRead(relay.getPin());
+    }
+    return relayState;
+}
+
+uint8_t readSignalPin(RelayStruct relayStruct) {
+    uint8_t signalState = 2;
+    if(relayStruct.isMcpPin()) {
+        signalState = mcp.digitalRead(relayStruct.getPin());
+    } else {
+        signalState = digitalRead(relayStruct.getPin());
+    }
+    return signalState;
+}
+
 // Relay acts as a click button
-void clickRelay(int pin) {
-    uint8_t state = digitalRead(pin);
+void clickRelay(Relay relay) {
+    uint8_t state = readRelayPin(relay);
     unsigned long currentMillis = millis();
-    digitalWrite(pin, !state);
-    myDelay(125);
-    digitalWrite(pin, state);
+    if(relay.isMcpPin()) {
+        mcp.digitalWrite(relay.getPin(), !state);
+        myDelay(125);
+        mcp.digitalWrite(relay.getPin(), state);
+    } else {
+        digitalWrite(relay.getPin(), !state);
+        myDelay(125);
+        digitalWrite(relay.getPin(), state);
+    }
 }
 
 // Relay acts as a press button
-void pressRelay(int pin) {
-    uint8_t pinState = digitalRead(pin);
-    digitalWrite(pin, !pinState);
+void pressRelay(Relay relay) {
+    uint8_t state = readRelayPin(relay);
+    if(relay.isMcpPin()) {
+        mcp.digitalWrite(relay.getPin(), !state);
+    } else {
+        digitalWrite(relay.getPin(), !state);
+    }
 }
 
 ////----------------------------------------------------------------------------------------------------
@@ -44,8 +74,8 @@ void updateRelayStateAndSendMessage(const uint8_t sensorId, bool pullUpActive = 
     auto relayStruct = getRelayStruct(sensorId);
     auto relay = getRelay(sensorId);
 
-    uint8_t signalState = digitalRead(relayStruct.getPin());
-    uint8_t relayState = digitalRead(relay.getPin());
+    uint8_t signalState = readSignalPin(relayStruct);
+    uint8_t relayState = readRelayPin(relay);
 
 
     if (relayStruct.hasSignalPin()) {
@@ -128,9 +158,9 @@ void switchRelay(const uint8_t sensorId, const uint8_t &cmd = Toggle::FLIP) {
     saveState(sensorId, state);
 
     if (cmd == Toggle::FLIP && relayStruct.hasSignalPin()) {
-        clickRelay(relay.getPin());
+        clickRelay(relay);
     } else if (cmd == Toggle::FLIP && !relayStruct.hasSignalPin()) {
-        pressRelay(relay.getPin());
+        pressRelay(relay);
     }
 
     updateRelayStateAndSendMessage(sensorId);

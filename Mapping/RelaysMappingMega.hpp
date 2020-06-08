@@ -11,6 +11,7 @@
 #pragma once
 
 #include <OneButton.h>
+#include <Adafruit_MCP23017.h>
 #include "../Relay/Relay.hpp"
 
 namespace Toggle {
@@ -18,6 +19,8 @@ namespace Toggle {
     const uint8_t ON = 1;
     const uint8_t FLIP = 2;
 }
+
+Adafruit_MCP23017 mcp;
 
 // Push buttons declaration
 // OneButton(int pin, int active = LOW, bool pullupActive = true);
@@ -27,12 +30,12 @@ OneButton button4(4, true);
 OneButton masterButton7(7, true);
 
 
-
 // Relays declaration
-// Relay(uint8_t pin, bool lowLevelTrigger = false)
+// Relay(uint8_t pin, bool lowLevelTrigger = false, mcpPin = false)
 Relay relay10(10, true);
-Relay relay11(11, false);
+Relay relay11(11);
 Relay relay12(12, true);
+Relay relay0(0, true, true); // MCP A0
 
 
 // Child ID declaration of RelaysStruct
@@ -40,7 +43,7 @@ const uint8_t SALOON_1_ID = 11;
 const uint8_t SALOON_2_ID = 12;
 const uint8_t DINING_ROOM_1_ID = 13;
 const uint8_t DINING_ROOM_2_ID = 14;
-//const uint8_t BEDROOM_1_ID = 21;
+const uint8_t BEDROOM_1_ID = 21;
 //const uint8_t BEDROOM_2_ID = 22;
 //const uint8_t KID1_BEDROOM_ID = 23;
 //const uint8_t KID2_BEDROOM_ID = 24;
@@ -68,6 +71,7 @@ typedef struct {
     char *description;
     const uint8_t signalPin; // pin to read the state of latch relay-button for relayStruct
     bool hasPin; // true if has latch relay-button assign to read the state from
+    bool mcpPin;
     Relay relay;
 
     uint8_t getId() {
@@ -86,15 +90,19 @@ typedef struct {
     bool hasSignalPin() {
         return hasPin;
     }
+
+    bool isMcpPin() {
+        return mcpPin;
+    }
 } RelayStruct;
 
 RelayStruct Relays[] = {
-//  Child ID               description   signalPin / hasSignalPin / relay
+//  Child ID               description   signalPin / hasSignalPin / isMcpPin / relay
 //        {SALOON_1_ID,      "Salon Glowne",      -1, false, relay9}, // 23
-        {SALOON_2_ID,      "Salon Kinkiety",     3, true, relay10}, // 25
-        {DINING_ROOM_1_ID, "Jadalnia Glowne",    4, true, relay11}, // 27
-        {DINING_ROOM_2_ID, "Jadalnia Kinkiety",  5, true, relay12}, // 29
-//  { BEDROOM_1_ID,      "Sypialnia Glowne",      13, false }, // 31
+        {SALOON_2_ID,      "Salon Kinkiety",    3,  true, false, relay10}, // 25
+        {DINING_ROOM_1_ID, "Jadalnia Glowne",   4,  true, false, relay11}, // 27
+        {DINING_ROOM_2_ID, "Jadalnia Kinkiety", 5,  true, false, relay12}, // 29
+        {BEDROOM_1_ID,     "Sypialnia Glowne",  -1, false, false, relay0}, // 31
 //  { BEDROOM_2_ID,      "Sypialnia Kinkiety",    33, false },
 //  { KID1_BEDROOM_ID,   "Pokoj Wojtek",          35, false },
 //  { KID2_BEDROOM_ID,   "Pokoj Marcel",          37, false },
