@@ -4,10 +4,10 @@
 
 #pragma once
 
-#include <BME280I2C.h>
 #include <Wire.h>
-#include <DallasTemperature.h>
 #include <OneWire.h>
+#include <BME280I2C.h>
+#include <DallasTemperature.h>
 
 // Bosh sensor BME280
 BME280I2C bme;
