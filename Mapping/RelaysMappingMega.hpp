@@ -15,18 +15,13 @@
 #include <Adafruit_MCP23017.h>
 #include "../Relay/Relay.hpp"
 
-namespace Toggle {
-    const uint8_t OFF = 0;
-    const uint8_t ON = 1;
-    const uint8_t FLIP = 2;
-}
 
 // MCP23017 expander declaration
 uint8_t expanderAddresses[] = {0,1,2,3,4,5,6,7};
 const int numberOfExpanders = sizeof(expanderAddresses);
 Adafruit_MCP23017 expander[numberOfExpanders];
 
-// Push buttons declaration
+// Push buttons declaration; add new button to readButtons()
 // OneButton(int pin, int active = LOW, bool pullUpActive = true);
 OneButton button2(2);
 OneButton button3(3);

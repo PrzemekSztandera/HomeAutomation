@@ -148,21 +148,19 @@ void readSensors() {
 
 ////----------------------------------------------------------------------------------------------------
 
-void switchRelay(const uint8_t sensorId, const uint8_t &cmd = Toggle::FLIP) {
+void switchRelay(const uint8_t sensorId) {
 
     auto relayStruct = getRelayStruct(sensorId);
     auto relay = getRelay(sensorId);
 
-    // check whether flip state of sensor
-    uint8_t state = (cmd == Toggle::FLIP) ? !loadState(sensorId) : cmd;
+    uint8_t state = !loadState(sensorId);
     saveState(sensorId, state);
 
-    if (cmd == Toggle::FLIP && relayStruct.hasSignalPin()) {
+    if (relayStruct.hasSignalPin()) {
         clickRelay(relay);
-    } else if (cmd == Toggle::FLIP && !relayStruct.hasSignalPin()) {
+    } else {
         pressRelay(relay);
     }
-
     updateRelayStateAndSendMessage(sensorId);
 }
 
@@ -170,21 +168,17 @@ void readAndUpdateState(uint8_t sensorId) {
     updateRelayStateAndSendMessage(sensorId);
 }
 
-void flipOutput(uint8_t sensorId) {
-    switchRelay(sensorId);
-}
-
 void masterClickButton() {
-    flipOutput(SALOON_1_ID);
-    flipOutput(SALOON_2_ID);
-    flipOutput(DINING_ROOM_1_ID);
+    switchRelay(SALOON_1_ID);
+    switchRelay(SALOON_2_ID);
+    switchRelay(DINING_ROOM_1_ID);
 }
 
 // Setup the buttons and relays. Do not assign LongPress and Click to the same sensor
 void setupClickButtons() {
 
-    button2.attachClick(flipOutput, SALOON_1_ID);
-    button4.attachClick(flipOutput, DINING_ROOM_1_ID);
+    button2.attachClick(switchRelay, SALOON_1_ID);
+    button4.attachClick(switchRelay, DINING_ROOM_1_ID);
     masterButton7.attachClick(masterClickButton);
 }
 
