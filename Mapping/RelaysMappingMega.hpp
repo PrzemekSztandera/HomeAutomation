@@ -28,10 +28,10 @@ Adafruit_MCP23017 expander[numberOfExpanders];
 
 // Push buttons declaration
 // OneButton(int pin, int active = LOW, bool pullupActive = true);
-OneButton button2(2, true);
-OneButton button3(3, true);
-OneButton button4(4, true);
-OneButton masterButton7(7, true);
+OneButton button2(2);
+OneButton button3(3);
+OneButton button4(4);
+OneButton masterButton7(7);
 
 
 // Relays declaration
@@ -39,7 +39,8 @@ OneButton masterButton7(7, true);
 Relay relay10(10, true);
 Relay relay11(11);
 Relay relay12(12, true);
-Relay relay0(0, true, 0); // MCP A0
+// On MCP23017 relays
+Relay relay0(0, true, 0);
 
 
 // Child ID declaration of RelaysStruct
@@ -76,7 +77,7 @@ typedef struct {
     const uint8_t signalPin; // pin to read the state of latch relay-button for relayStruct
     bool hasPin; // true if has latch relay-button assign to read the state from
     Relay relay;
-    uint8_t expanderAddress;
+    const uint8_t expanderAddress;
 
     uint8_t getId() {
         return id;
@@ -145,7 +146,7 @@ MyMessage msgs[maxRelays];
 
 byte getIndex(uint8_t sensorId) {
     for (uint8_t i = 0; i < maxRelays; i++) {
-        if (Relays[i].id == sensorId) return (i);
+        if (Relays[i].getId() == sensorId) return (i);
     }
     return (-1);
 }

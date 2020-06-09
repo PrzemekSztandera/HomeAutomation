@@ -76,12 +76,14 @@ void initializeSensors() {
     Serial.println("Sensors initialized");
 }
 
-//void initializeMcpPins() {
-//    for (uint8_t i = 0; i <= 15; i++) {
-//        mcp.pinMode(i, OUTPUT); // ustaw pin jako wyjście
-//        mcp.digitalWrite(i, HIGH); // ustaw pin na stan wysoki
-//    }
-//}
+void initializeMcpPinsAsSignalPinsForRelays() {
+    for (uint8_t i = 0; i < maxRelays; i++) {
+        if (Relays[i].onExpander()) {
+            expander[Relays[i].getExpanderAddress()].pinMode(Relays[i].getPin(), INPUT);
+            expander[Relays[i].getExpanderAddress()].pullUp(Relays[i].getPin(), HIGH);
+        }
+    }
+}
 
 unsigned long currentMillis = 0;
 unsigned long currentMillis2 = 0;

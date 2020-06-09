@@ -30,6 +30,7 @@ void setup() {
     initializeTimers();
     setupClickButtons();
     setupPressButtons();
+    initializeMcpPinsAsSignalPinsForRelays();
     Serial.println("Setup() called");
 }
 
