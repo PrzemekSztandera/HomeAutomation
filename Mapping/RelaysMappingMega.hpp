@@ -27,7 +27,7 @@ const int numberOfExpanders = sizeof(expanderAddresses);
 Adafruit_MCP23017 expander[numberOfExpanders];
 
 // Push buttons declaration
-// OneButton(int pin, int active = LOW, bool pullupActive = true);
+// OneButton(int pin, int active = LOW, bool pullUpActive = true);
 OneButton button2(2);
 OneButton button3(3);
 OneButton button4(4);
@@ -102,7 +102,7 @@ typedef struct {
 
     bool onExpander() {
 
-        if(expanderAddress < 8 && expanderAddress >= 0) {
+        if(expanderAddress >= 0 && expanderAddress < 8) {
             return true;
         } else {
             return false;

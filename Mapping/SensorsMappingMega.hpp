@@ -61,7 +61,7 @@ MyMessage sensorMsgs[maxSensors];
 
 byte getSensorIndex(uint8_t sensorId) {
     for (uint8_t i = 0; i < maxSensors; i++) {
-        if (Sensors[i].id == sensorId) return (i);
+        if (Sensors[i].getId() == sensorId) return (i);
     }
     return (-1);
 }

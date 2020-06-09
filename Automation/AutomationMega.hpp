@@ -154,7 +154,7 @@ void switchRelay(const uint8_t sensorId, const uint8_t &cmd = Toggle::FLIP) {
     auto relay = getRelay(sensorId);
 
     // check whether flip state of sensor
-    uint8_t state = (cmd == Toggle::FLIP) ? !loadState(sensorId) : cmd; // OFF -> ON
+    uint8_t state = (cmd == Toggle::FLIP) ? !loadState(sensorId) : cmd;
     saveState(sensorId, state);
 
     if (cmd == Toggle::FLIP && relayStruct.hasSignalPin()) {

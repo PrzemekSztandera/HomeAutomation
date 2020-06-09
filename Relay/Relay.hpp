@@ -30,7 +30,7 @@ public:
 
     bool onExpander() {
 
-        if(_expanderAddress < 8 && _expanderAddress >= 0) {
+        if(_expanderAddress >= 0 && _expanderAddress < 8) {
             return true;
         } else {
             return false;

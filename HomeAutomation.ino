@@ -19,8 +19,8 @@
 
 // Remember to add library to Arduino path
 #include <MySensors.h>
-#include "./Initialization/InitializationMega.hpp"
 #include "./Automation/AutomationMega.hpp"
+#include "./Initialization/InitializationMega.hpp"
 
 void setup() {
     Serial.begin(115200);
