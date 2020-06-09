@@ -3,7 +3,7 @@
  */
 
 #pragma once
-
+#define USE_EXPANDER
 #include "../Mapping/RelaysMappingMega.hpp"
 #include "../Mapping/SensorsMappingMega.hpp"
 
@@ -11,8 +11,8 @@ void initializeRelays() {
     for (uint8_t i = 0; i < maxRelays; i++) {
         auto relayStruct = Relays[i];
         auto relay = getRelay(relayStruct.getId());
-        if(relay.isMcpPin()) {
-            mcp.pinMode(relay.getPin(), OUTPUT);
+        if(relay.onExpander()) {
+            expander[relay.getExpanderAddress()].pinMode(relay.getPin(), OUTPUT);
         } else {
             pinMode(relay.getPin(), OUTPUT);
         }
@@ -33,8 +33,8 @@ void initializeRelays() {
         if (relayStruct.hasSignalPin()) {
             bState = (relay.isLowLevelTrigger()) ? HIGH : LOW;
         }
-        if(relay.isMcpPin()) {
-            mcp.digitalWrite(relay.getPin(), bState);
+        if(relay.onExpander()) {
+            expander[relay.getExpanderAddress()].digitalWrite(relay.getPin(), bState);
         } else {
             digitalWrite(relay.getPin(), bState);
         }
@@ -92,7 +92,11 @@ void initializeTimers() {
 }
 
 void initializeMCP23017() {
-    mcp.begin();
+#ifdef USE_EXPANDER
+    for(int i = 0; i < numberOfExpanders; i++) {
+      expander[i].begin(expanderAddresses[i]);
+    }
+#endif
 }
 
 void sendPresentation() {

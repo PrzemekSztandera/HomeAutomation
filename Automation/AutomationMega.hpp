@@ -19,8 +19,8 @@ void myDelay(long interval) {
 
 uint8_t readRelayPin(Relay relay) {
     uint8_t relayState = 2;
-    if(relay.isMcpPin()) {
-        relayState = mcp.digitalRead(relay.getPin());
+    if(relay.onExpander()) {
+        relayState = expander[relay.getExpanderAddress()].digitalRead(relay.getPin());
     } else {
         relayState = digitalRead(relay.getPin());
     }
@@ -29,8 +29,8 @@ uint8_t readRelayPin(Relay relay) {
 
 uint8_t readSignalPin(RelayStruct relayStruct) {
     uint8_t signalState = 2;
-    if(relayStruct.isMcpPin()) {
-        signalState = mcp.digitalRead(relayStruct.getPin());
+    if(relayStruct.onExpander()) {
+        signalState = expander[relayStruct.getExpanderAddress()].digitalRead(relayStruct.getPin());
     } else {
         signalState = digitalRead(relayStruct.getPin());
     }
@@ -41,10 +41,10 @@ uint8_t readSignalPin(RelayStruct relayStruct) {
 void clickRelay(Relay relay) {
     uint8_t state = readRelayPin(relay);
     unsigned long currentMillis = millis();
-    if(relay.isMcpPin()) {
-        mcp.digitalWrite(relay.getPin(), !state);
+    if(relay.onExpander()) {
+        expander[relay.getExpanderAddress()].digitalWrite(relay.getPin(), !state);
         myDelay(125);
-        mcp.digitalWrite(relay.getPin(), state);
+        expander[relay.getExpanderAddress()].digitalWrite(relay.getPin(), state);
     } else {
         digitalWrite(relay.getPin(), !state);
         myDelay(125);
@@ -55,8 +55,8 @@ void clickRelay(Relay relay) {
 // Relay acts as a press button
 void pressRelay(Relay relay) {
     uint8_t state = readRelayPin(relay);
-    if(relay.isMcpPin()) {
-        mcp.digitalWrite(relay.getPin(), !state);
+    if(relay.onExpander()) {
+        expander[relay.getExpanderAddress()].digitalWrite(relay.getPin(), !state);
     } else {
         digitalWrite(relay.getPin(), !state);
     }
