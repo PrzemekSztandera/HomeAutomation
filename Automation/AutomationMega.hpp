@@ -19,7 +19,7 @@ void myDelay(long interval) {
 
 uint8_t readRelayPin(Relay relay) {
     uint8_t relayState = 2;
-    if(relay.onExpander()) {
+    if (relay.onExpander()) {
         relayState = expander[relay.getExpanderAddress()].digitalRead(relay.getPin());
     } else {
         relayState = digitalRead(relay.getPin());
@@ -29,7 +29,7 @@ uint8_t readRelayPin(Relay relay) {
 
 uint8_t readSignalPin(RelayStruct relayStruct) {
     uint8_t signalState = 2;
-    if(relayStruct.onExpander()) {
+    if (relayStruct.onExpander()) {
         signalState = expander[relayStruct.getExpanderAddress()].digitalRead(relayStruct.getPin());
     } else {
         signalState = digitalRead(relayStruct.getPin());
@@ -41,7 +41,7 @@ uint8_t readSignalPin(RelayStruct relayStruct) {
 void clickRelay(Relay relay) {
     uint8_t state = readRelayPin(relay);
     unsigned long currentMillis = millis();
-    if(relay.onExpander()) {
+    if (relay.onExpander()) {
         expander[relay.getExpanderAddress()].digitalWrite(relay.getPin(), !state);
         myDelay(125);
         expander[relay.getExpanderAddress()].digitalWrite(relay.getPin(), state);
@@ -55,7 +55,7 @@ void clickRelay(Relay relay) {
 // Relay acts as a press button
 void pressRelay(Relay relay) {
     uint8_t state = readRelayPin(relay);
-    if(relay.onExpander()) {
+    if (relay.onExpander()) {
         expander[relay.getExpanderAddress()].digitalWrite(relay.getPin(), !state);
     } else {
         digitalWrite(relay.getPin(), !state);
@@ -101,7 +101,7 @@ void updateRelayStateAndSendMessage(const uint8_t sensorId, bool pullUpActive = 
 }
 
 void checkButtonsState() {
-    if(millis() - currentMillis2 > 2000) {
+    if (millis() - currentMillis2 > 2000) {
         for (uint8_t i = 0; i < maxRelays; i++) {
             auto relayStruct = Relays[i];
             updateRelayStateAndSendMessage(relayStruct.getId());
@@ -135,7 +135,7 @@ void readSensors() {
         sensors.requestTemperatures();
         for (uint8_t i = 0; i < maxSensors; i++) {
             auto sensorStruct = Sensors[i];
-            if(sensorStruct.getId() == SALOON_DALLAS_TEMP) {
+            if (sensorStruct.getId() == SALOON_DALLAS_TEMP) {
                 send(sensorMsgs[i].set(sensors.getTempC(sensor1), 1));
             }
         }

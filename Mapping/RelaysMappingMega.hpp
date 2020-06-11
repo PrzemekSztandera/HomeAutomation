@@ -17,7 +17,7 @@
 
 
 // MCP23017 expander declaration
-uint8_t expanderAddresses[] = {0,1,2,3,4,5,6,7};
+uint8_t expanderAddresses[] = {0, 1, 2, 3, 4, 5, 6, 7};
 const int numberOfExpanders = sizeof(expanderAddresses);
 Adafruit_MCP23017 expander[numberOfExpanders];
 
@@ -97,7 +97,7 @@ typedef struct {
 
     bool onExpander() {
 
-        if(expanderAddress >= 0 && expanderAddress < 8) {
+        if (expanderAddress >= 0 && expanderAddress < 8) {
             return true;
         } else {
             return false;
@@ -108,10 +108,10 @@ typedef struct {
 RelayStruct Relays[] = {
 //  Child ID               description   signalPin / hasSignalPin / relay / expanderAddress
 //        {SALOON_1_ID,      "Salon Glowne",      -1, false, relay9}, // 23
-        {SALOON_2_ID,      "Salon Kinkiety",    3,  true, relay10, 8}, // 25
-        {DINING_ROOM_1_ID, "Jadalnia Glowne",   4,  true, relay11, 8}, // 27
-        {DINING_ROOM_2_ID, "Jadalnia Kinkiety", 5,  true, relay12, 8}, // 29
-        {BEDROOM_1_ID,     "Sypialnia Glowne",  -1, false, relay0, 8}, // 31
+        {SALOON_2_ID,      "Salon Kinkiety",    3,  true,  relay10, 8}, // 25
+        {DINING_ROOM_1_ID, "Jadalnia Glowne",   4,  true,  relay11, 8}, // 27
+        {DINING_ROOM_2_ID, "Jadalnia Kinkiety", 5,  true,  relay12, 8}, // 29
+        {BEDROOM_1_ID,     "Sypialnia Glowne",  -1, false, relay0,  8}, // 31
 //  { BEDROOM_2_ID,      "Sypialnia Kinkiety",    33, false },
 //  { KID1_BEDROOM_ID,   "Pokoj Wojtek",          35, false },
 //  { KID2_BEDROOM_ID,   "Pokoj Marcel",          37, false },

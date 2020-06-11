@@ -53,7 +53,7 @@ SensorStruct Sensors[] = {
 //        {SALOON_TEMP,        "Salon Temperatura", V_TEMP,     S_TEMP},
 //        {SALOON_BARO,        "Salon Cisnienie",   V_PRESSURE, S_BARO},
 //        {SALOON_HUM,         "Salon Wilgotnosc",  V_HUM,      S_HUM},
-        {SALOON_DALLAS_TEMP, "Salon Temperatura", V_TEMP,     S_TEMP},
+        {SALOON_DALLAS_TEMP, "Salon Temperatura", V_TEMP, S_TEMP},
 };
 
 const uint8_t maxSensors = sizeof(Sensors) / sizeof(SensorStruct);
