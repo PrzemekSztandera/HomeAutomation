@@ -102,8 +102,8 @@ void updateRelayStateAndSendMessage(const uint8_t sensorId, bool pullUpActive = 
 
 void checkButtonsState() {
     if (millis() - currentMillis2 > 2000) {
-        for (uint8_t i = 0; i < maxRelays; i++) {
-            auto relayStruct = Relays[i];
+        for (uint8_t i = 0; i < numberOfRelayStruct; i++) {
+            auto relayStruct = relaySensors[i];
             updateRelayStateAndSendMessage(relayStruct.getId());
         }
         currentMillis2 = millis();
@@ -114,10 +114,9 @@ void checkButtonsState() {
 ////----------------------------------------------------------------------------------------------------
 
 void readButtons() {
-    button2.tick();
-    button3.tick();
-    button4.tick();
-    masterButton7.tick();
+    for (uint8_t i = 0; i < sizeof(buttons) / sizeof(OneButton); i++) {
+        buttons[i].tick();
+    }
 }
 
 void readSensors() {
@@ -134,7 +133,7 @@ void readSensors() {
 // Dallas temp sensor DS18B20
         sensors.requestTemperatures();
         for (uint8_t i = 0; i < maxSensors; i++) {
-            auto sensorStruct = Sensors[i];
+            auto sensorStruct = environmentSensors[i];
             if (sensorStruct.getId() == SALOON_DALLAS_TEMP) {
                 send(sensorMsgs[i].set(sensors.getTempC(sensor1), 1));
             }
@@ -177,15 +176,23 @@ void masterClickButton() {
 // Setup the buttons and relays. Do not assign LongPress and Click to the same sensor
 void setupClickButtons() {
 
-    button2.attachClick(switchRelay, SALOON_1_ID);
-    button4.attachClick(switchRelay, DINING_ROOM_1_ID);
-    masterButton7.attachClick(masterClickButton);
+    for (uint8_t i = 0; i < numberOfButtons; i++) {
+        if (!relaySensors[i].hasSignalPin()) {
+            buttons[i].attachClick(switchRelay, relaySensors[i].getId());
+        }
+    }
+
+//    masterButton7.attachClick(masterClickButton);
 }
 
 void setupPressButtons() {
 
-    button3.attachLongPressStart(readAndUpdateState, SALOON_2_ID);
-    button3.attachLongPressStop(readAndUpdateState, SALOON_2_ID);
+    for (uint8_t i = 0; i < numberOfButtons; i++) {
+        if (relaySensors[i].hasSignalPin()) {
+            buttons[i].attachLongPressStart(readAndUpdateState, relaySensors[i].getId());
+            buttons[i].attachLongPressStop(readAndUpdateState, relaySensors[i].getId());
+        }
+    }
 }
 
 

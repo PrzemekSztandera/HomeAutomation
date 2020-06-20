@@ -10,6 +10,7 @@ private:
 
 public:
     Relay();
+
     Relay(uint8_t pin, bool lowLevelTrigger = false, uint8_t expanderAddress = 8) {
         _pin = pin;
         _lowLevelTrigger = lowLevelTrigger;
@@ -29,8 +30,7 @@ public:
     }
 
     bool onExpander() {
-
-        if(_expanderAddress >= 0 && _expanderAddress < 8) {
+        if (_expanderAddress >= 0 && _expanderAddress < 8) {
             return true;
         } else {
             return false;

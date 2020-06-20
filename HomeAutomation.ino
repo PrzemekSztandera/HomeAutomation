@@ -28,9 +28,10 @@ void setup() {
     initializeRelays();
     initializeSensors();
     initializeTimers();
+    createButtons();
     setupClickButtons();
     setupPressButtons();
-    initializeMcpPinsAsSignalPinsForRelays();
+//    initializeMcpPinsAsSignalPinsForRelays(); only when expander pins are used as input
     Serial.println("Setup() called");
 }
 

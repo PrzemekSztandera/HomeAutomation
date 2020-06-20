@@ -9,8 +9,8 @@
 #include "../Mapping/SensorsMappingMega.hpp"
 
 void initializeRelays() {
-    for (uint8_t i = 0; i < maxRelays; i++) {
-        auto relayStruct = Relays[i];
+    for (uint8_t i = 0; i < numberOfRelayStruct; i++) {
+        auto relayStruct = relaySensors[i];
         auto relay = getRelay(relayStruct.getId());
         if (relay.onExpander()) {
             expander[relay.getExpanderAddress()].pinMode(relay.getPin(), OUTPUT);
@@ -28,7 +28,7 @@ void initializeRelays() {
         }
 
         // Inverse state if relay is Active Low and relayStruct uses relay as "press button" - bi stable relay
-        bool bState = (relay.isLowLevelTrigger()) ? !currentState : currentState;
+        bool bState = relay.isLowLevelTrigger() ? !currentState : currentState;
 
         // Assign state if relayStruct uses relay as "click button" - mono stable relay
         if (relayStruct.hasSignalPin()) {
@@ -46,8 +46,8 @@ void initializeRelays() {
 
 void initializeSensors() {
     for (uint8_t i = 0; i < maxSensors; i++) {
-        auto sensorStruct = Sensors[i];
-        sensorMsgs[i] = MyMessage(Sensors[i].getId(), Sensors[i].getVariableType());
+        auto sensorStruct = environmentSensors[i];
+        sensorMsgs[i] = MyMessage(environmentSensors[i].getId(), environmentSensors[i].getVariableType());
     }
 
     // Bosh sensor BME280
@@ -55,12 +55,7 @@ void initializeSensors() {
     if (!bme.begin()) {
         Serial.println("Could not find BME280 sensor!");
     }
-//    while (!bme.begin()) {
-//        Serial.println("Could not find BME280 sensor!");
-//        wait(1000);
-//    }
 
-    // bme.chipID(); // Deprecated. See chipModel().
     switch (bme.chipModel()) {
         case BME280::ChipModel_BME280:
             Serial.println("Found BME280 sensor! Success.");
@@ -78,10 +73,10 @@ void initializeSensors() {
 }
 
 void initializeMcpPinsAsSignalPinsForRelays() {
-    for (uint8_t i = 0; i < maxRelays; i++) {
-        if (Relays[i].onExpander()) {
-            expander[Relays[i].getExpanderAddress()].pinMode(Relays[i].getPin(), INPUT);
-            expander[Relays[i].getExpanderAddress()].pullUp(Relays[i].getPin(), HIGH);
+    for (uint8_t i = 0; i < numberOfRelayStruct; i++) {
+        if (relaySensors[i].onExpander()) {
+            expander[relaySensors[i].getExpanderAddress()].pinMode(relaySensors[i].getPin(), INPUT);
+            expander[relaySensors[i].getExpanderAddress()].pullUp(relaySensors[i].getPin(), HIGH);
         }
     }
 }
@@ -104,14 +99,14 @@ void initializeMCP23017() {
 
 void sendPresentation() {
 
-    for (uint8_t i = 0; i < maxRelays; i++) {
-        auto relayStruct = Relays[i];
+    for (uint8_t i = 0; i < numberOfRelayStruct; i++) {
+        auto relayStruct = relaySensors[i];
         present(relayStruct.getId(), S_BINARY, relayStruct.getDescription());
         send(msgs[i].set(loadState(relayStruct.getId())));
     }
 
     for (uint8_t i = 0; i < maxSensors; i++) {
-        auto sensorStruct = Sensors[i];
+        auto sensorStruct = environmentSensors[i];
         present(sensorStruct.getId(), sensorStruct.getPresentationType(), sensorStruct.getDescription());
     }
 

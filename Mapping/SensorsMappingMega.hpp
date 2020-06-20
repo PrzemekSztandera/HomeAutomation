@@ -49,25 +49,25 @@ typedef struct {
     }
 } SensorStruct;
 
-SensorStruct Sensors[] = {
+SensorStruct environmentSensors[] = {
 //        {SALOON_TEMP,        "Salon Temperatura", V_TEMP,     S_TEMP},
 //        {SALOON_BARO,        "Salon Cisnienie",   V_PRESSURE, S_BARO},
 //        {SALOON_HUM,         "Salon Wilgotnosc",  V_HUM,      S_HUM},
         {SALOON_DALLAS_TEMP, "Salon Temperatura", V_TEMP, S_TEMP},
 };
 
-const uint8_t maxSensors = sizeof(Sensors) / sizeof(SensorStruct);
+const uint8_t maxSensors = sizeof(environmentSensors) / sizeof(SensorStruct);
 MyMessage sensorMsgs[maxSensors];
 
 byte getSensorIndex(uint8_t sensorId) {
     for (uint8_t i = 0; i < maxSensors; i++) {
-        if (Sensors[i].getId() == sensorId) return (i);
+        if (environmentSensors[i].getId() == sensorId) return (i);
     }
     return (-1);
 }
 
 SensorStruct getSensorStruct(uint8_t sensorId) {
     uint8_t index = getSensorIndex(sensorId);
-    return Sensors[index];
+    return environmentSensors[index];
 }
 
