@@ -22,40 +22,43 @@ const int numberOfExpanders = sizeof(expanderAddresses);
 Adafruit_MCP23017 expander[numberOfExpanders];
 
 // Relays declaration
-// Relay(uint8_t pin, bool lowLevelTrigger = false, expanderAddress = 8)
+// Relay(uint8_t pin, bool lowLevelTrigger = false, bool momentary = true, expanderAddress = 8)
 // MCP23017 relays
-Relay relay000(0, true, 0);
-Relay relay001(1, true, 0);
-Relay relay002(2, true, 0);
-Relay relay003(3, true, 0);
-Relay relay004(4, true, 0);
-Relay relay005(5, true, 0);
-Relay relay006(6, true, 0);
-Relay relay007(7, true, 0);
-Relay relay008(8, true, 0);
-Relay relay009(9, true, 0);
-Relay relay010(10, true, 0);
-Relay relay011(11, true, 0);
-Relay relay012(12, true, 0);
-Relay relay013(13, true, 0);
-Relay relay014(14, true, 0);
-Relay relay015(15, true, 0);
-Relay relay100(0, true, 1);
-Relay relay101(1, true, 1);
-Relay relay102(2, true, 1);
-Relay relay103(3, true, 1);
-Relay relay104(4, true, 1);
-Relay relay105(5, true, 1);
-Relay relay106(6, true, 1);
-Relay relay107(7, true, 1);
-Relay relay108(8, true, 1);
-Relay relay109(9, true, 1);
-Relay relay110(10, true, 1);
-Relay relay111(11, true, 1);
-Relay relay112(12, true, 1);
-Relay relay113(13, true, 1);
-Relay relay114(14, true, 1);
-Relay relay115(15, true, 1);
+Relay relay000(0, true, true, 0);
+Relay relay001(1, true, true, 0);
+Relay relay002(2, true, true, 0);
+Relay relay003(3, true, true, 0);
+Relay relay004(4, true, true, 0);
+Relay relay005(5, true, true, 0);
+Relay relay006(6, true, true, 0);
+Relay relay007(7, true, true, 0);
+Relay relay008(8, true, true, 0);
+Relay relay009(9, true, true, 0);
+Relay relay010(10, true, true, 0);
+Relay relay011(11, true, true, 0);
+Relay relay012(12, true, true, 0);
+Relay relay013(13, true, true, 0);
+Relay relay014(14, true, true, 0);
+Relay relay015(15, true, true, 0);
+Relay relay100(0, true, true, 1);
+Relay relay101(1, true, true, 1);
+Relay relay102(2, true, true, 1);
+Relay relay103(3, true, true, 1);
+Relay relay104(4, true, true, 1);
+Relay relay105(5, true, true, 1);
+Relay relay106(6, true, true, 1);
+Relay relay107(7, true, true, 1);
+Relay relay108(8, true, true, 1);
+Relay relay109(9, true, true, 1);
+Relay relay110(10, true, true, 1);
+Relay relay111(11, true, true, 1);
+
+Relay relay112(12, true, false, 1);
+Relay relay113(13, true, false, 1);
+Relay relay114(14, true, false, 1);
+Relay relay115(15, true, false, 1);
+Relay relayArduino9(9, true, false, 8);
+
 
 // Child ID declaration of RelaysStruct
 const uint8_t SALOON_1_ID = 11;
@@ -92,13 +95,14 @@ const uint8_t SPARE_4 = 84;
 const uint8_t SPARE_5 = 85;
 const uint8_t SPARE_6 = 86;
 const uint8_t SPARE_7 = 87;
-const uint8_t MASTER = 90;
+const uint8_t SPARE_8 = 88;
+const uint8_t SPARE_9 = 89;
 
 typedef struct {
     const uint8_t id;
-    const uint8_t expanderAddress;
     char *description;
     const uint8_t signalPin; // pin to read the state of latch relay-button for relayStruct
+    const uint8_t expanderAddress;
     bool hasPin; // true if has latch relay-button assign to read the state from
     Relay relay;
 
@@ -171,6 +175,9 @@ RelayStruct relaySensors[] = {
         {SPARE_5,          "Spare 5",            3,  8, false, relay113}, // 30
         {SPARE_6,          "Spare 6",            4,  8, false, relay114}, // 31
         {SPARE_7,          "Spare 7",            5,  8, false, relay115}, // 32
+        {SPARE_8,          "Spare 8",            6,  8, false, relay000}, // 33
+        // Sensors using Button as button      IN-button       OUT - relay on Arduino
+        {SPARE_9,          "Spare 9",            8,  8, false, relayArduino9}, // 34
 };
 const uint8_t numberOfRelayStruct = sizeof(relaySensors) / sizeof(RelayStruct);
 MyMessage msgs[numberOfRelayStruct];

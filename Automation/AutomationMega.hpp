@@ -149,13 +149,12 @@ void readSensors() {
 
 void switchRelay(const uint8_t sensorId) {
 
-    auto relayStruct = getRelayStruct(sensorId);
     auto relay = getRelay(sensorId);
 
     uint8_t state = !loadState(sensorId);
     saveState(sensorId, state);
 
-    if (relayStruct.hasSignalPin()) {
+    if (relay.isMomentary()) {
         clickRelay(relay);
     } else {
         pressRelay(relay);

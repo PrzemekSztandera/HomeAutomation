@@ -6,14 +6,16 @@ class Relay {
 private:
     uint8_t _pin;
     bool _lowLevelTrigger;
+    bool _momentary;
     uint8_t _expanderAddress;
 
 public:
     Relay();
 
-    Relay(uint8_t pin, bool lowLevelTrigger = false, uint8_t expanderAddress = 8) {
+    Relay(uint8_t pin, bool lowLevelTrigger = false, bool momentary = true, uint8_t expanderAddress = 8) {
         _pin = pin;
         _lowLevelTrigger = lowLevelTrigger;
+        _momentary = momentary;
         _expanderAddress = expanderAddress;
     }
 
@@ -23,6 +25,10 @@ public:
 
     bool isLowLevelTrigger() {
         return _lowLevelTrigger;
+    }
+
+    bool isMomentary() {
+        return _momentary;
     }
 
     uint8_t getExpanderAddress() {

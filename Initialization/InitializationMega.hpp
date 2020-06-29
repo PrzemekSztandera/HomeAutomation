@@ -30,8 +30,8 @@ void initializeRelays() {
         // Inverse state if relay is Active Low and relayStruct uses relay as "press button" - bi stable relay
         bool bState = relay.isLowLevelTrigger() ? !currentState : currentState;
 
-        // Assign state if relayStruct uses relay as "click button" - mono stable relay
-        if (relayStruct.hasSignalPin()) {
+        // Assign state if relayStruct uses relay as "momentary button" - mono stable relay
+        if (relay.isMomentary()) {
             bState = (relay.isLowLevelTrigger()) ? HIGH : LOW;
         }
         if (relay.onExpander()) {
