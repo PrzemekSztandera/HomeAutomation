@@ -1,6 +1,12 @@
 //
 // Created by Przemyslaw Sztandera on 22/05/2020.
 //
+#include <Adafruit_MCP23017.h>
+
+// MCP23017 expander declaration
+uint8_t expanderAddresses[] = {0, 1, 2, 3, 4, 5, 6, 7};
+const int numberOfExpanders = sizeof(expanderAddresses);
+Adafruit_MCP23017 expander[numberOfExpanders];
 
 class Relay {
 private:
@@ -41,5 +47,15 @@ public:
         } else {
             return false;
         }
+    }
+
+    uint8_t readPin() {
+        uint8_t relayState = 2;
+        if (this -> onExpander()) {
+            relayState = expander[_expanderAddress].digitalRead(this -> getPin());
+        } else {
+            relayState = digitalRead(this -> getPin());
+        }
+        return relayState;
     }
 };

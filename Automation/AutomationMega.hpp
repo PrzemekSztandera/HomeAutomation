@@ -18,23 +18,25 @@ void myDelay(long interval) {
 }
 
 uint8_t readRelayPin(Relay relay) {
-    uint8_t relayState = 2;
-    if (relay.onExpander()) {
-        relayState = expander[relay.getExpanderAddress()].digitalRead(relay.getPin());
-    } else {
-        relayState = digitalRead(relay.getPin());
-    }
-    return relayState;
+//    uint8_t relayState = 2;
+//    if (relay.onExpander()) {
+//        relayState = expander[relay.getExpanderAddress()].digitalRead(relay.getPin());
+//    } else {
+//        relayState = digitalRead(relay.getPin());
+//    }
+//    return relayState;
+    return relay.readPin();
 }
 
 uint8_t readSignalPin(RelayStruct relayStruct) {
-    uint8_t signalState = 2;
-    if (relayStruct.onExpander()) {
-        signalState = expander[relayStruct.getExpanderAddress()].digitalRead(relayStruct.getPin());
-    } else {
-        signalState = digitalRead(relayStruct.getPin());
-    }
-    return signalState;
+//    uint8_t signalState = 2;
+//    if (relayStruct.onExpander()) {
+//        signalState = expander[relayStruct.getExpanderAddress()].digitalRead(relayStruct.getPin());
+//    } else {
+//        signalState = digitalRead(relayStruct.getPin());
+//    }
+//    return signalState;
+    return relayStruct.readPin();
 }
 
 // Relay acts as a click button
