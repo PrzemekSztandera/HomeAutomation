@@ -48,11 +48,10 @@ Relay relay108(8, true, true, 1);
 Relay relay109(9, true, true, 1);
 Relay relay110(10, true, true, 1);
 Relay relay111(11, true, true, 1);
-
-Relay relay112(12, true, false, 1);
-Relay relay113(13, true, false, 1);
-Relay relay114(14, true, false, 1);
-Relay relay115(15, true, false, 1);
+Relay relay112(12, true, true, 1);
+Relay relay113(13, true, true, 1);
+Relay relay114(14, true, true, 1);
+Relay relay115(15, true, true, 1);
 // Arduino relays
 Relay relayArduino9(9, true, false, 8);
 
@@ -89,8 +88,8 @@ const uint8_t ATTIC_4_ID = 56;
 const uint8_t FAN_1_ID = 61;
 const uint8_t FAN_2_ID = 62;
 const uint8_t SPARE_SIGNAL_1 = 71;
-const uint8_t SPARE_BUTTON_1 = 72;
-const uint8_t SPARE_BUTTON_2 = 73;
+const uint8_t SPARE_SIGNAL_2 = 72;
+const uint8_t SPARE_BUTTON = 73;
 
 
 typedef struct {
@@ -148,42 +147,40 @@ typedef struct {
 RelayStruct relaySensors[] = {
 //  Child ID               description   signalPin(or button) / expanderAddress / hasSignalPin / relay
         // Sensors using Button as signal pin  IN-signal       OUT - relay on expander
-        {SALOON_1_ID,      "Salon - Glowne",            22, 8, true,  relay000}, // 1
-        {SALOON_2_ID,      "Salon - Kinkiety(Sofa)",    23, 8, true,  relay001}, // 2
-        {SALOON_3_ID,      "Salon - Kinkiety(TV)",      24, 8, true,  relay002}, // 3
-        {DINING_ROOM_1_ID, "Jadalnia - Glowne",         25, 8, true,  relay003}, // 4
-        {DINING_ROOM_2_ID, "Jadalnia - Kinkiety",       26, 8, true,  relay004}, // 5
-        {BEDROOM_1_ID,     "Sypialnia - Glowne",        27, 8, true,  relay005}, // 6
-        {BEDROOM_2_ID,     "Sypialnia - Kinkiety",      28, 8, true,  relay006}, // 7
-        {ROOM_1_ID,        "Pokoj - Prawy",             29, 8, true,  relay007}, // 8
-        {ROOM_2_ID,        "Pokoj - Lewy",              30, 8, true,  relay008}, // 9
-        {BATHROOM_ID,      "Lazienka",                  31, 8, true,  relay009}, // 10
-        {KITCHEN_1_ID,     "Kuchnia - Glowne",          32, 8, true,  relay010}, // 11
-        {KITCHEN_2_ID,     "Kuchnia - Dodatkowe",       33, 8, true,  relay011}, // 12
-        {ENTRANCE_ID,      "Wejscie",                   34, 8, true,  relay012}, // 13
-        {LANDING_ID,       "Wiatrolap",                 35, 8, true,  relay013}, // 14
-        {HALL_ID,          "Przedpokoj",                36, 8, true,  relay014}, // 15
-        {CORRIDOR_ID,      "Korytarz",                  37, 8, true,  relay015}, // 16
-        {UTILITY_ROOM,     "Kotlownia",                 38, 8, true,  relay100}, // 17
-        {TERRACE_1_ID,     "Taras - Zachod",            39, 8, true,  relay101}, // 18
-        {TERRACE_2_ID,     "Taras - Poludnie",          40, 8, true,  relay102}, // 19
-        {HOUSE_1_ID,       "Dom - Zachod",              41, 8, true,  relay103}, // 20
-        {HOUSE_2_ID,       "Dom - Wschod",              42, 8, true,  relay104}, // 21
-        {HOUSE_3_ID,       "Dom - Christmass",          43, 8, true,  relay105}, // 22
-        {GARDEN_1_ID,      "Ogrod - Przod",             44, 8, true,  relay106}, // 23
-        {GARDEN_2_ID,      "Ogrod - Tyl",               45, 8, true,  relay107}, // 24
-        {ATTIC_1_ID,       "Strych - Wejscie",          46, 8, true,  relay108}, // 25
-        {ATTIC_2_ID,       "Strych 1",                  47, 8, true,  relay109}, // 26
-        {ATTIC_3_ID,       "Strych 2",                  48, 8, true,  relay110}, // 27
-        {ATTIC_4_ID,       "Strych 3",                  49, 8, true,  relay111}, // 28
-// ---------------------------------------------------------------------------- //
-        {FAN_1_ID,         "Wentylator - Lazienka",      2, 8, true,  relay112}, // 29
-        {FAN_2_ID,         "Wentylator - Kotlownia",     3, 8, true,  relay113}, // 30
-        {SPARE_SIGNAL_1,   "Spare signal on pin 4",      4, 8, true,  relay114}, // 31
-        // Sensors using Button as button      IN-button       OUT - relay on expander
-        {SPARE_BUTTON_1,   "Spare button on pin 5",      5,  8, false, relay115}, // 32
+        {SALOON_1_ID,      "Salon - Glowne",            22, 8, true,  relay000},    // 0
+        {SALOON_2_ID,      "Salon - Kinkiety(Sofa)",    23, 8, true,  relay001},    // 1
+        {SALOON_3_ID,      "Salon - Kinkiety(TV)",      24, 8, true,  relay002},    // 2
+        {DINING_ROOM_1_ID, "Jadalnia - Glowne",         25, 8, true,  relay003},    // 3
+        {DINING_ROOM_2_ID, "Jadalnia - Kinkiety",       26, 8, true,  relay004},    // 4
+        {BEDROOM_1_ID,     "Sypialnia - Glowne",        27, 8, true,  relay005},    // 5
+        {BEDROOM_2_ID,     "Sypialnia - Kinkiety",      28, 8, true,  relay006},    // 6
+        {ROOM_1_ID,        "Pokoj - Prawy",             29, 8, true,  relay007},    // 7
+        {ROOM_2_ID,        "Pokoj - Lewy",              30, 8, true,  relay008},    // 8
+        {BATHROOM_ID,      "Lazienka",                  31, 8, true,  relay009},    // 9
+        {KITCHEN_1_ID,     "Kuchnia - Glowne",          32, 8, true,  relay010},    // 10
+        {KITCHEN_2_ID,     "Kuchnia - Dodatkowe",       33, 8, true,  relay011},    // 11
+        {ENTRANCE_ID,      "Wejscie",                   34, 8, true,  relay012},    // 12
+        {LANDING_ID,       "Wiatrolap",                 35, 8, true,  relay013},    // 13
+        {HALL_ID,          "Przedpokoj",                36, 8, true,  relay014},    // 14
+        {CORRIDOR_ID,      "Korytarz",                  37, 8, true,  relay015},    // 15
+        {UTILITY_ROOM,     "Kotlownia",                 38, 8, true,  relay100},    // 16
+        {TERRACE_1_ID,     "Taras - Zachod",            39, 8, true,  relay101},    // 17
+        {TERRACE_2_ID,     "Taras - Poludnie",          40, 8, true,  relay102},    // 18
+        {HOUSE_1_ID,       "Dom - Zachod",              41, 8, true,  relay103},    // 19
+        {HOUSE_2_ID,       "Dom - Wschod",              42, 8, true,  relay104},    // 20
+        {HOUSE_3_ID,       "Dom - Christmass",          43, 8, true,  relay105},    // 21
+        {GARDEN_1_ID,      "Ogrod - Przod",             44, 8, true,  relay106},    // 22
+        {GARDEN_2_ID,      "Ogrod - Tyl",               45, 8, true,  relay107},    // 23
+        {ATTIC_1_ID,       "Strych - Wejscie",          46, 8, true,  relay108},    // 24
+        {ATTIC_2_ID,       "Strych 1",                  47, 8, true,  relay109},    // 25
+        {ATTIC_3_ID,       "Strych 2",                  48, 8, true,  relay110},    // 26
+        {ATTIC_4_ID,       "Strych 3",                  49, 8, true,  relay111},    // 27
+        {FAN_1_ID,         "Wentylator - Lazienka",      2, 8, true,  relay112},    // 28
+        {FAN_2_ID,         "Wentylator - Kotlownia",     3, 8, true,  relay113},    // 29
+        {SPARE_SIGNAL_1,   "Spare signal on pin 4",      4, 8, true,  relay114},    // 30
+        {SPARE_SIGNAL_2,   "Spare signal on pin 5",      5, 8, true,  relay115},    // 31
         // Sensors using Button as button      IN-button       OUT - relay on Arduino
-        {SPARE_BUTTON_2,   "Spare button on pin 6",      6,  8, false, relayArduino9}, // 37
+        {SPARE_BUTTON,     "Spare button on pin 6",      6,  8, false, relayArduino9}, // 32
 };
 const uint8_t numberOfRelayStruct = sizeof(relaySensors) / sizeof(RelayStruct);
 MyMessage msgs[numberOfRelayStruct];

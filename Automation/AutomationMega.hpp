@@ -171,7 +171,7 @@ void readAndUpdateState(uint8_t sensorId) {
 void masterClickButton() {
     switchRelay(SALOON_1_ID);
     switchRelay(SALOON_2_ID);
-    switchRelay(DINING_ROOM_1_ID);
+    switchRelay(SALOON_3_ID);
 }
 
 // Setup the buttons and relays. Do not assign LongPress and Click to the same sensor
@@ -182,11 +182,21 @@ void setupClickButtons() {
             buttons[i].attachClick(switchRelay, relaySensors[i].getId());
         }
     }
-
-//    masterButton7.attachClick(masterClickButton);
 }
 
-void setupPressButtons() {
+
+void setupDoubleClickButtons() {
+
+//    for (uint8_t i = 0; i < numberOfButtons; i++) {
+//        if (!relaySensors[i].hasSignalPin()) {
+//            buttons[i].attachPress(switchRelay, relaySensors[i].getId());
+//        }
+//    }
+    buttons[32].attachDoubleClick(masterClickButton);
+
+}
+
+void setupSignalButtons() {
 
     for (uint8_t i = 0; i < numberOfButtons; i++) {
         if (relaySensors[i].hasSignalPin()) {
