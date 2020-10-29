@@ -3,7 +3,7 @@
  * @file AutomationMega.hpp
  * @author Przemyslaw Sztandera
  * based on https://github.com/Kirizaki/mysensors
- * Automation for buttons & sensors.
+ * Automation for buttons & sensors
  * @license GPL V2
  *
  */
@@ -12,60 +12,20 @@
 
 #include "../Initialization/InitializationMega.hpp"
 
+//// Relays automation
+
 void myDelay(long interval) {
     unsigned long currentMillis = millis();
     while (millis() - currentMillis < interval) {}
 }
 
 uint8_t readRelayPin(Relay relay) {
-//    uint8_t relayState = 2;
-//    if (relay.onExpander()) {
-//        relayState = expander[relay.getExpanderAddress()].digitalRead(relay.getPin());
-//    } else {
-//        relayState = digitalRead(relay.getPin());
-//    }
-//    return relayState;
     return relay.readPin();
 }
 
 uint8_t readSignalPin(RelayStruct relayStruct) {
-//    uint8_t signalState = 2;
-//    if (relayStruct.onExpander()) {
-//        signalState = expander[relayStruct.getExpanderAddress()].digitalRead(relayStruct.getPin());
-//    } else {
-//        signalState = digitalRead(relayStruct.getPin());
-//    }
-//    return signalState;
     return relayStruct.readPin();
 }
-
-// Relay acts as a click button
-void clickRelay(Relay relay) {
-    uint8_t state = readRelayPin(relay);
-    unsigned long currentMillis = millis();
-    if (relay.onExpander()) {
-        expander[relay.getExpanderAddress()].digitalWrite(relay.getPin(), !state);
-        myDelay(125);
-        expander[relay.getExpanderAddress()].digitalWrite(relay.getPin(), state);
-    } else {
-        digitalWrite(relay.getPin(), !state);
-        myDelay(125);
-        digitalWrite(relay.getPin(), state);
-    }
-}
-
-// Relay acts as a press button
-void pressRelay(Relay relay) {
-    uint8_t state = readRelayPin(relay);
-    if (relay.onExpander()) {
-        expander[relay.getExpanderAddress()].digitalWrite(relay.getPin(), !state);
-    } else {
-        digitalWrite(relay.getPin(), !state);
-    }
-}
-
-////----------------------------------------------------------------------------------------------------
-
 
 void updateRelayStateAndSendMessage(const uint8_t sensorId, bool pullUpActive = true) {
     // Debug
@@ -102,27 +62,41 @@ void updateRelayStateAndSendMessage(const uint8_t sensorId, bool pullUpActive = 
     send(msgs[index].set(loadState(sensorId)));
 }
 
-void checkButtonsState() {
-    if (millis() - currentMillis2 > 2000) {
-        for (uint8_t i = 0; i < numberOfRelayStruct; i++) {
-            auto relayStruct = relaySensors[i];
-            updateRelayStateAndSendMessage(relayStruct.getId());
+
+void switchRelay(const uint8_t sensorId) {
+
+    auto relay = getRelay(sensorId);
+
+    uint8_t state = !loadState(sensorId);
+    saveState(sensorId, state);
+
+    if (relay.isNonLatching()) {
+        state = readRelayPin(relay);
+//        unsigned long currentMillis = millis();
+        if (relay.onExpander()) {
+            expander[relay.getExpanderAddress()].digitalWrite(relay.getPin(), !state);
+            myDelay(125);
+            expander[relay.getExpanderAddress()].digitalWrite(relay.getPin(), state);
+        } else {
+            digitalWrite(relay.getPin(), !state);
+            myDelay(125);
+            digitalWrite(relay.getPin(), state);
         }
-        currentMillis2 = millis();
-        return;
+    } else {
+        state = readRelayPin(relay);
+        if (relay.onExpander()) {
+            expander[relay.getExpanderAddress()].digitalWrite(relay.getPin(), !state);
+        } else {
+            digitalWrite(relay.getPin(), !state);
+        }
     }
+    updateRelayStateAndSendMessage(sensorId);
 }
 
-////----------------------------------------------------------------------------------------------------
-
-void readButtons() {
-    for (uint8_t i = 0; i < sizeof(buttons) / sizeof(OneButton); i++) {
-        buttons[i].tick();
-    }
-}
+//// Sensors automation
 
 void readSensors() {
-    if (millis() - currentMillis > 10000) {
+    if (millis() - currentSensorMillis > 30000) {
 // Bosh sensor BME280
 //        float temp(NAN), hum(NAN), pres(NAN);
 //        BME280::TempUnit tempUnit(BME280::TempUnit_Celsius);
@@ -142,62 +116,49 @@ void readSensors() {
         }
 
 //        Serial.println("Server update");
-        currentMillis = millis();
+        currentSensorMillis = millis();
         return;
     }
 }
 
-////----------------------------------------------------------------------------------------------------
+//// Buttons automation
 
-void switchRelay(const uint8_t sensorId) {
-
-    auto relay = getRelay(sensorId);
-
-    uint8_t state = !loadState(sensorId);
-    saveState(sensorId, state);
-
-    if (relay.isMomentary()) {
-        clickRelay(relay);
-    } else {
-        pressRelay(relay);
+void checkSignalAndRelayState() {
+    if (millis() - currentButtonMillis > 2000) {
+        for (uint8_t i = 0; i < numberOfRelayStruct; i++) {
+            auto relayStruct = relaySensors[i];
+            updateRelayStateAndSendMessage(relayStruct.getId());
+        }
+        currentButtonMillis = millis();
+        return;
     }
-    updateRelayStateAndSendMessage(sensorId);
+}
+
+void readButtons() {
+    for (uint8_t i = 0; i < numberOfRelayStruct; i++) {
+        buttons[i].tick();
+    }
+}
+
+//void pressButton() {
+//    switchRelay(SPARE_BUTTON);
+//}
+
+// Setup the buttons and relays. Do not assign LongPress and Click to the same sensor
+void setupClickButtons() {
+    for (uint8_t i = 0; i < numberOfButtons; i++) {
+        if (!relaySensors[i].hasSignalPin()) {
+            buttons[i].attachLongPressStart(switchRelay, relaySensors[i].getId());
+            buttons[i].setPressTicks(275);
+        }
+    }
 }
 
 void readAndUpdateState(uint8_t sensorId) {
     updateRelayStateAndSendMessage(sensorId);
 }
 
-void masterClickButton() {
-    switchRelay(SALOON_1_ID);
-    switchRelay(SALOON_2_ID);
-    switchRelay(SALOON_3_ID);
-}
-
-// Setup the buttons and relays. Do not assign LongPress and Click to the same sensor
-void setupClickButtons() {
-
-    for (uint8_t i = 0; i < numberOfButtons; i++) {
-        if (!relaySensors[i].hasSignalPin()) {
-            buttons[i].attachClick(switchRelay, relaySensors[i].getId());
-        }
-    }
-}
-
-
-void setupDoubleClickButtons() {
-
-//    for (uint8_t i = 0; i < numberOfButtons; i++) {
-//        if (!relaySensors[i].hasSignalPin()) {
-//            buttons[i].attachPress(switchRelay, relaySensors[i].getId());
-//        }
-//    }
-    buttons[32].attachDoubleClick(masterClickButton);
-
-}
-
 void setupSignalButtons() {
-
     for (uint8_t i = 0; i < numberOfButtons; i++) {
         if (relaySensors[i].hasSignalPin()) {
             buttons[i].attachLongPressStart(readAndUpdateState, relaySensors[i].getId());

@@ -7,6 +7,8 @@
 
 #include "../Mapping/RelaysMappingMega.hpp"
 #include "../Mapping/SensorsMappingMega.hpp"
+#include "../Automation/AutomationMega.hpp"
+#include "../Button/ButtonsInitialization.hpp"
 
 void initializeRelays() {
     for (uint8_t i = 0; i < numberOfRelayStruct; i++) {
@@ -31,7 +33,7 @@ void initializeRelays() {
         bool bState = relay.isLowLevelTrigger() ? !currentState : currentState;
 
         // Assign state if relayStruct uses relay as "momentary button" - mono stable relay
-        if (relay.isMomentary()) {
+        if (relay.isNonLatching()) {
             bState = (relay.isLowLevelTrigger()) ? HIGH : LOW;
         }
         if (relay.onExpander()) {
@@ -81,12 +83,12 @@ void initializeMcpPinsAsSignalPinsForRelays() {
     }
 }
 
-unsigned long currentMillis = 0;
-unsigned long currentMillis2 = 0;
+unsigned long currentButtonMillis = 0;
+unsigned long currentSensorMillis = 0;
 
 void initializeTimers() {
-    currentMillis = millis();
-    currentMillis2 = millis();
+    currentButtonMillis = millis();
+    currentSensorMillis = millis();
 }
 
 void initializeMCP23017() {
@@ -98,13 +100,11 @@ void initializeMCP23017() {
 }
 
 void sendPresentation() {
-
     for (uint8_t i = 0; i < numberOfRelayStruct; i++) {
         auto relayStruct = relaySensors[i];
         present(relayStruct.getId(), S_BINARY, relayStruct.getDescription());
         send(msgs[i].set(loadState(relayStruct.getId())));
     }
-
     for (uint8_t i = 0; i < maxSensors; i++) {
         auto sensorStruct = environmentSensors[i];
         present(sensorStruct.getId(), sensorStruct.getPresentationType(), sensorStruct.getDescription());

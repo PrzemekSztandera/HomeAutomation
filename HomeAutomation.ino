@@ -1,3 +1,5 @@
+#include <OneButton.h>
+
 /**
  *
  * @file automatykaMegaGateway.ino
@@ -30,7 +32,6 @@ void setup() {
     initializeTimers();
     createButtons();
     setupClickButtons();
-    setupDoubleClickButtons();
     setupSignalButtons();
 //    initializeMcpPinsAsSignalPinsForRelays(); only when expander pins are used as input
     Serial.println("Setup() called");
@@ -45,7 +46,7 @@ void presentation() {
 
 void loop() {
     readButtons();
-    checkButtonsState();
+    checkSignalAndRelayState();
     readSensors();
 }
 

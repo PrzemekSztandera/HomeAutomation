@@ -3,7 +3,7 @@
  * @file MappingMega.hpp
  * @author Przemyslaw Sztandera
  * based on https://github.com/Kirizaki/mysensors
- * Mappings.
+ * Mappings
  * @license GPL V2
  *
  */
@@ -11,14 +11,12 @@
 #pragma once
 
 //#include <Wire.h>
-#include <OneButton.h>
 #include "../Relay/Relay.hpp"
 
 
-
-
 // Relays declaration
-// Relay(uint8_t pin, bool lowLevelTrigger = false, bool momentary = true, expanderAddress = 8)
+// Relay(uint8_t pin, bool lowLevelTrigger = false, bool nonLatching = true, expanderAddress = 8)
+
 // MCP23017 relays
 Relay relay000(0, true, true, 0);
 Relay relay001(1, true, true, 0);
@@ -53,7 +51,8 @@ Relay relay113(13, true, true, 1);
 Relay relay114(14, true, true, 1);
 Relay relay115(15, true, true, 1);
 // Arduino relays
-Relay relayArduino9(9, true, false, 8);
+Relay relayArd09(9, true, false, 8);
+Relay relayArd08(8, true, true, 8);
 
 
 // Child ID declaration of RelaysStruct
@@ -90,6 +89,7 @@ const uint8_t FAN_2_ID = 62;
 const uint8_t SPARE_SIGNAL_1 = 71;
 const uint8_t SPARE_SIGNAL_2 = 72;
 const uint8_t SPARE_BUTTON = 73;
+const uint8_t TEST_BUTTON = 74;
 
 
 typedef struct {
@@ -124,20 +124,15 @@ typedef struct {
     }
 
     bool onExpander() {
-
-        if (_expanderAddress >= 0 && _expanderAddress < 8) {
-            return true;
-        } else {
-            return false;
-        }
+        return _expanderAddress >= 0 && _expanderAddress < 8 ? true : false;
     }
 
     uint8_t readPin() {
         uint8_t signalState = 2;
-        if (this -> onExpander()) {
-            signalState = expander[_expanderAddress].digitalRead(this -> getPin());
+        if (this->onExpander()) {
+            signalState = expander[_expanderAddress].digitalRead(this->getPin());
         } else {
-            signalState = digitalRead(this -> getPin());
+            signalState = digitalRead(this->getPin());
         }
         return signalState;
     }
@@ -147,41 +142,43 @@ typedef struct {
 RelayStruct relaySensors[] = {
 //  Child ID               description   signalPin(or button) / expanderAddress / hasSignalPin / relay
         // Sensors using Button as signal pin  IN-signal       OUT - relay on expander
-        {SALOON_1_ID,      "Salon - Glowne",            22, 8, true,  relay000},    // 0
-        {SALOON_2_ID,      "Salon - Kinkiety(Sofa)",    23, 8, true,  relay001},    // 1
-        {SALOON_3_ID,      "Salon - Kinkiety(TV)",      24, 8, true,  relay002},    // 2
-        {DINING_ROOM_1_ID, "Jadalnia - Glowne",         25, 8, true,  relay003},    // 3
-        {DINING_ROOM_2_ID, "Jadalnia - Kinkiety",       26, 8, true,  relay004},    // 4
-        {BEDROOM_1_ID,     "Sypialnia - Glowne",        27, 8, true,  relay005},    // 5
-        {BEDROOM_2_ID,     "Sypialnia - Kinkiety",      28, 8, true,  relay006},    // 6
-        {ROOM_1_ID,        "Pokoj - Prawy",             29, 8, true,  relay007},    // 7
-        {ROOM_2_ID,        "Pokoj - Lewy",              30, 8, true,  relay008},    // 8
-        {BATHROOM_ID,      "Lazienka",                  31, 8, true,  relay009},    // 9
-        {KITCHEN_1_ID,     "Kuchnia - Glowne",          32, 8, true,  relay010},    // 10
-        {KITCHEN_2_ID,     "Kuchnia - Dodatkowe",       33, 8, true,  relay011},    // 11
-        {ENTRANCE_ID,      "Wejscie",                   34, 8, true,  relay012},    // 12
-        {LANDING_ID,       "Wiatrolap",                 35, 8, true,  relay013},    // 13
-        {HALL_ID,          "Przedpokoj",                36, 8, true,  relay014},    // 14
-        {CORRIDOR_ID,      "Korytarz",                  37, 8, true,  relay015},    // 15
-        {UTILITY_ROOM,     "Kotlownia",                 38, 8, true,  relay100},    // 16
-        {TERRACE_1_ID,     "Taras - Zachod",            39, 8, true,  relay101},    // 17
-        {TERRACE_2_ID,     "Taras - Poludnie",          40, 8, true,  relay102},    // 18
-        {HOUSE_1_ID,       "Dom - Zachod",              41, 8, true,  relay103},    // 19
-        {HOUSE_2_ID,       "Dom - Wschod",              42, 8, true,  relay104},    // 20
-        {HOUSE_3_ID,       "Dom - Christmass",          43, 8, true,  relay105},    // 21
-        {GARDEN_1_ID,      "Ogrod - Przod",             44, 8, true,  relay106},    // 22
-        {GARDEN_2_ID,      "Ogrod - Tyl",               45, 8, true,  relay107},    // 23
-        {ATTIC_1_ID,       "Strych - Wejscie",          46, 8, true,  relay108},    // 24
-        {ATTIC_2_ID,       "Strych 1",                  47, 8, true,  relay109},    // 25
-        {ATTIC_3_ID,       "Strych 2",                  48, 8, true,  relay110},    // 26
-        {ATTIC_4_ID,       "Strych 3",                  49, 8, true,  relay111},    // 27
-        {FAN_1_ID,         "Wentylator - Lazienka",      2, 8, true,  relay112},    // 28
-        {FAN_2_ID,         "Wentylator - Kotlownia",     3, 8, true,  relay113},    // 29
-        {SPARE_SIGNAL_1,   "Spare signal on pin 4",      4, 8, true,  relay114},    // 30
-        {SPARE_SIGNAL_2,   "Spare signal on pin 5",      5, 8, true,  relay115},    // 31
+        {SALOON_1_ID,      "Salon - Glowne",         22, 8, true,  relay000},    // 0
+        {SALOON_2_ID,      "Salon - Kinkiety(Sofa)", 23, 8, true,  relay001},    // 1
+        {SALOON_3_ID,      "Salon - Kinkiety(TV)",   24, 8, true,  relay002},    // 2
+        {DINING_ROOM_1_ID, "Jadalnia - Glowne",      25, 8, true,  relay003},    // 3
+        {DINING_ROOM_2_ID, "Jadalnia - Kinkiety",    26, 8, true,  relay004},    // 4
+        {BEDROOM_1_ID,     "Sypialnia - Glowne",     27, 8, true,  relay005},    // 5
+        {BEDROOM_2_ID,     "Sypialnia - Kinkiety",   28, 8, true,  relay006},    // 6
+        {ROOM_1_ID,        "Pokoj - Prawy",          29, 8, true,  relay007},    // 7
+        {ROOM_2_ID,        "Pokoj - Lewy",           30, 8, true,  relay008},    // 8
+        {BATHROOM_ID,      "Lazienka",               31, 8, true,  relay009},    // 9
+        {KITCHEN_1_ID,     "Kuchnia - Glowne",       32, 8, true,  relay010},    // 10
+        {KITCHEN_2_ID,     "Kuchnia - Dodatkowe",    33, 8, true,  relay011},    // 11
+        {ENTRANCE_ID,      "Wejscie",                34, 8, true,  relay012},    // 12
+        {LANDING_ID,       "Wiatrolap",              35, 8, true,  relay013},    // 13
+        {HALL_ID,          "Przedpokoj",             36, 8, true,  relay014},    // 14
+        {CORRIDOR_ID,      "Korytarz",               37, 8, true,  relay015},    // 15
+        {UTILITY_ROOM,     "Kotlownia",              38, 8, true,  relay100},    // 16
+        {TERRACE_1_ID,     "Taras - Zachod",         39, 8, true,  relay101},    // 17
+        {TERRACE_2_ID,     "Taras - Poludnie",       40, 8, true,  relay102},    // 18
+        {HOUSE_1_ID,       "Dom - Zachod",           41, 8, true,  relay103},    // 19
+        {HOUSE_2_ID,       "Dom - Wschod",           42, 8, true,  relay104},    // 20
+        {HOUSE_3_ID,       "Dom - Christmass",       43, 8, true,  relay105},    // 21
+        {GARDEN_1_ID,      "Ogrod - Przod",          44, 8, true,  relay106},    // 22
+        {GARDEN_2_ID,      "Ogrod - Tyl",            45, 8, true,  relay107},    // 23
+        {ATTIC_1_ID,       "Strych - Wejscie",       46, 8, true,  relay108},    // 24
+        {ATTIC_2_ID,       "Strych 1",               47, 8, true,  relay109},    // 25
+        {ATTIC_3_ID,       "Strych 2",               48, 8, true,  relay110},    // 26
+        {ATTIC_4_ID,       "Strych 3",               49, 8, true,  relay111},    // 27
+        {FAN_1_ID,         "Wentylator - Lazienka",  2,  8, true,  relay112},    // 28
+        {FAN_2_ID,         "Wentylator - Kotlownia", 3,  8, true,  relay113},    // 29
+        {SPARE_SIGNAL_1,   "Spare signal on pin 4",  4,  8, true,  relay114},    // 30
+        {SPARE_SIGNAL_2,   "Spare signal on pin 5",  5,  8, true,  relay115},    // 31
         // Sensors using Button as button      IN-button       OUT - relay on Arduino
-        {SPARE_BUTTON,     "Spare button on pin 6",      6,  8, false, relayArduino9}, // 32
+        {SPARE_BUTTON,     "Spare button on pin 6",  6,  8, false, relayArd09},  // 32
+        {TEST_BUTTON,      "Test button on pin 6",   6,  8, false, relayArd08},  // 33
 };
+
 const uint8_t numberOfRelayStruct = sizeof(relaySensors) / sizeof(RelayStruct);
 MyMessage msgs[numberOfRelayStruct];
 
@@ -202,15 +199,4 @@ RelayStruct getRelayStruct(uint8_t sensorId) {
 Relay getRelay(uint8_t sensorId) {
     auto relayStruct = getRelayStruct(sensorId);
     return relayStruct.relay;
-}
-
-// Buttons declaration; add new button to readButtons()
-// OneButton(int pin, int active = LOW, bool pullUpActive = true) - default constructor;
-OneButton buttons[numberOfRelayStruct];
-const uint8_t numberOfButtons = sizeof(buttons) / sizeof(OneButton);
-
-void createButtons() {
-    for (uint8_t i = 0; i < numberOfButtons; i++) {
-        buttons[i] = OneButton(relaySensors[i].getPin());
-    }
 }
