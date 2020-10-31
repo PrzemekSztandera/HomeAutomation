@@ -28,10 +28,6 @@ uint8_t readSignalPin(RelayStruct relayStruct) {
 }
 
 void updateRelayStateAndSendMessage(const uint8_t sensorId, bool pullUpActive = true) {
-    // Debug
-//    Serial.print("Calling updateRelayStateAndSendMessage() for sensor: ");
-//    Serial.print(sensorId);
-    // End of Debug
 
     auto relayStruct = getRelayStruct(sensorId);
     auto relay = getRelay(sensorId);
@@ -39,56 +35,61 @@ void updateRelayStateAndSendMessage(const uint8_t sensorId, bool pullUpActive = 
     uint8_t signalState = readSignalPin(relayStruct);
     uint8_t relayState = readRelayPin(relay);
 
-
+// save state of signal pin to EEPROM
     if (relayStruct.hasSignalPin()) {
         if (pullUpActive) {
             saveState(sensorId, !signalState);
         } else {
             saveState(sensorId, signalState);
         }
-//        Serial.print(" and pin: ");
-//        Serial.println(relayStruct.getPin());
+// save state of relay pin to EEPROM
     } else {
-        if (relay.isLowLevelTrigger()) {
-            relayState = !relayState;
+        if (relay.isLatching()) {
+            if (relay.isLowLevelTrigger()) {
+                saveState(sensorId, !relayState);
+            } else {
+                saveState(sensorId, relayState);
+            }
         }
-        saveState(sensorId, relayState);
-
-//        Serial.print(" and pin: ");
-//        Serial.println(relay.getPin());
     }
 
     uint8_t index = getIndex(relayStruct.getId());
-    send(msgs[index].set(loadState(sensorId)));
+    uint8_t state = loadState(sensorId);
+    send(msgs[index].set(state));
+
+//    Serial.print("Message for sensor: ");
+//    Serial.print(relayStruct.getId());
+//    Serial.print(" sent. Message: ");
+//    Serial.println(loadState(sensorId));
 }
 
 
 void switchRelay(const uint8_t sensorId) {
 
     auto relay = getRelay(sensorId);
+    uint8_t relayState = readRelayPin(relay);
 
-    uint8_t state = !loadState(sensorId);
-    saveState(sensorId, state);
+//     save new sensor state to EEPROM
+    uint8_t sensorState = !loadState(sensorId);
+    saveState(sensorId, sensorState);
 
-    if (relay.isNonLatching()) {
-        state = readRelayPin(relay);
-//        unsigned long currentMillis = millis();
+    if (relay.isLatching()) {
         if (relay.onExpander()) {
-            expander[relay.getExpanderAddress()].digitalWrite(relay.getPin(), !state);
-            myDelay(125);
-            expander[relay.getExpanderAddress()].digitalWrite(relay.getPin(), state);
+            expander[relay.getExpanderAddress()].digitalWrite(relay.getPin(), !relayState);
         } else {
-            digitalWrite(relay.getPin(), !state);
-            myDelay(125);
-            digitalWrite(relay.getPin(), state);
+            digitalWrite(relay.getPin(), !relayState);
         }
     } else {
-        state = readRelayPin(relay);
         if (relay.onExpander()) {
-            expander[relay.getExpanderAddress()].digitalWrite(relay.getPin(), !state);
+            expander[relay.getExpanderAddress()].digitalWrite(relay.getPin(), !relayState);
+            myDelay(125);
+            expander[relay.getExpanderAddress()].digitalWrite(relay.getPin(), relayState);
         } else {
-            digitalWrite(relay.getPin(), !state);
+            digitalWrite(relay.getPin(), !relayState);
+            myDelay(125);
+            digitalWrite(relay.getPin(), relayState);
         }
+
     }
     updateRelayStateAndSendMessage(sensorId);
 }
@@ -128,6 +129,15 @@ void checkSignalAndRelayState() {
         for (uint8_t i = 0; i < numberOfRelayStruct; i++) {
             auto relayStruct = relaySensors[i];
             updateRelayStateAndSendMessage(relayStruct.getId());
+
+//            Serial.print("Current sensor: ");
+//            Serial.println(relayStruct.id);
+//            Serial.print("Current sensor state: ");
+//            Serial.println(loadState(relayStruct.getId()));
+//            auto relay = getRelay(relayStruct.getId());
+//            Serial.print("Current pin state: ");
+//            Serial.println(digitalRead(relay.getPin()));
+
         }
         currentButtonMillis = millis();
         return;

@@ -15,44 +15,45 @@
 
 
 // Relays declaration
-// Relay(uint8_t pin, bool lowLevelTrigger = false, bool nonLatching = true, expanderAddress = 8)
+// Relay(uint8_t pin, bool lowLevelTrigger = false, bool latching = false, expanderAddress = 8)
 
 // MCP23017 relays
-Relay relay000(0, true, true, 0);
-Relay relay001(1, true, true, 0);
-Relay relay002(2, true, true, 0);
-Relay relay003(3, true, true, 0);
-Relay relay004(4, true, true, 0);
-Relay relay005(5, true, true, 0);
-Relay relay006(6, true, true, 0);
-Relay relay007(7, true, true, 0);
-Relay relay008(8, true, true, 0);
-Relay relay009(9, true, true, 0);
-Relay relay010(10, true, true, 0);
-Relay relay011(11, true, true, 0);
-Relay relay012(12, true, true, 0);
-Relay relay013(13, true, true, 0);
-Relay relay014(14, true, true, 0);
-Relay relay015(15, true, true, 0);
-Relay relay100(0, true, true, 1);
-Relay relay101(1, true, true, 1);
-Relay relay102(2, true, true, 1);
-Relay relay103(3, true, true, 1);
-Relay relay104(4, true, true, 1);
-Relay relay105(5, true, true, 1);
-Relay relay106(6, true, true, 1);
-Relay relay107(7, true, true, 1);
-Relay relay108(8, true, true, 1);
-Relay relay109(9, true, true, 1);
-Relay relay110(10, true, true, 1);
-Relay relay111(11, true, true, 1);
-Relay relay112(12, true, true, 1);
-Relay relay113(13, true, true, 1);
-Relay relay114(14, true, true, 1);
-Relay relay115(15, true, true, 1);
+Relay relay000(0, true, false, 0);
+Relay relay001(1, true, false, 0);
+Relay relay002(2, true, false, 0);
+Relay relay003(3, true, false, 0);
+Relay relay004(4, true, false, 0);
+Relay relay005(5, true, false, 0);
+Relay relay006(6, true, false, 0);
+Relay relay007(7, true, false, 0);
+Relay relay008(8, true, false, 0);
+Relay relay009(9, true, false, 0);
+Relay relay010(10, true, false, 0);
+Relay relay011(11, true, false, 0);
+Relay relay012(12, true, false, 0);
+Relay relay013(13, true, false, 0);
+Relay relay014(14, true, false, 0);
+Relay relay015(15, true, false, 0);
+Relay relay100(0, true, false, 1);
+Relay relay101(1, true, false, 1);
+Relay relay102(2, true, false, 1);
+Relay relay103(3, true, false, 1);
+Relay relay104(4, true, false, 1);
+Relay relay105(5, true, false, 1);
+Relay relay106(6, true, false, 1);
+Relay relay107(7, true, false, 1);
+Relay relay108(8, true, false, 1);
+Relay relay109(9, true, false, 1);
+Relay relay110(10, true, false, 1);
+Relay relay111(11, true, false, 1);
+Relay relay112(12, true, false, 1);
+Relay relay113(13, true, false, 1);
+Relay relay114(14, true, false, 1);
+Relay relay115(15, true, false, 1);
+
 // Arduino relays
-Relay relayArd09(9, true, false, 8);
-Relay relayArd08(8, true, true, 8);
+Relay relayArd08(8, true, false, 8);
+Relay relayArd09(9, true, true, 8);
 
 
 // Child ID declaration of RelaysStruct
@@ -130,7 +131,7 @@ typedef struct {
     uint8_t readPin() {
         uint8_t signalState = 2;
         if (this->onExpander()) {
-            signalState = expander[_expanderAddress].digitalRead(this->getPin());
+            signalState = expander[this->getExpanderAddress()].digitalRead(this->getPin());
         } else {
             signalState = digitalRead(this->getPin());
         }
@@ -175,8 +176,8 @@ RelayStruct relaySensors[] = {
         {SPARE_SIGNAL_1,   "Spare signal on pin 4",  4,  8, true,  relay114},    // 30
         {SPARE_SIGNAL_2,   "Spare signal on pin 5",  5,  8, true,  relay115},    // 31
         // Sensors using Button as button      IN-button       OUT - relay on Arduino
-        {SPARE_BUTTON,     "Spare button on pin 6",  6,  8, false, relayArd09},  // 32
-        {TEST_BUTTON,      "Test button on pin 6",   6,  8, false, relayArd08},  // 33
+        {SPARE_BUTTON,     "Spare button on pin 6",  22, 8, true, relayArd08},  // 32
+        {TEST_BUTTON,      "Test button on pin 6",   6,  8, false, relayArd09},  // 33
 };
 
 const uint8_t numberOfRelayStruct = sizeof(relaySensors) / sizeof(RelayStruct);

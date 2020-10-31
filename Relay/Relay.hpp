@@ -12,16 +12,16 @@ class Relay {
 private:
     uint8_t _pin;
     bool _lowLevelTrigger;
-    bool _nonLatching;
+    bool _latching;
     uint8_t _expanderAddress;
 
 public:
     Relay();
 
-    Relay(uint8_t pin, bool lowLevelTrigger = false, bool nonLatching = true, uint8_t expanderAddress = 8) {
+    Relay(uint8_t pin, bool lowLevelTrigger, bool latching = false, uint8_t expanderAddress = 8) {
         _pin = pin;
         _lowLevelTrigger = lowLevelTrigger;
-        _nonLatching = nonLatching;
+        _latching = latching;
         _expanderAddress = expanderAddress;
     }
 
@@ -33,8 +33,8 @@ public:
         return _lowLevelTrigger;
     }
 
-    bool isNonLatching() {
-        return _nonLatching;
+    bool isLatching() {
+        return _latching;
     }
 
     uint8_t getExpanderAddress() {
@@ -48,10 +48,18 @@ public:
     uint8_t readPin() {
         uint8_t relayState = 2;
         if (this->onExpander()) {
-            relayState = expander[_expanderAddress].digitalRead(this->getPin());
+            relayState = expander[this->getExpanderAddress()].digitalRead(this->getPin());
         } else {
             relayState = digitalRead(this->getPin());
         }
         return relayState;
+    }
+
+    void initialize() {
+        if (this->onExpander()) {
+            expander[this->getExpanderAddress()].pinMode(this->getPin(), OUTPUT);
+        } else {
+            pinMode(this->getPin(), OUTPUT);
+        }
     }
 };

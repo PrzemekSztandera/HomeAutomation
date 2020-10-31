@@ -23,17 +23,20 @@
 #include <MySensors.h>
 #include "./Automation/AutomationMega.hpp"
 #include "./Initialization/InitializationMega.hpp"
+#include "./I2C/I2C_scanner.hpp"
 
 void setup() {
     Serial.begin(115200);
+    scanI2cDevices();
+    createButtons();
     initializeMCP23017();
     initializeRelays();
     initializeSensors();
     initializeTimers();
-    createButtons();
     setupClickButtons();
     setupSignalButtons();
 //    initializeMcpPinsAsSignalPinsForRelays(); only when expander pins are used as input
+    printSensorDetails();
     Serial.println("Setup() called");
 }
 
@@ -42,7 +45,6 @@ void presentation() {
     sendSketchInfo("Gateway", "1.5");
     sendPresentation();
 }
-
 
 void loop() {
     readButtons();

@@ -13,7 +13,7 @@
 BME280I2C bme;
 
 // Dallas temp sensor DS18B20
-#define ONE_WIRE_BUS 7
+#define ONE_WIRE_BUS 69
 OneWire oneWire(ONE_WIRE_BUS);
 DallasTemperature sensors(&oneWire);
 // Address of 1 DS18B20s
