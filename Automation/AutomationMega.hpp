@@ -56,11 +56,6 @@ void updateRelayStateAndSendMessage(const uint8_t sensorId, bool pullUpActive = 
     uint8_t index = getIndex(relayStruct.getId());
     uint8_t state = loadState(sensorId);
     send(msgs[index].set(state));
-
-//    Serial.print("Message for sensor: ");
-//    Serial.print(relayStruct.getId());
-//    Serial.print(" sent. Message: ");
-//    Serial.println(loadState(sensorId));
 }
 
 
@@ -125,7 +120,7 @@ void readSensors() {
 //// Buttons automation
 
 void checkSignalAndRelayState() {
-    if (millis() - currentButtonMillis > 2000) {
+    if (millis() - currentButtonMillis > 1500) {
         for (uint8_t i = 0; i < numberOfRelayStruct; i++) {
             auto relayStruct = relaySensors[i];
             updateRelayStateAndSendMessage(relayStruct.getId());
