@@ -18,41 +18,41 @@
 // Relay(uint8_t pin, bool lowLevelTrigger = false, bool latching = false, expanderAddress = 8)
 
 // MCP23017 relays
-Relay relayE000(0, false, false, 0);
-Relay relayE001(1, false, false, 0);
-Relay relayE002(2, false, false, 0);
-Relay relayE003(3, false, false, 0);
-Relay relayE004(4, false, false, 0);
-Relay relayE005(5, false, false, 0);
-Relay relayE006(6, false, false, 0);
-Relay relayE007(7, false, false, 0);
-Relay relayE008(8, false, false, 0);
-Relay relayE009(9, false, false, 0);
-Relay relayE010(10, false, false, 0);
-Relay relayE011(11, false, false, 0);
-Relay relayE012(12, false, false, 0);
-Relay relayE013(13, false, false, 0);
-Relay relayE014(14, false, false, 0);
-Relay relayE015(15, false, false, 0);
-Relay relayE100(0, false, false, 1);
-Relay relayE101(1, false, false, 1);
-Relay relayE102(2, false, false, 1);
-Relay relayE103(3, false, false, 1);
-Relay relayE104(4, false, false, 1);
-Relay relayE105(5, false, false, 1);
-Relay relayE106(6, false, false, 1);
-Relay relayE107(7, false, false, 1);
-Relay relayE108(8, false, false, 1);
-Relay relayE109(9, false, false, 1);
-Relay relayE110(10, false, false, 1);
-Relay relayE111(11, false, false, 1);
-Relay relayE112(12, false, false, 1);
-Relay relayE113(13, false, false, 1);
-Relay relayE114(14, false, false, 1);
-Relay relayE115(15, false, false, 1);
+Relay relayE000(0, true, false, 0);
+Relay relayE001(1, true, false, 0);
+Relay relayE002(2, true, false, 0);
+Relay relayE003(3, true, false, 0);
+Relay relayE004(4, true, false, 0);
+Relay relayE005(5, true, false, 0);
+Relay relayE006(6, true, false, 0);
+Relay relayE007(7, true, false, 0);
+Relay relayE008(8, true, false, 0);
+Relay relayE009(9, true, false, 0);
+Relay relayE010(10, true, false, 0);
+Relay relayE011(11, true, false, 0);
+Relay relayE012(12, true, false, 0);
+Relay relayE013(13, true, false, 0);
+Relay relayE014(14, true, false, 0);
+Relay relayE015(15, true, false, 0);
+Relay relayE100(0, true, false, 1);
+Relay relayE101(1, true, false, 1);
+Relay relayE102(2, true, false, 1);
+Relay relayE103(3, true, false, 1);
+Relay relayE104(4, true, false, 1);
+Relay relayE105(5, true, false, 1);
+Relay relayE106(6, true, false, 1);
+Relay relayE107(7, true, false, 1);
+Relay relayE108(8, true, false, 1);
+Relay relayE109(9, true, false, 1);
+Relay relayE110(10, true, false, 1);
+Relay relayE111(11, true, false, 1);
+Relay relayE112(12, true, false, 1);
+Relay relayE113(13, true, false, 1);
+Relay relayE114(14, true, false, 1);
+Relay relayE115(15, true, false, 1);
 
 // Arduino relays
-Relay relayA08(8, false, true, 8);
+Relay relayA08(8, true, true, 8);
 Relay relayA09(9, true, true, 8);
 
 

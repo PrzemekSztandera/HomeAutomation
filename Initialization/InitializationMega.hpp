@@ -6,7 +6,7 @@
 #define USE_EXPANDER
 #define MY_DEBUG
 
-#include "../Mapping/RelaysMappingMega.hpp"
+#include "../Mapping/RelaysMapping.hpp"
 #include "../Mapping/SensorsMappingMega.hpp"
 #include "../Automation/AutomationMega.hpp"
 #include "../Button/ButtonsInitialization.hpp"
