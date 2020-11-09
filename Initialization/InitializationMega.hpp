@@ -7,7 +7,7 @@
 #define MY_DEBUG
 
 #include "../Mapping/RelaysMapping.hpp"
-#include "../Mapping/SensorsMappingMega.hpp"
+#include "../Mapping/EnvironmentSensorsMapping.hpp"
 #include "../Automation/AutomationMega.hpp"
 #include "../Button/ButtonsInitialization.hpp"
 

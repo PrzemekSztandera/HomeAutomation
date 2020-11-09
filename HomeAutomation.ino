@@ -25,14 +25,17 @@
 #include "./Initialization/InitializationMega.hpp"
 #include "./I2C/I2C_scanner.hpp"
 
-void setup() {
-    Serial.begin(115200);
+void before() {
+  Serial.begin(115200);
     scanI2cDevices();
     createButtons();
     initializeMCP23017();
     initializeRelays();
     initializeSensors();
     initializeTimers();
+}
+
+void setup() {
     setupClickButtons();
     setupSignalButtons();
 //    initializeMcpPinsAsSignalPinsForRelays(); only when expander pins are used as input
