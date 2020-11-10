@@ -79,6 +79,7 @@ const uint8_t TERRACE_2_ID = 42;
 const uint8_t HOUSE_1_ID = 43;
 const uint8_t HOUSE_2_ID = 44;
 const uint8_t HOUSE_3_ID = 45;
+const uint8_t HOUSE_4_ID = 46;
 const uint8_t GARDEN_1_ID = 51;
 const uint8_t GARDEN_2_ID = 52;
 const uint8_t ATTIC_1_ID = 53;
@@ -88,9 +89,8 @@ const uint8_t ATTIC_4_ID = 56;
 const uint8_t FAN_1_ID = 61;
 const uint8_t FAN_2_ID = 62;
 const uint8_t SPARE_1_ID = 71;
-const uint8_t SPARE_2_ID = 72;
-const uint8_t CHARGER_ID = 73;
-const uint8_t TEST_BUTTON = 74;
+const uint8_t CHARGER_ID = 72;
+const uint8_t TEST_BUTTON = 73;
 
 
 typedef struct {
@@ -159,22 +159,23 @@ RelayStruct relaySensors[] = {
         {LANDING_ID,       "Wiatrolap",              35, 8, true,  relayE013},    // 13
         {HALL_ID,          "Przedpokoj",             36, 8, true,  relayE014},    // 14
         {CORRIDOR_ID,      "Korytarz",               37, 8, true,  relayE015},    // 15
-        {UTILITY_ROOM,     "Kotlownia",              38, 8, true,  relayE100},    // 16
-        {TERRACE_1_ID,     "Taras - Zachod",         39, 8, true,  relayE101},    // 17
-        {TERRACE_2_ID,     "Taras - Poludnie",       40, 8, true,  relayE102},    // 18
-        {HOUSE_1_ID,       "Dom - Zachod",           41, 8, true,  relayE103},    // 19
+        {UTILITY_ROOM,     "Kotlownia/WC",           38, 8, true,  relayE100},    // 16
+        {TERRACE_1_ID,     "Taras - Poludnie",       39, 8, true,  relayE101},    // 17
+        {TERRACE_2_ID,     "Taras - Zachod",         40, 8, true,  relayE102},    // 18
+        {HOUSE_1_ID,       "Dom - Polnoc",           41, 8, true,  relayE103},    // 19
         {HOUSE_2_ID,       "Dom - Wschod",           42, 8, true,  relayE104},    // 20
-        {HOUSE_3_ID,       "Dom - Christmass",       43, 8, true,  relayE105},    // 21
-        {GARDEN_1_ID,      "Ogrod - Przod",          44, 8, true,  relayE106},    // 22
-        {GARDEN_2_ID,      "Ogrod - Tyl",            45, 8, true,  relayE107},    // 23
-        {ATTIC_1_ID,       "Strych - Wejscie",       46, 8, true,  relayE108},    // 24
-        {ATTIC_2_ID,       "Strych 1",               47, 8, true,  relayE109},    // 25
-        {ATTIC_3_ID,       "Strych 2",               48, 8, true,  relayE110},    // 26
-        {ATTIC_4_ID,       "Strych 3",               49, 8, true,  relayE111},    // 27
-        {FAN_1_ID,         "Wentylator - Lazienka",  2,  8, true,  relayE112},    // 28
-        {FAN_2_ID,         "Wentylator - Kotlownia", 3,  8, true,  relayE113},    // 29
-        {SPARE_1_ID,       "Spare signal on pin 4",  4,  8, true,  relayE114},    // 30
-        {SPARE_2_ID,       "Spare signal on pin 5",  5,  8, true,  relayE115},    // 31
+        {HOUSE_3_ID,       "Dom - Zachod",           43, 8, true,  relayE105},    // 21
+        {HOUSE_4_ID,       "Dom - Christmass",       44, 8, true,  relayE106},    // 22
+        {GARDEN_1_ID,      "Ogrod - Przod",          45, 8, true,  relayE107},    // 23
+        {GARDEN_2_ID,      "Ogrod - Tyl",            46, 8, true,  relayE108},    // 24
+        {FAN_1_ID,         "Wentylator - Lazienka",  47, 8, true,  relayE109},    // 25
+        {FAN_2_ID,         "Wentylator - Kotlownia", 48, 8, true,  relayE110},    // 26
+        {SPARE_1_ID,       "Spare signal on pin 49", 49, 8, true,  relayE111},    // 27
+        {ATTIC_1_ID,       "Strych - Wejscie",       2,  8, true,  relayE112},    // 28
+        {ATTIC_2_ID,       "Strych 1",               3,  8, true,  relayE113},    // 29
+        {ATTIC_3_ID,       "Strych 2",               4,  8, true,  relayE114},    // 30
+        {ATTIC_4_ID,       "Strych 3",               5,  8, true,  relayE115},    // 31
+
         // Sensors using Button as button      IN-button       OUT - relay on Arduino
         {CHARGER_ID,       "Ladowarka do tabletu",   6,  8, false, relayA08},     // 32
         {TEST_BUTTON,      "Test button on pin 6",   7,  8, false, relayA09},     // 33
