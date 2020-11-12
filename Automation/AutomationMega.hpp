@@ -34,6 +34,7 @@ void updateRelayStateAndSendMessage(const uint8_t sensorId, bool pullUpActive = 
 
     uint8_t signalState = readSignalPin(relayStruct);
     uint8_t relayState = readRelayPin(relay);
+    uint8_t sensorState = loadState(sensorId);
 
 // save state of signal pin to EEPROM
     if (relayStruct.hasSignalPin()) {
@@ -56,10 +57,19 @@ void updateRelayStateAndSendMessage(const uint8_t sensorId, bool pullUpActive = 
     uint8_t index = getIndex(relayStruct.getId());
     uint8_t state = loadState(sensorId);
     send(msgs[index].set(state));
+    if(sensorState != state) {
+        Serial.print("Message send and new state updated: ");
+        Serial.print(state);
+        Serial.print(" for sensor: ");
+        Serial.println(sensorId);
+    }
 }
 
 
 void switchRelay(const uint8_t sensorId) {
+
+    Serial.print("Calling switchRelay() for sensor: ");
+    Serial.println(sensorId);
 
     auto relay = getRelay(sensorId);
     uint8_t relayState = readRelayPin(relay);
@@ -86,7 +96,13 @@ void switchRelay(const uint8_t sensorId) {
         }
 
     }
+
     updateRelayStateAndSendMessage(sensorId);
+    Serial.print("updateRelayStateAndSendMessage() and ");
+    Serial.print("switchRelay() called for sensor: ");
+    Serial.print(sensorId);
+    Serial.print(", new state: ");
+    Serial.println(loadState(sensorId));
 }
 
 //// Sensors automation
@@ -145,15 +161,16 @@ void readButtons() {
     }
 }
 
-//void pressButton() {
-//    switchRelay(SPARE_BUTTON);
-//}
+void pressButton() {
+    switchRelay(SALOON_2_ID);
+}
 
 // Setup the buttons and relays. Do not assign LongPress and Click to the same sensor
 void setupClickButtons() {
     for (uint8_t i = 0; i < numberOfButtons; i++) {
         if (!relaySensors[i].hasSignalPin()) {
             buttons[i].attachLongPressStart(switchRelay, relaySensors[i].getId());
+            buttons[i].attachLongPressStart(pressButton);
             buttons[i].setPressTicks(275);
         }
     }

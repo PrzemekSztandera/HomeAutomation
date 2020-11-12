@@ -33,6 +33,7 @@ void before() {
     initializeRelays();
     initializeSensors();
     initializeTimers();
+    Serial.println("before() called...!");
 }
 
 void setup() {
@@ -40,13 +41,14 @@ void setup() {
     setupSignalButtons();
 //    initializeMcpPinsAsSignalPinsForRelays(); only when expander pins are used as input
     printSensorDetails();
-    Serial.println("Setup() called");
+    Serial.println("setup() called...!");
 }
 
 void presentation() {
     // Send the sketch version information to the gateway and Controller
     sendSketchInfo("Gateway", "1.5");
     sendPresentation();
+    Serial.println("presentation() called...!");
 }
 
 void loop() {
@@ -56,9 +58,11 @@ void loop() {
 }
 
 void receive(const MyMessage &message) {
-    Serial.println("Calling receive()");
+    Serial.print("Calling receive() for sensor: ");
+    Serial.println(message.getSensor());
     if (message.type == V_STATUS) {
         switchRelay(message.getSensor());
     }
-    Serial.println("Receive() called");
+    Serial.print("receive() called for sensor: ");
+    Serial.println(message.getSensor());
 }

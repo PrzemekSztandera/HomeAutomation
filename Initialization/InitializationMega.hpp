@@ -27,6 +27,12 @@ void initializeTimers() {
     currentSensorMillis = millis();
 }
 
+void myDelay2(long interval) {
+    unsigned long currentMillis = millis();
+    while (millis() - currentMillis < interval) {}
+    Serial.println("Waiting...");
+}
+
 void initializeRelays() {
     for (uint8_t i = 0; i < numberOfRelayStruct; i++) {
         auto relayStruct = relaySensors[i];
@@ -40,7 +46,7 @@ void initializeRelays() {
 #ifdef MY_DEBUG
         Serial.print("Current sensor: ");
         Serial.println(relayStruct.id);
-        Serial.print("Current sensor state: ");
+        Serial.print("Current sensor state in initialization: ");
         Serial.println(currentSensorState);
 #endif
 
@@ -50,10 +56,10 @@ void initializeRelays() {
             saveState(relayStruct.getId(), currentSensorState);
         }
 
-#ifdef MY_DEBUG
-        Serial.print("Current sensor state2: ");
-        Serial.println(loadState(relayStruct.getId()));
-#endif
+//#ifdef MY_DEBUG
+//        Serial.print("Current sensor state2: ");
+//        Serial.println(loadState(relayStruct.getId()));
+//#endif
 
         uint8_t currentRelayState = !loadState(relayStruct.getId());
 
@@ -66,7 +72,7 @@ void initializeRelays() {
         }
 
 #ifdef MY_DEBUG
-        Serial.print("Current relay state: ");
+        Serial.print("Current relay state in initialization: ");
         Serial.println(currentRelayState);
 #endif
 
@@ -77,12 +83,13 @@ void initializeRelays() {
         }
 
 #ifdef MY_DEBUG
-        Serial.print("Current pin state: ");
+        Serial.print("Current pin state in initialization: ");
         Serial.println(digitalRead(relay.getPin()));
 #endif
+        myDelay2(250);
 
     }
-    Serial.println("Relays initialized");
+    Serial.println("initializeRelays() called...!");
 }
 
 void initializeSensors() {
@@ -133,7 +140,7 @@ void sendPresentation() {
         present(sensorStruct.getId(), sensorStruct.getPresentationType(), sensorStruct.getDescription());
     }
 
-    Serial.println("Presentation() called");
+    Serial.println("sendPresentation() called...!");
 }
 
 void printSensorDetails() {
@@ -142,9 +149,10 @@ void printSensorDetails() {
         auto relay = getRelay(relayStruct.getId());
         Serial.print("Current sensor: ");
         Serial.println(relayStruct.id);
-        Serial.print("Current sensor state: ");
+        Serial.print("Current sensor state in setup: ");
         Serial.println(loadState(relayStruct.getId()));
-        Serial.print("Current pin state: ");
+        Serial.print("Current pin state in setup: ");
         Serial.println(digitalRead(relay.getPin()));
+        myDelay2(250);
     }
 }
