@@ -139,7 +139,7 @@ typedef struct {
     }
 } RelayStruct;
 
-// D0, D1, D10, D13, D50, D51, D52, D53 - do not use
+// D0, D1, D4, D10, D13, D50, D51, D52, D53 - do not use
 RelayStruct relaySensors[] = {
 //  Child ID               description   signalPin(or button) / expanderAddress / hasSignalPin / relay
         // Sensors using Button as signal pin  IN-signal       OUT - relay on expander
