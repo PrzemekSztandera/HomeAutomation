@@ -46,6 +46,7 @@ void initializeRelays() {
 #ifdef MY_DEBUG
         Serial.print("Current sensor: ");
         Serial.println(relayStruct.id);
+        Serial.println(relayStruct.getDescription());
         Serial.print("Current sensor state in initialization: ");
         Serial.println(currentSensorState);
 #endif
