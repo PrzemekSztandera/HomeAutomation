@@ -115,7 +115,7 @@ void initializeSensors() {
             Serial.println("Found UNKNOWN sensor! Error!");
     }
 // Dallas temp sensor DS18B20
-    sensors.begin();
+    dallasSensors.begin();
 
     Serial.println("Sensors initialized");
 }
@@ -132,7 +132,7 @@ void initializeMcpPinsAsSignalPinsForRelays() {
 void sendPresentation() {
     for (uint8_t i = 0; i < numberOfRelayStruct; i++) {
         auto relayStruct = relaySensors[i];
-        present(relayStruct.getId(), S_BINARY, relayStruct.getDescription());
+        present(relayStruct.getId(), relayStruct.getPresentationType(), relayStruct.getDescription());
         send(msgs[i].set(loadState(relayStruct.getId())));
     }
     for (uint8_t i = 0; i < maxSensors; i++) {

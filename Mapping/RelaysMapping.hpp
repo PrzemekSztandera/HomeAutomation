@@ -52,50 +52,51 @@ Relay relayE114(14, true, false, 1);
 Relay relayE115(15, true, false, 1);
 
 // Arduino relays
-Relay relayA08(8, true, true, 8);
-Relay relayA09(9, true, true, 8);
+Relay relayArduino68(68, true, true, 8);
+Relay relayArduino69(69, true, true, 8);
 
 
 // Child ID declaration of RelaysStruct
-const uint8_t SALOON_1_ID = 11;
-const uint8_t SALOON_2_ID = 12;
-const uint8_t SALOON_3_ID = 13;
-const uint8_t DINING_ROOM_1_ID = 14;
-const uint8_t DINING_ROOM_2_ID = 15;
-const uint8_t BEDROOM_1_ID = 21;
-const uint8_t BEDROOM_2_ID = 22;
-const uint8_t ROOM_1_ID = 23;
-const uint8_t ROOM_2_ID = 24;
-const uint8_t BATHROOM_ID = 31;
-const uint8_t KITCHEN_1_ID = 32;
-const uint8_t KITCHEN_2_ID = 33;
-const uint8_t ENTRANCE_ID = 34;
-const uint8_t LANDING_ID = 35;
-const uint8_t HALL_ID = 36;
-const uint8_t CORRIDOR_ID = 37;
-const uint8_t UTILITY_ROOM = 38;
-const uint8_t TERRACE_1_ID = 41;
-const uint8_t TERRACE_2_ID = 42;
-const uint8_t HOUSE_1_ID = 43;
-const uint8_t HOUSE_2_ID = 44;
-const uint8_t HOUSE_3_ID = 45;
-const uint8_t HOUSE_4_ID = 46;
-const uint8_t GARDEN_1_ID = 51;
-const uint8_t GARDEN_2_ID = 52;
-const uint8_t ATTIC_1_ID = 53;
-const uint8_t ATTIC_2_ID = 54;
-const uint8_t ATTIC_3_ID = 55;
-const uint8_t ATTIC_4_ID = 56;
-const uint8_t FAN_1_ID = 61;
-const uint8_t FAN_2_ID = 62;
-const uint8_t SPARE_1_ID = 71;
-const uint8_t CHARGER_ID = 72;
-const uint8_t TEST_BUTTON = 73;
+const uint8_t SIGNAL_IN_11 = 11;
+const uint8_t SIGNAL_IN_12 = 12;
+const uint8_t SIGNAL_IN_13 = 13;
+const uint8_t SIGNAL_IN_14 = 14;
+const uint8_t SIGNAL_IN_15 = 15;
+const uint8_t SIGNAL_IN_21 = 21;
+const uint8_t SIGNAL_IN_22 = 22;
+const uint8_t SIGNAL_IN_23 = 23;
+const uint8_t SIGNAL_IN_24 = 24;
+const uint8_t SIGNAL_IN_31 = 31;
+const uint8_t SIGNAL_IN_32 = 32;
+const uint8_t SIGNAL_IN_33 = 33;
+const uint8_t SIGNAL_IN_34 = 34;
+const uint8_t SIGNAL_IN_35 = 35;
+const uint8_t SIGNAL_IN_36 = 36;
+const uint8_t SIGNAL_IN_37 = 37;
+const uint8_t SIGNAL_IN_38 = 38;
+const uint8_t SIGNAL_IN_41 = 41;
+const uint8_t SIGNAL_IN_42 = 42;
+const uint8_t SIGNAL_IN_43 = 43;
+const uint8_t SIGNAL_IN_44 = 44;
+const uint8_t SIGNAL_IN_45 = 45;
+const uint8_t SIGNAL_IN_46 = 46;
+const uint8_t SIGNAL_IN_51 = 51;
+const uint8_t SIGNAL_IN_52 = 52;
+const uint8_t SIGNAL_IN_53 = 53;
+const uint8_t SIGNAL_IN_54 = 54;
+const uint8_t SIGNAL_IN_55 = 55;
+const uint8_t SIGNAL_IN_56 = 56;
+const uint8_t SIGNAL_IN_61 = 61;
+const uint8_t SIGNAL_IN_62 = 62;
+const uint8_t SIGNAL_IN_71 = 71;
+const uint8_t SIGNAL_OUT_72 = 72;
+const uint8_t SIGNAL_OUT_73 = 73;
 
 
 typedef struct {
 
     const uint8_t id;
+    const mysensors_sensor_t presentationType;
     char *description;
     const uint8_t _signalPin; // pin to read the state of latch relay-button for relayStruct
     const uint8_t _expanderAddress;
@@ -105,6 +106,10 @@ typedef struct {
 
     uint8_t getId() {
         return id;
+    }
+
+    mysensors_sensor_t getPresentationType() {
+        return presentationType;
     }
 
     char *getDescription() {
@@ -139,46 +144,46 @@ typedef struct {
     }
 } RelayStruct;
 
-// D0, D1, D4, D10, D13, D50, D51, D52, D53 - do not use
+// D0, D1, D2, D4, D10, D13 - D21, D49 - D54 : do not use
 RelayStruct relaySensors[] = {
 //  Child ID               description   signalPin(or button) / expanderAddress / hasSignalPin / relay
-        // Sensors using Button as signal pin  IN-signal       OUT - relay on expander
-        {SALOON_1_ID,      "Salon - Glowne",         22, 8, true,  relayE000},    // 0
-        {SALOON_2_ID,      "Salon - Kinkiety(Sofa)", 23, 8, true,  relayE001},    // 1
-        {SALOON_3_ID,      "Salon - Kinkiety(TV)",   24, 8, true,  relayE002},    // 2
-        {DINING_ROOM_1_ID, "Jadalnia - Glowne",      25, 8, true,  relayE003},    // 3
-        {DINING_ROOM_2_ID, "Jadalnia - Kinkiety",    26, 8, true,  relayE004},    // 4
-        {BEDROOM_1_ID,     "Sypialnia - Glowne",     27, 8, true,  relayE005},    // 5
-        {BEDROOM_2_ID,     "Sypialnia - Kinkiety",   28, 8, true,  relayE006},    // 6
-        {ROOM_1_ID,        "Pokoj - Prawy",          29, 8, true,  relayE007},    // 7
-        {ROOM_2_ID,        "Pokoj - Lewy",           30, 8, true,  relayE008},    // 8
-        {BATHROOM_ID,      "Lazienka",               31, 8, true,  relayE009},    // 9
-        {KITCHEN_1_ID,     "Kuchnia - Glowne",       32, 8, true,  relayE010},    // 10
-        {KITCHEN_2_ID,     "Kuchnia - Dodatkowe",    33, 8, true,  relayE011},    // 11
-        {ENTRANCE_ID,      "Wejscie",                34, 8, true,  relayE012},    // 12
-        {LANDING_ID,       "Wiatrolap",              35, 8, true,  relayE013},    // 13
-        {HALL_ID,          "Przedpokoj",             36, 8, true,  relayE014},    // 14
-        {CORRIDOR_ID,      "Korytarz",               37, 8, true,  relayE015},    // 15
-        {UTILITY_ROOM,     "Kotlownia/WC",           38, 8, true,  relayE100},    // 16
-        {TERRACE_1_ID,     "Taras - Poludnie",       39, 8, true,  relayE101},    // 17
-        {TERRACE_2_ID,     "Taras - Zachod",         40, 8, true,  relayE102},    // 18
-        {HOUSE_1_ID,       "Dom - Polnoc",           41, 8, true,  relayE103},    // 19
-        {HOUSE_2_ID,       "Dom - Wschod",           42, 8, true,  relayE104},    // 20
-        {HOUSE_3_ID,       "Dom - Zachod",           43, 8, true,  relayE105},    // 21
-        {HOUSE_4_ID,       "Dom - Christmass",       44, 8, true,  relayE106},    // 22
-        {GARDEN_1_ID,      "Ogrod - Przod",          45, 8, true,  relayE107},    // 23
-        {GARDEN_2_ID,      "Ogrod - Tyl",            46, 8, true,  relayE108},    // 24
-        {FAN_1_ID,         "Wentylator - Lazienka",  47, 8, true,  relayE109},    // 25
-        {FAN_2_ID,         "Wentylator - Kotlownia", 48, 8, true,  relayE110},    // 26
-        {SPARE_1_ID,       "Spare signal on pin 49", 49, 8, true,  relayE111},    // 27
-        {ATTIC_1_ID,       "Strych - Wejscie",       2,  8, true,  relayE112},    // 28
-        {ATTIC_2_ID,       "Strych 1",               3,  8, true,  relayE113},    // 29
-        {ATTIC_3_ID,       "Strych 2",               4,  8, true,  relayE114},    // 30
-        {ATTIC_4_ID,       "Strych 3",               5,  8, true,  relayE115},    // 31
+        // Signal buttons (32)           IN-signal     OUT - relay on expander
+        {SIGNAL_IN_11, S_BINARY,  "Pin 22 - in",   22, 8, true,  relayE000},    // 0
+        {SIGNAL_IN_12, S_BINARY,  "Pin 23 - in",   23, 8, true,  relayE001},    // 1
+        {SIGNAL_IN_13, S_BINARY,  "Pin 24 - in",   24, 8, true,  relayE002},    // 2
+        {SIGNAL_IN_14, S_BINARY,  "Pin 25 - in",   25, 8, true,  relayE003},    // 3
+        {SIGNAL_IN_15, S_BINARY,  "Pin 26 - in",   26, 8, true,  relayE004},    // 4
+        {SIGNAL_IN_21, S_BINARY,  "Pin 27 - in",   27, 8, true,  relayE005},    // 5
+        {SIGNAL_IN_22, S_BINARY,  "Pin 28 - in",   28, 8, true,  relayE006},    // 6
+        {SIGNAL_IN_23, S_BINARY,  "Pin 29 - in",   29, 8, true,  relayE007},    // 7
+        {SIGNAL_IN_24, S_BINARY,  "Pin 30 - in",   30, 8, true,  relayE008},    // 8
+        {SIGNAL_IN_31, S_BINARY,  "Pin 31 - in",   31, 8, true,  relayE009},    // 9
+        {SIGNAL_IN_32, S_BINARY,  "Pin 32 - in",   32, 8, true,  relayE010},    // 10
+        {SIGNAL_IN_33, S_BINARY,  "Pin 33 - in",   33, 8, true,  relayE011},    // 11
+        {SIGNAL_IN_34, S_BINARY,  "Pin 34 - in",   34, 8, true,  relayE012},    // 12
+        {SIGNAL_IN_35, S_BINARY,  "Pin 35 - in",   35, 8, true,  relayE013},    // 13
+        {SIGNAL_IN_36, S_BINARY,  "Pin 36 - in",   36, 8, true,  relayE014},    // 14
+        {SIGNAL_IN_37, S_BINARY,  "Pin 37 - in",   37, 8, true,  relayE015},    // 15
+        {SIGNAL_IN_38, S_BINARY,  "Pin 38 - in",   38, 8, true,  relayE100},    // 16
+        {SIGNAL_IN_41, S_BINARY,  "Pin 39 - in",   39, 8, true,  relayE101},    // 17
+        {SIGNAL_IN_42, S_BINARY,  "Pin 40 - in",   40, 8, true,  relayE102},    // 18
+        {SIGNAL_IN_43, S_BINARY,  "Pin 41 - in",   41, 8, true,  relayE103},    // 19
+        {SIGNAL_IN_44, S_BINARY,  "Pin 42 - in",   42, 8, true,  relayE104},    // 20
+        {SIGNAL_IN_45, S_BINARY,  "Pin 43 - in",   43, 8, true,  relayE105},    // 21
+        {SIGNAL_IN_46, S_BINARY,  "Pin 44 - in",   44, 8, true,  relayE106},    // 22
+        {SIGNAL_IN_51, S_BINARY,  "Pin 45 - in",   45, 8, true,  relayE107},    // 23
+        {SIGNAL_IN_52, S_BINARY,  "Pin 46 - in",   46, 8, true,  relayE108},    // 24
+        {SIGNAL_IN_53, S_BINARY,  "Pin 47 - in",   47, 8, true,  relayE109},    // 25
+        {SIGNAL_IN_54, S_BINARY,  "Pin 48 - in",   48, 8, true,  relayE110},    // 26
+        {SIGNAL_IN_55, S_BINARY,  "Pin A8 - in",   62, 8, true,  relayE111},    // 27
+        {SIGNAL_IN_56, S_BINARY,  "Pin A9 - in",   63, 8, true,  relayE112},    // 28
+        {SIGNAL_IN_61, S_BINARY,  "Pin A10 - in",  64, 8, true,  relayE113},    // 29
+        {SIGNAL_IN_62, S_BINARY,  "Pin A11 - in",  65, 8, true,  relayE114},    // 30
+        {SIGNAL_IN_71, S_BINARY,  "Pin A12 - in",  66, 8, true,  relayE115},    // 31
 
-        // Sensors using Button as button      IN-button       OUT - relay on Arduino
-        {CHARGER_ID,       "Ladowarka do tabletu",   6,  8, false, relayA08},     // 32
-        {TEST_BUTTON,      "Test button on pin 6",   7,  8, false, relayA09},     // 33
+        // Button                  IN-button      OUT - relay on Arduino
+        {SIGNAL_OUT_72, S_BINARY, "Pin A14(A3) - out",  57,  8, false, relayArduino68}, // 32
+        {SIGNAL_OUT_73, S_BINARY, "Pin A15(A13) - out", 67,  8, false, relayArduino69}, // 33
 };
 
 const uint8_t numberOfRelayStruct = sizeof(relaySensors) / sizeof(RelayStruct);

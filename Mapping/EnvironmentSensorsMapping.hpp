@@ -13,18 +13,18 @@
 BME280I2C bme;
 
 // Dallas temp sensor DS18B20
-#define ONE_WIRE_BUS 69
+#define ONE_WIRE_BUS 7
 OneWire oneWire(ONE_WIRE_BUS);
-DallasTemperature sensors(&oneWire);
+DallasTemperature dallasSensors(&oneWire);
 // Address of 1 DS18B20s
 uint8_t sensor1[8] = {0x28, 0xC8, 0xF3, 0x79, 0xA2, 0x00, 0x03, 0xA8};
 
 
-// Child ID declaration of RelaysStruct
-//const uint8_t SALOON_TEMP = 101;
-//const uint8_t SALOON_BARO = 102;
-//const uint8_t SALOON_HUM = 103;
-const uint8_t SALOON_DALLAS_TEMP = 104;
+// Child ID declaration of SensorStruct
+//const uint8_t BME_TEMP = 101;
+//const uint8_t BME_BARO = 102;
+//const uint8_t BME_HUM = 103;
+const uint8_t DALLAS_TEMP = 104;
 
 typedef struct {
     const uint8_t id;
@@ -50,10 +50,10 @@ typedef struct {
 } SensorStruct;
 
 SensorStruct environmentSensors[] = {
-//        {SALOON_TEMP,        "Salon Temperatura", V_TEMP,     S_TEMP},
-//        {SALOON_BARO,        "Salon Cisnienie",   V_PRESSURE, S_BARO},
-//        {SALOON_HUM,         "Salon Wilgotnosc",  V_HUM,      S_HUM},
-        {SALOON_DALLAS_TEMP, "Salon Temperatura", V_TEMP, S_TEMP},
+//        {BME_TEMP,        "I2C BME_TEMP", V_TEMP,     S_TEMP},
+//        {BME_BARO,        "I2C BME_BARO", V_PRESSURE, S_BARO},
+//        {BME_HUM,         "I2C BME_HUM",  V_HUM,      S_HUM},
+        {DALLAS_TEMP, "Pin 7 - OneWire", V_TEMP, S_TEMP},
 };
 
 const uint8_t maxSensors = sizeof(environmentSensors) / sizeof(SensorStruct);

@@ -119,11 +119,11 @@ void readSensors() {
 //        send(sensorMsgs[2].set(hum, 1));
 
 // Dallas temp sensor DS18B20
-        sensors.requestTemperatures();
+        dallasSensors.requestTemperatures();
         for (uint8_t i = 0; i < maxSensors; i++) {
             auto sensorStruct = environmentSensors[i];
-            if (sensorStruct.getId() == SALOON_DALLAS_TEMP) {
-                send(sensorMsgs[i].set(sensors.getTempC(sensor1), 1));
+            if (sensorStruct.getId() == DALLAS_TEMP) {
+                send(sensorMsgs[i].set(dallasSensors.getTempC(sensor1), 1));
             }
         }
 
@@ -162,7 +162,7 @@ void readButtons() {
 }
 
 void pressButton() {
-    switchRelay(SALOON_2_ID);
+//    switchRelay(...);
 }
 
 // Setup the buttons and relays. Do not assign LongPress and Click to the same sensor
@@ -170,7 +170,7 @@ void setupClickButtons() {
     for (uint8_t i = 0; i < numberOfButtons; i++) {
         if (!relaySensors[i].hasSignalPin()) {
             buttons[i].attachLongPressStart(switchRelay, relaySensors[i].getId());
-            buttons[i].attachLongPressStart(pressButton);
+//            buttons[i].attachLongPressStart(pressButton);
             buttons[i].setPressTicks(275);
         }
     }
