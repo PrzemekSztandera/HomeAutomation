@@ -12,7 +12,7 @@
 
 #include "../Initialization/InitializationMega.hpp"
 
-//// Relays automation
+// Relays automation
 
 void myDelay(long interval) {
     unsigned long currentMillis = millis();
@@ -74,7 +74,7 @@ void switchRelay(const uint8_t sensorId) {
     auto relay = getRelay(sensorId);
     uint8_t relayState = readRelayPin(relay);
 
-//     save new sensor state to EEPROM
+// save new sensor state to EEPROM
     uint8_t sensorState = !loadState(sensorId);
     saveState(sensorId, sensorState);
 
@@ -105,10 +105,9 @@ void switchRelay(const uint8_t sensorId) {
     Serial.println(loadState(sensorId));
 }
 
-//// Sensors automation
-
+// Sensors automation
 void readSensors() {
-    if (millis() - currentSensorMillis > 30000) {
+    if (millis() - currentSensorMillis > 300000) {
 // Bosh sensor BME280
 //        float temp(NAN), hum(NAN), pres(NAN);
 //        BME280::TempUnit tempUnit(BME280::TempUnit_Celsius);
@@ -133,8 +132,7 @@ void readSensors() {
     }
 }
 
-//// Buttons automation
-
+// Buttons automation
 void checkSignalAndRelayState() {
     if (millis() - currentButtonMillis > 1500) {
         for (uint8_t i = 0; i < numberOfRelayStruct; i++) {

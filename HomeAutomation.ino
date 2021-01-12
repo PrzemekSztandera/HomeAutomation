@@ -8,14 +8,10 @@
  *
  */
 
-#include <Ethernet.h>
-#include <OneButton.h>
 
 // Enable serial gateway
 //#define MY_GATEWAY_SERIAL
 
-// Enable and select radio type attached
-//#define MY_RADIO_RF24
 
 // Enable gateway ethernet module type
 #define MY_GATEWAY_W5100
@@ -45,6 +41,7 @@
 #endif
 
 // Remember to add library to Arduino path
+#include <Ethernet.h>
 #include <MySensors.h>
 #include "./Automation/AutomationMega.hpp"
 #include "./Initialization/InitializationMega.hpp"
@@ -71,7 +68,7 @@ void setup() {
 
 void presentation() {
     // Send the sketch version information to the gateway and Controller
-    sendSketchInfo("Gateway", "1.5");
+    sendSketchInfo("Arduino", "MQTT");
     sendPresentation();
     Serial.println("presentation() called...!");
 }

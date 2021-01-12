@@ -19,11 +19,10 @@ DallasTemperature dallasSensors(&oneWire);
 // Address of 1 DS18B20s
 uint8_t sensor1[8] = {0x28, 0xC8, 0xF3, 0x79, 0xA2, 0x00, 0x03, 0xA8};
 
-
-// Child ID declaration of SensorStruct
-//const uint8_t BME_TEMP = 101;
-//const uint8_t BME_BARO = 102;
-//const uint8_t BME_HUM = 103;
+// CHILD_ID declaration of SensorStruct
+// const uint8_t BME_TEMP = 101;
+// const uint8_t BME_BARO = 102;
+// const uint8_t BME_HUM = 103;
 const uint8_t DALLAS_TEMP = 104;
 
 typedef struct {

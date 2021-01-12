@@ -10,14 +10,12 @@
 
 #pragma once
 
-//#include <Wire.h>
 #include "../Relay/Relay.hpp"
 
-
-// Relays declaration
+// Default relays declaration
 // Relay(uint8_t pin, bool lowLevelTrigger = false, bool latching = false, expanderAddress = 8)
 
-// MCP23017 relays
+// Relays on MCP23017
 Relay relayE000(0, true, false, 0);
 Relay relayE001(1, true, false, 0);
 Relay relayE002(2, true, false, 0);
@@ -51,12 +49,12 @@ Relay relayE113(13, true, false, 1);
 Relay relayE114(14, true, false, 1);
 Relay relayE115(15, true, false, 1);
 
-// Arduino relays
+// Relays on Arduino
 Relay relayArduino68(68, true, true, 8);
 Relay relayArduino69(69, true, true, 8);
 
 
-// Child ID declaration of RelaysStruct
+// CHILD_ID declaration of RelaysStruct
 const uint8_t SIGNAL_IN_11 = 11;
 const uint8_t SIGNAL_IN_12 = 12;
 const uint8_t SIGNAL_IN_13 = 13;
@@ -98,9 +96,9 @@ typedef struct {
     const uint8_t id;
     const mysensors_sensor_t presentationType;
     char *description;
-    const uint8_t _signalPin; // pin to read the state of latch relay-button for relayStruct
+    const uint8_t _signalPin; // pin for reading state of Hager(EPN524) relay or physical trigger button
     const uint8_t _expanderAddress;
-    bool _hasPin; // true if has latch relay-button assign to read the state from
+    bool _hasPin; // true if for reading state of Hager(EPN524) relay
     Relay relay;
 
 
@@ -146,8 +144,8 @@ typedef struct {
 
 // D0, D1, D2, D4, D10, D13 - D21, D49 - D54 : do not use
 RelayStruct relaySensors[] = {
-//  Child ID               description   signalPin(or button) / expanderAddress / hasSignalPin / relay
-        // Signal buttons (32)           IN-signal     OUT - relay on expander
+
+        // CHILD_ID / presentation / description / pin / expanderAddress / hasSignalPin / relay
         {SIGNAL_IN_11, S_BINARY,  "Pin 22 - in",   22, 8, true,  relayE000},    // 0
         {SIGNAL_IN_12, S_BINARY,  "Pin 23 - in",   23, 8, true,  relayE001},    // 1
         {SIGNAL_IN_13, S_BINARY,  "Pin 24 - in",   24, 8, true,  relayE002},    // 2
@@ -181,9 +179,8 @@ RelayStruct relaySensors[] = {
         {SIGNAL_IN_62, S_BINARY,  "Pin A11 - in",  65, 8, true,  relayE114},    // 30
         {SIGNAL_IN_71, S_BINARY,  "Pin A12 - in",  66, 8, true,  relayE115},    // 31
 
-        // Button                  IN-button      OUT - relay on Arduino
-        {SIGNAL_OUT_72, S_BINARY, "Pin A14(A3) - out",  57,  8, false, relayArduino68}, // 32
-        {SIGNAL_OUT_73, S_BINARY, "Pin A15(A13) - out", 67,  8, false, relayArduino69}, // 33
+        {SIGNAL_OUT_72, S_BINARY, "Pin A14 - out, A3 - in",  57,  8, false, relayArduino68}, // 32
+        {SIGNAL_OUT_73, S_BINARY, "Pin A15 - out, A13 - in", 67,  8, false, relayArduino69}, // 33
 };
 
 const uint8_t numberOfRelayStruct = sizeof(relaySensors) / sizeof(RelayStruct);
