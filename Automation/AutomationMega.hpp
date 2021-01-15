@@ -87,11 +87,11 @@ void switchRelay(const uint8_t sensorId) {
     } else {
         if (relay.onExpander()) {
             expander[relay.getExpanderAddress()].digitalWrite(relay.getPin(), !relayState);
-            myDelay(125);
+            delay(125);
             expander[relay.getExpanderAddress()].digitalWrite(relay.getPin(), relayState);
         } else {
             digitalWrite(relay.getPin(), !relayState);
-            myDelay(125);
+            delay(125);
             digitalWrite(relay.getPin(), relayState);
         }
 
@@ -107,7 +107,8 @@ void switchRelay(const uint8_t sensorId) {
 
 // Sensors automation
 void readSensors() {
-    if (millis() - currentSensorMillis > 300000) {
+    unsigned long timer = millis() - currentSensorMillis;
+    if (timer > 60000 || timer <= 0) {
 // Bosh sensor BME280
 //        float temp(NAN), hum(NAN), pres(NAN);
 //        BME280::TempUnit tempUnit(BME280::TempUnit_Celsius);
@@ -134,7 +135,8 @@ void readSensors() {
 
 // Buttons automation
 void checkSignalAndRelayState() {
-    if (millis() - currentButtonMillis > 1500) {
+    unsigned long timer = millis() - currentButtonMillis;
+    if (timer > 1500 || timer <= 0) {
         for (uint8_t i = 0; i < numberOfRelayStruct; i++) {
             auto relayStruct = relaySensors[i];
             updateRelayStateAndSendMessage(relayStruct.getId());
