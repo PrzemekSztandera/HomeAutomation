@@ -12,7 +12,7 @@ class Relay {
 private:
     uint8_t _pin;
     bool _lowLevelTrigger;
-    bool _latching; // false if used with Hager(EPN524) relay
+    bool _latching; // false if used with signal pin on RelaySensor
     uint8_t _expanderAddress;
 
 public:

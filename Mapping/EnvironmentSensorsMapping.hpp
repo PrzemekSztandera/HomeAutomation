@@ -20,10 +20,11 @@ DallasTemperature dallasSensors(&oneWire);
 uint8_t sensor1[8] = {0x28, 0xC8, 0xF3, 0x79, 0xA2, 0x00, 0x03, 0xA8};
 
 // CHILD_ID declaration of SensorStruct
-// const uint8_t BME_TEMP = 101;
-// const uint8_t BME_BARO = 102;
-// const uint8_t BME_HUM = 103;
-const uint8_t DALLAS_TEMP = 104;
+const uint8_t ARDUINO_TIMER = 100;
+const uint8_t BME_TEMP = 101;
+const uint8_t BME_BARO = 102;
+const uint8_t BME_HUM = 103;
+//const uint8_t DALLAS_TEMP = 104;
 
 typedef struct {
     const uint8_t id;
@@ -46,26 +47,26 @@ typedef struct {
     mysensors_sensor_t getPresentationType() {
         return presentationType;
     }
-} SensorStruct;
+} EnvironmentSensor;
 
-SensorStruct environmentSensors[] = {
-//        {BME_TEMP,        "I2C BME_TEMP", V_TEMP,     S_TEMP},
-//        {BME_BARO,        "I2C BME_BARO", V_PRESSURE, S_BARO},
-//        {BME_HUM,         "I2C BME_HUM",  V_HUM,      S_HUM},
-        {DALLAS_TEMP, "Pin 7 - OneWire", V_TEMP, S_TEMP},
+EnvironmentSensor environmentSensors[] = {
+        {ARDUINO_TIMER, "Arduino Timer",   V_TEXT,     S_INFO},
+        {BME_TEMP,      "I2C BME_TEMP",    V_TEMP,     S_TEMP},
+        {BME_BARO,      "I2C BME_BARO",    V_PRESSURE, S_BARO},
+        {BME_HUM,       "I2C BME_HUM",     V_HUM,      S_HUM},
+//        {DALLAS_TEMP, "Pin 7 - OneWire", V_TEMP,     S_TEMP},
 };
 
-const uint8_t maxSensors = sizeof(environmentSensors) / sizeof(SensorStruct);
-MyMessage sensorMsgs[maxSensors];
+const uint8_t numberOfEnvironmentSensors = sizeof(environmentSensors) / sizeof(EnvironmentSensor);
 
 byte getSensorIndex(uint8_t sensorId) {
-    for (uint8_t i = 0; i < maxSensors; i++) {
+    for (uint8_t i = 0; i < numberOfEnvironmentSensors; i++) {
         if (environmentSensors[i].getId() == sensorId) return (i);
     }
     return (-1);
 }
 
-SensorStruct getSensorStruct(uint8_t sensorId) {
+EnvironmentSensor getEnvironmentSensor(uint8_t sensorId) {
     uint8_t index = getSensorIndex(sensorId);
     return environmentSensors[index];
 }

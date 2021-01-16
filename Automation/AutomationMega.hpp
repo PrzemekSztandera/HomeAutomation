@@ -23,28 +23,28 @@ uint8_t readRelayPin(Relay relay) {
     return relay.readPin();
 }
 
-uint8_t readSignalPin(RelayStruct relayStruct) {
-    return relayStruct.readPin();
+uint8_t readRelaySensorPin(RelaySensor relaySensor) {
+    return relaySensor.readPin();
 }
 
 void updateRelayStateAndSendMessage(const uint8_t sensorId, bool pullUpActive = true) {
 
-    auto relayStruct = getRelayStruct(sensorId);
+    auto relaySensor = getRelaySensor(sensorId);
     auto relay = getRelay(sensorId);
 
-    uint8_t signalState = readSignalPin(relayStruct);
+    uint8_t signalState = readRelaySensorPin(relaySensor);
     uint8_t relayState = readRelayPin(relay);
     uint8_t sensorState = loadState(sensorId);
 
 // save state of signal pin to EEPROM
-    if (relayStruct.hasSignalPin()) {
+    if (relaySensor.getPinType() == SIGNAL_PIN) {
         if (pullUpActive) {
             saveState(sensorId, !signalState);
         } else {
             saveState(sensorId, signalState);
         }
 // save state of relay pin to EEPROM
-    } else {
+    } else if (relaySensor.getPinType() == TRIGGER_PIN) {
         if (relay.isLatching()) {
             if (relay.isLowLevelTrigger()) {
                 saveState(sensorId, !relayState);
@@ -54,9 +54,9 @@ void updateRelayStateAndSendMessage(const uint8_t sensorId, bool pullUpActive = 
         }
     }
 
-    uint8_t index = getIndex(relayStruct.getId());
+    uint8_t index = getIndex(relaySensor.getId());
     uint8_t state = loadState(sensorId);
-    send(msgs[index].set(state));
+    send(relaySensorMessages[index].set(state));
     if(sensorState != state) {
         Serial.print("Message send and new state updated: ");
         Serial.print(state);
@@ -106,30 +106,33 @@ void switchRelay(const uint8_t sensorId) {
 }
 
 // Sensors automation
-void readSensors() {
-    unsigned long timer = millis() - currentSensorMillis;
-    if (timer > 60000 || timer <= 0) {
+void readEnvironmentSensors() {
+    unsigned long timer1 = millis() - currentSensorMillis;
+    if (timer1 > 60000 || timer1 <= 0) {
+
+        send(environmentSensorMessages[0].set(millis() / 1000));
 // Bosh sensor BME280
-//        float temp(NAN), hum(NAN), pres(NAN);
-//        BME280::TempUnit tempUnit(BME280::TempUnit_Celsius);
-//        BME280::PresUnit presUnit(BME280::PresUnit_Pa);
-//        bme.read(pres, temp, hum, tempUnit, presUnit);
-//        send(sensorMsgs[0].set(temp, 1));
-//        send(sensorMsgs[1].set(pres, 0));
-//        send(sensorMsgs[2].set(hum, 1));
+        float temp(NAN), hum(NAN), pres(NAN);
+        BME280::TempUnit tempUnit(BME280::TempUnit_Celsius);
+        BME280::PresUnit presUnit(BME280::PresUnit_Pa);
+        bme.read(pres, temp, hum, tempUnit, presUnit);
+        send(environmentSensorMessages[1].set(temp, 1));
+        send(environmentSensorMessages[2].set(pres, 0));
+        send(environmentSensorMessages[3].set(hum, 1));
+
 
 // Dallas temp sensor DS18B20
-        dallasSensors.requestTemperatures();
-        for (uint8_t i = 0; i < maxSensors; i++) {
-            auto sensorStruct = environmentSensors[i];
-            if (sensorStruct.getId() == DALLAS_TEMP) {
-                send(sensorMsgs[i].set(dallasSensors.getTempC(sensor1), 1));
-            }
-        }
+//        dallasSensors.requestTemperatures();
+//        for (uint8_t i = 0; i < numberOfEnvironmentSensors; i++) {
+//            auto environmentSensor = environmentSensors[i];
+//            if (environmentSensor.getId() == DALLAS_TEMP) {
+//                send(sensorMsgs[i].set(dallasSensors.getTempC(sensor1), 1));
+//            }
+//        }
 
 //        Serial.println("Server update");
         currentSensorMillis = millis();
-        return;
+        myDelay(1000);
     }
 }
 
@@ -137,9 +140,9 @@ void readSensors() {
 void checkSignalAndRelayState() {
     unsigned long timer = millis() - currentButtonMillis;
     if (timer > 1500 || timer <= 0) {
-        for (uint8_t i = 0; i < numberOfRelayStruct; i++) {
-            auto relayStruct = relaySensors[i];
-            updateRelayStateAndSendMessage(relayStruct.getId());
+        for (uint8_t i = 0; i < numberOfRelaySensors; i++) {
+            auto relaySensor = relaySensors[i];
+            updateRelayStateAndSendMessage(relaySensor.getId());
 
 //            Serial.print("Current sensor: ");
 //            Serial.println(relayStruct.id);
@@ -156,7 +159,7 @@ void checkSignalAndRelayState() {
 }
 
 void readButtons() {
-    for (uint8_t i = 0; i < numberOfRelayStruct; i++) {
+    for (uint8_t i = 0; i < numberOfRelaySensors; i++) {
         buttons[i].tick();
     }
 }
@@ -165,33 +168,47 @@ void pressButton() {
 //    switchRelay(...);
 }
 
-// Setup the buttons and relays. Do not assign LongPress and Click to the same sensor
-void setupClickButtons() {
-    for (uint8_t i = 0; i < numberOfButtons; i++) {
-        if (!relaySensors[i].hasSignalPin()) {
-            buttons[i].attachLongPressStart(switchRelay, relaySensors[i].getId());
-//            buttons[i].attachLongPressStart(pressButton);
-            buttons[i].setPressTicks(275);
-        }
-    }
-}
-
 void readAndUpdateState(uint8_t sensorId) {
     updateRelayStateAndSendMessage(sensorId);
 }
 
-void setupSignalButtons() {
-    for (uint8_t i = 0; i < numberOfButtons; i++) {
-        if (relaySensors[i].hasSignalPin()) {
-            buttons[i].attachLongPressStart(readAndUpdateState, relaySensors[i].getId());
-            buttons[i].attachLongPressStop(readAndUpdateState, relaySensors[i].getId());
+void setupButtons() {
+    bool flag = false;
+    for (uint8_t i = 0; i < numberOfRelaySensors; i++) {
+        auto relay = getRelay(relaySensors[i].getId());
+
+        if (relaySensors[i].getPinType() == TRIGGER_PIN) {
+            if (relay.isLatching()) {
+                buttons[i].setDebounceTicks(100);
+                buttons[i].attachLongPressStart(switchRelay, relaySensors[i].getId());
+//                buttons[i].attachLongPressStop(switchRelay, relaySensors[i].getId());
+                buttons[i].setPressTicks(275);
+            } else {
+                Serial.print("Error: Wrong relay type for relay sensor: ");
+                Serial.print(relaySensors[i].getId());
+                Serial.println(" Only latching relay allowed when sensor pin set to: TRIGGER");
+                Serial.println("Refactor code and load again...");
+                flag = true;
+
+            }
+        } else if (relaySensors[i].getPinType() == SIGNAL_PIN) {
+            if(!relay.isLatching()) {
+                buttons[i].attachLongPressStart(readAndUpdateState, relaySensors[i].getId());
+                buttons[i].attachLongPressStop(readAndUpdateState, relaySensors[i].getId());
+            } else {
+                Serial.print("Error: Wrong relay type for relay sensor: ");
+                Serial.print(relaySensors[i].getId());
+                Serial.println(" Only non-latching relay allowed when sensor pin set to: SIGNAL");
+                Serial.println("Refactor code and load again...");
+                flag = true;
+            }
         }
     }
+    while (flag) {
+        Serial.println("waiting...");
+        delay(5000);
+    }
 }
-
-
-
-
 
 
 

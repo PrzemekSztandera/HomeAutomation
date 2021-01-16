@@ -53,16 +53,15 @@ void before() {
     createButtons();
     initializeMCP23017();
     initializeRelays();
-    initializeSensors();
+    initializeEnvironmentSensors();
     initializeTimers();
     Serial.println("before() called...!");
 }
 
 void setup() {
-    setupClickButtons();
-    setupSignalButtons();
+    setupButtons();
 //    initializeMcpPinsAsSignalPinsForRelays(); only when expander pins are used as input
-    printSensorDetails();
+    printRelaySensorDetails();
     Serial.println("setup() called...!");
 }
 
@@ -76,7 +75,7 @@ void presentation() {
 void loop() {
     readButtons();
     checkSignalAndRelayState();
-    readSensors();
+    readEnvironmentSensors();
 }
 
 void receive(const MyMessage &message) {
