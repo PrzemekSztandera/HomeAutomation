@@ -8,32 +8,36 @@
  *
  */
 
+void switchRelay(const uint8_t sensorId);
+void updateRelayStateAndSendMessage(const uint8_t sensorId, bool pullUpActive = true);
+void myDelay(long interval);
+void updateEnvironmentSensors();
+
+
 #pragma once
 
-#include "../Initialization/InitializationMega.hpp"
+#include "../Initialization/Initialization.hpp"
+#include "../Button/ButtonsInitialization.hpp"
 
-// Relays automation
 
 void myDelay(long interval) {
     unsigned long currentMillis = millis();
-    while (millis() - currentMillis < interval) {}
-}
-
-uint8_t readRelayPin(Relay relay) {
-    return relay.readPin();
-}
-
-uint8_t readRelaySensorPin(RelaySensor relaySensor) {
-    return relaySensor.readPin();
+    bool flag = true;
+    while (flag) {
+        if (millis() - currentMillis < interval && millis() - currentMillis >= 0) {
+            flag = true;
+        } else {
+            flag = false;
+        }
+    }
 }
 
 void updateRelayStateAndSendMessage(const uint8_t sensorId, bool pullUpActive = true) {
 
     auto relaySensor = getRelaySensor(sensorId);
-    auto relay = getRelay(sensorId);
-
-    uint8_t signalState = readRelaySensorPin(relaySensor);
-    uint8_t relayState = readRelayPin(relay);
+    Relay relay = relaySensor.getRelay();
+    uint8_t signalState = relaySensor.readPin();
+    uint8_t relayState = relay.readPin();
     uint8_t sensorState = loadState(sensorId);
 
 // save state of signal pin to EEPROM
@@ -71,8 +75,9 @@ void switchRelay(const uint8_t sensorId) {
     Serial.print("Calling switchRelay() for sensor: ");
     Serial.println(sensorId);
 
-    auto relay = getRelay(sensorId);
-    uint8_t relayState = readRelayPin(relay);
+    auto relaySensor = getRelaySensor(sensorId);
+    Relay relay = relaySensor.getRelay();
+    uint8_t relayState = relay.readPin();
 
 // save new sensor state to EEPROM
     uint8_t sensorState = !loadState(sensorId);
@@ -105,10 +110,9 @@ void switchRelay(const uint8_t sensorId) {
     Serial.println(loadState(sensorId));
 }
 
-// Sensors automation
-void readEnvironmentSensors() {
-    unsigned long timer1 = millis() - currentSensorMillis;
-    if (timer1 > 60000 || timer1 <= 0) {
+void updateEnvironmentSensors() {
+    unsigned long timer = millis() - currentSensorMillis;
+    if (timer > 60000 || timer <= 0) {
 
         send(environmentSensorMessages[0].set(millis() / 1000));
 // Bosh sensor BME280
@@ -132,87 +136,7 @@ void readEnvironmentSensors() {
 
 //        Serial.println("Server update");
         currentSensorMillis = millis();
-        myDelay(1000);
     }
 }
-
-// Buttons automation
-void checkSignalAndRelayState() {
-    unsigned long timer = millis() - currentButtonMillis;
-    if (timer > 1500 || timer <= 0) {
-        for (uint8_t i = 0; i < numberOfRelaySensors; i++) {
-            auto relaySensor = relaySensors[i];
-            updateRelayStateAndSendMessage(relaySensor.getId());
-
-//            Serial.print("Current sensor: ");
-//            Serial.println(relayStruct.id);
-//            Serial.print("Current sensor state: ");
-//            Serial.println(loadState(relayStruct.getId()));
-//            auto relay = getRelay(relayStruct.getId());
-//            Serial.print("Current pin state: ");
-//            Serial.println(digitalRead(relay.getPin()));
-
-        }
-        currentButtonMillis = millis();
-        return;
-    }
-}
-
-void readButtons() {
-    for (uint8_t i = 0; i < numberOfRelaySensors; i++) {
-        buttons[i].tick();
-    }
-}
-
-void pressButton() {
-//    switchRelay(...);
-}
-
-void readAndUpdateState(uint8_t sensorId) {
-    updateRelayStateAndSendMessage(sensorId);
-}
-
-void setupButtons() {
-    bool flag = false;
-    for (uint8_t i = 0; i < numberOfRelaySensors; i++) {
-        auto relay = getRelay(relaySensors[i].getId());
-
-        if (relaySensors[i].getPinType() == TRIGGER_PIN) {
-            if (relay.isLatching()) {
-                buttons[i].setDebounceTicks(100);
-                buttons[i].attachLongPressStart(switchRelay, relaySensors[i].getId());
-//                buttons[i].attachLongPressStop(switchRelay, relaySensors[i].getId());
-                buttons[i].setPressTicks(275);
-            } else {
-                Serial.print("Error: Wrong relay type for relay sensor: ");
-                Serial.print(relaySensors[i].getId());
-                Serial.println(" Only latching relay allowed when sensor pin set to: TRIGGER");
-                Serial.println("Refactor code and load again...");
-                flag = true;
-
-            }
-        } else if (relaySensors[i].getPinType() == SIGNAL_PIN) {
-            if(!relay.isLatching()) {
-                buttons[i].attachLongPressStart(readAndUpdateState, relaySensors[i].getId());
-                buttons[i].attachLongPressStop(readAndUpdateState, relaySensors[i].getId());
-            } else {
-                Serial.print("Error: Wrong relay type for relay sensor: ");
-                Serial.print(relaySensors[i].getId());
-                Serial.println(" Only non-latching relay allowed when sensor pin set to: SIGNAL");
-                Serial.println("Refactor code and load again...");
-                flag = true;
-            }
-        }
-    }
-    while (flag) {
-        Serial.println("waiting...");
-        delay(5000);
-    }
-}
-
-
-
-
-
 
 

@@ -2,59 +2,55 @@
  * Created by Przemyslaw Sztandera on 21/05/2020.
  */
 
-#pragma once
-#define USE_EXPANDER
-#define MY_DEBUG
 
-#include "../Mapping/RelaysMapping.hpp"
+// Functions prototypes
+
+#pragma once
+
+#include "../Mapping/RelaySensorsMapping.hpp"
 #include "../Mapping/EnvironmentSensorsMapping.hpp"
-#include "../Automation/AutomationMega.hpp"
-#include "../Button/ButtonsInitialization.hpp"
 
 unsigned long currentButtonMillis = 0;
 unsigned long currentSensorMillis = 0;
 
-
 MyMessage relaySensorMessages[numberOfRelaySensors];
 MyMessage environmentSensorMessages[numberOfEnvironmentSensors];
-
-void initializeMCP23017() {
-#ifdef USE_EXPANDER
-    for (int i = 0; i < numberOfExpanders; i++) {
-        expander[i].begin(expanderAddresses[i]);
-    }
-#endif
-}
 
 void initializeTimers() {
     currentButtonMillis = millis();
     currentSensorMillis = millis();
 }
 
-void myDelay2(long interval) {
-    unsigned long currentMillis = millis();
-    while (millis() - currentMillis < interval) {}
-    Serial.println("Waiting...");
+void resetTimers() {
+    if (millis() == 0) {
+        currentButtonMillis = millis();
+        currentSensorMillis = millis();
+    }
+}
+
+void initializeMCP23017() {
+    for (int i = 0; i < numberOfExpanders; i++) {
+        expander[i].begin(expanderAddresses[i]);
+    }
 }
 
 void initializeRelays() {
 
     for (uint8_t i = 0; i < numberOfRelaySensors; i++) {
         auto relaySensor = relaySensors[i];
-        auto relay = getRelay(relaySensor.getId());
+        Relay relay = relaySensor.getRelay();
 
         relay.initialize();
 
-        relaySensorMessages[i] = MyMessage(relaySensor.getId(), V_STATUS);
+        relaySensorMessages[i] = MyMessage(relaySensor.getId(), relaySensor.getVariableType());
+
         uint8_t currentSensorState = loadState(relaySensor.getId());
 
-#ifdef MY_DEBUG
         Serial.print("Current sensor: ");
         Serial.println(relaySensor.getId());
         Serial.println(relaySensor.getDescription());
         Serial.print("Current sensor state in initialization: ");
         Serial.println(currentSensorState);
-#endif
 
         // Check whether EEPROM cell was used before
         if (!(currentSensorState == 0 || currentSensorState == 1)) {
@@ -62,12 +58,7 @@ void initializeRelays() {
             saveState(relaySensor.getId(), currentSensorState);
         }
 
-//#ifdef MY_DEBUG
-//        Serial.print("Current sensor state2: ");
-//        Serial.println(loadState(relayStruct.getId()));
-//#endif
-
-        uint8_t currentRelayState = !loadState(relaySensor.getId());
+        uint8_t currentRelayState = loadState(relaySensor.getId());
 
         if (relay.isLatching()) {
             if (relay.isLowLevelTrigger()) {
@@ -77,10 +68,8 @@ void initializeRelays() {
             currentRelayState = (relay.isLowLevelTrigger()) ? HIGH : LOW;
         }
 
-#ifdef MY_DEBUG
         Serial.print("Current relay state in initialization: ");
         Serial.println(currentRelayState);
-#endif
 
         if (relay.onExpander()) {
             expander[relay.getExpanderAddress()].digitalWrite(relay.getPin(), currentRelayState);
@@ -88,11 +77,10 @@ void initializeRelays() {
             digitalWrite(relay.getPin(), currentRelayState);
         }
 
-#ifdef MY_DEBUG
         Serial.print("Current pin state in initialization: ");
         Serial.println(digitalRead(relay.getPin()));
-#endif
-        myDelay2(250);
+
+        myDelay(250);
 
     }
     Serial.println("initializeRelays() called...!");
@@ -147,6 +135,7 @@ void sendPresentation() {
     for (uint8_t i = 0; i < numberOfEnvironmentSensors; i++) {
         auto environmentSensor = environmentSensors[i];
         present(environmentSensor.getId(), environmentSensor.getPresentationType(), environmentSensor.getDescription());
+        send(environmentSensorMessages[0].set(millis() / 1000));
     }
 
     Serial.println("sendPresentation() called...!");
@@ -155,13 +144,12 @@ void sendPresentation() {
 void printRelaySensorDetails() {
     for (uint8_t i = 0; i < numberOfRelaySensors; i++) {
         auto relaySensor = relaySensors[i];
-        auto relay = getRelay(relaySensor.getId());
+        Relay relay = relaySensor.getRelay();
         Serial.print("Current sensor: ");
         Serial.println(relaySensor.id);
         Serial.print("Current sensor state in setup: ");
         Serial.println(loadState(relaySensor.getId()));
         Serial.print("Current pin state in setup: ");
         Serial.println(digitalRead(relay.getPin()));
-        myDelay2(250);
     }
 }

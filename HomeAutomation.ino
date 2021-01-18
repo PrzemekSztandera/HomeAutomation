@@ -33,7 +33,9 @@
 #define MY_MQTT_SUBSCRIBE_TOPIC_PREFIX "arduino-in"
 #define MY_MQTT_CLIENT_ID "arduino-mega"
 
-#define MY_DEBUG
+//#define MY_DEBUG
+#define USE_EXPANDER
+//#define USE_EXPANDER_AS_INPUT
 
 // Define a lower baud rate for Arduino's running on 8 MHz (Arduino Pro Mini 3.3V & SenseBender)
 #if F_CPU == 16000000L
@@ -43,15 +45,17 @@
 // Remember to add library to Arduino path
 #include <Ethernet.h>
 #include <MySensors.h>
-#include "./Automation/AutomationMega.hpp"
-#include "./Initialization/InitializationMega.hpp"
+#include "./Automation/Automation.hpp"
+#include "./Initialization/Initialization.hpp"
 #include "./I2C/I2C_scanner.hpp"
 
 void before() {
     Serial.begin(115200);
     scanI2cDevices();
     createButtons();
+#ifdef USE_EXPANDER
     initializeMCP23017();
+#endif
     initializeRelays();
     initializeEnvironmentSensors();
     initializeTimers();
@@ -60,7 +64,9 @@ void before() {
 
 void setup() {
     setupButtons();
-//    initializeMcpPinsAsSignalPinsForRelays(); only when expander pins are used as input
+#ifdef USE_EXPANDER_AS_INPUT
+    initializeMcpPinsAsSignalPinsForRelays();
+#endif
     printRelaySensorDetails();
     Serial.println("setup() called...!");
 }
@@ -73,16 +79,18 @@ void presentation() {
 }
 
 void loop() {
+    resetTimers();
     readButtons();
-    checkSignalAndRelayState();
-    readEnvironmentSensors();
+    updateEnvironmentSensors();
+    resetTimers();
 }
 
 void receive(const MyMessage &message) {
+    uint8_t sensorId = message.getSensor();
     Serial.print("Calling receive() for sensor: ");
-    Serial.println(message.getSensor());
-    if (message.type == V_STATUS) {
-        switchRelay(message.getSensor());
+    Serial.println(sensorId);
+    if (message.type == getRelaySensor(sensorId).getVariableType()) {
+        switchRelay(sensorId);
     }
     Serial.print("receive() called for sensor: ");
     Serial.println(message.getSensor());
