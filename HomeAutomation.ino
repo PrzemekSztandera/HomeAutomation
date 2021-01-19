@@ -33,7 +33,7 @@
 #define MY_MQTT_SUBSCRIBE_TOPIC_PREFIX "arduino-in"
 #define MY_MQTT_CLIENT_ID "arduino-mega"
 
-//#define MY_DEBUG
+#define MY_DEBUG
 #define USE_EXPANDER
 //#define USE_EXPANDER_AS_INPUT
 
@@ -56,6 +56,7 @@ void before() {
     Serial.begin(115200);
     scanI2cDevices();
     createButtons();
+    setupButtons();
 #ifdef USE_EXPANDER
     initializeMCP23017();
 #endif
@@ -66,7 +67,6 @@ void before() {
 }
 
 void setup() {
-    setupButtons();
 #ifdef USE_EXPANDER_AS_INPUT
     initializeMcpPinsAsSignalPinsForRelays();
 #endif

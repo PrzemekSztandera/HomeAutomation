@@ -9,7 +9,7 @@
  */
 
 void switchRelay(const uint8_t sensorId);
-void updateRelayStateAndSendMessage(const uint8_t sensorId, bool pullUpActive = true);
+bool updateRelayStateAndSendMessage(const uint8_t sensorId, bool pullUpActive = true);
 void myDelay(long interval);
 void updateEnvironmentSensors();
 
@@ -32,13 +32,16 @@ void myDelay(long interval) {
     }
 }
 
-void updateRelayStateAndSendMessage(const uint8_t sensorId, bool pullUpActive = true) {
+bool updateRelayStateAndSendMessage(const uint8_t sensorId, bool pullUpActive = true) {
+
+    bool updated;
 
     auto relaySensor = getRelaySensor(sensorId);
     Relay relay = relaySensor.getRelay();
     uint8_t signalState = relaySensor.readPin();
     uint8_t relayState = relay.readPin();
-    uint8_t sensorState = loadState(sensorId);
+    uint8_t oldState = loadState(sensorId);
+    uint8_t pinState;
 
 // save state of signal pin to EEPROM
     if (relaySensor.getPinType() == SIGNAL_PIN) {
@@ -47,6 +50,7 @@ void updateRelayStateAndSendMessage(const uint8_t sensorId, bool pullUpActive = 
         } else {
             saveState(sensorId, signalState);
         }
+        pinState = signalState;
 // save state of relay pin to EEPROM
     } else if (relaySensor.getPinType() == TRIGGER_PIN) {
         if (relay.isLatching()) {
@@ -55,18 +59,35 @@ void updateRelayStateAndSendMessage(const uint8_t sensorId, bool pullUpActive = 
             } else {
                 saveState(sensorId, relayState);
             }
+        } else {
+            saveState(sensorId, oldState);
         }
+        pinState = relayState;
     }
 
-    uint8_t index = getIndex(relaySensor.getId());
-    uint8_t state = loadState(sensorId);
-    send(relaySensorMessages[index].set(state));
-    if(sensorState != state) {
-        Serial.print("Message send and new state updated: ");
-        Serial.print(state);
-        Serial.print(" for sensor: ");
-        Serial.println(sensorId);
+
+
+    uint8_t newState = loadState(sensorId);
+    send(relaySensorMessages[getIndex(relaySensor.getId())].set(newState));
+
+    if(oldState == newState) {
+        updated = true;
+        Serial.print("updateRelayStateAndSendMessage() called and message send for sensor: ");
+        Serial.print(sensorId);
+        Serial.print(" New sensor state: ");
+        Serial.print(newState);
+        Serial.print(", new pin state: ");
+        Serial.println(pinState);
+    } else {
+        updated = false;
+        Serial.print("updateRelayStateAndSendMessage() called and message send for sensor: ");
+        Serial.print(sensorId);
+        Serial.print(" New sensor state: ");
+        Serial.print(newState);
+        Serial.print(", new pin state: ");
+        Serial.println(pinState);
     }
+    return updated;
 }
 
 
@@ -102,12 +123,23 @@ void switchRelay(const uint8_t sensorId) {
 
     }
 
-    updateRelayStateAndSendMessage(sensorId);
-    Serial.print("updateRelayStateAndSendMessage() and ");
-    Serial.print("switchRelay() called for sensor: ");
-    Serial.print(sensorId);
-    Serial.print(", new state: ");
-    Serial.println(loadState(sensorId));
+    myDelay(250);
+
+    if(updateRelayStateAndSendMessage(sensorId)) {
+
+        Serial.print("switchRelay() called for sensor: ");
+        Serial.print(sensorId);
+        Serial.print(", new sensor state: ");
+        Serial.print(loadState(sensorId));
+        Serial.println(", Switch successful.");
+    } else {
+        Serial.print("switchRelay() called for sensor: ");
+        Serial.print(sensorId);
+        Serial.print(", new sensor state: ");
+        Serial.print(loadState(sensorId));
+        Serial.println(", Switch unsuccessful!!!");
+    }
+
 }
 
 void updateEnvironmentSensors() {
