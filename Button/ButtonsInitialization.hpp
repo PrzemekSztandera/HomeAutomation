@@ -44,12 +44,18 @@ void setupButtons() {
 
         if (relaySensors[i].getPinType() == TRIGGER_PIN) {
             if (relay.isLatching()) {
-                buttons[i].setDebounceTicks(100);
+                buttons[i].setDebounceTicks(50);
                 buttons[i].attachClick(switchRelay, relaySensors[i].getId());
 //                buttons[i].attachLongPressStart(switchRelay, relaySensors[i].getId());
 //                buttons[i].attachLongPressStop(switchRelay, relaySensors[i].getId());
-                buttons[i].setPressTicks(275);
+                buttons[i].setPressTicks(1000);
                 Serial.print("Trigger button set for sensor: ");
+                Serial.println(relaySensors[i].getId());
+            } else if (!relay.isLatching() && relay.getPin() == 57) {
+                buttons[i].setDebounceTicks(50);
+                buttons[i].attachClick(switchRelay, relaySensors[i].getId());
+                buttons[i].setPressTicks(1000);
+                Serial.print("Trigger button set for reset sensor: ");
                 Serial.println(relaySensors[i].getId());
             } else {
                 Serial.print("Error: Wrong relay type for RelaySensor: ");
