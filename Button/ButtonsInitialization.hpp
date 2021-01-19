@@ -66,7 +66,7 @@ void setupButtons() {
 
             }
         } else if (relaySensors[i].getPinType() == SIGNAL_PIN) {
-            if(!relay.isLatching()) {
+            if (!relay.isLatching()) {
                 buttons[i].attachLongPressStart(readAndUpdateStateHelper, relaySensors[i].getId());
                 buttons[i].attachLongPressStop(readAndUpdateStateHelper, relaySensors[i].getId());
                 Serial.print("Signal button set for sensor: ");

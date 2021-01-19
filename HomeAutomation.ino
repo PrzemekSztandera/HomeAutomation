@@ -50,9 +50,9 @@
 #include "./I2C/I2C_scanner.hpp"
 
 void before() {
-  // Initialize reset trigger pin to HIGH
+    // Initialize reset trigger pin to HIGH
     digitalWrite(relaySensors[0].getRelay().getPin(), HIGH);
-    
+
     Serial.begin(115200);
     scanI2cDevices();
     createButtons();

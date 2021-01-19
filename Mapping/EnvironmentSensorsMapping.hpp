@@ -28,16 +28,12 @@ const uint8_t BME_HUM = 103;
 
 typedef struct {
     const uint8_t id;
-    char *description;
     const mysensors_data_t variableType;
     const mysensors_sensor_t presentationType;
+    char *description;
 
     uint8_t getId() {
         return id;
-    }
-
-    char *getDescription() {
-        return description;
     }
 
     mysensors_data_t getVariableType() {
@@ -47,14 +43,18 @@ typedef struct {
     mysensors_sensor_t getPresentationType() {
         return presentationType;
     }
+
+    char *getDescription() {
+        return description;
+    }
 } EnvironmentSensor;
 
 EnvironmentSensor environmentSensors[] = {
-        {ARDUINO_TIMER, "Arduino Timer",   V_TEXT,     S_INFO},
-        {BME_TEMP,      "I2C BME_TEMP",    V_TEMP,     S_TEMP},
-        {BME_BARO,      "I2C BME_BARO",    V_PRESSURE, S_BARO},
-        {BME_HUM,       "I2C BME_HUM",     V_HUM,      S_HUM},
-//        {DALLAS_TEMP, "Pin 7 - OneWire", V_TEMP,     S_TEMP},
+        {ARDUINO_TIMER, V_TEXT,     S_INFO, "Arduino Timer"},
+        {BME_TEMP,      V_TEMP,     S_TEMP, "I2C BME_TEMP"},
+        {BME_BARO,      V_PRESSURE, S_BARO, "I2C BME_BARO"},
+        {BME_HUM,       V_HUM,      S_HUM,  "I2C BME_HUM"},
+//        {DALLAS_TEMP, V_TEMP, S_TEMP, "Pin 7 - OneWire"},
 };
 
 const uint8_t numberOfEnvironmentSensors = sizeof(environmentSensors) / sizeof(EnvironmentSensor);

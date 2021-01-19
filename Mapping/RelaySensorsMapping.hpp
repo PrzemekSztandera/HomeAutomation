@@ -48,16 +48,15 @@ Relay relayE112(12, true, false, 1);
 Relay relayE113(13, true, false, 1);
 Relay relayE114(14, true, false, 1);
 Relay relayE115(15, true, false, 1);
+// Reset - don't change
+Relay relayArduino57(57, true, false, 8);
 
 // Relays on Arduino
 Relay relayArduino69(69, true, true, 8);
 
-// Reset - don't change
-Relay reset(57, true, false, 8);
-
 
 // CHILD_ID declaration of RelaysStruct
-const uint8_t RESET = 3;
+const uint8_t SIGNAL_OUT_3 = 3;
 const uint8_t SIGNAL_IN_11 = 11;
 const uint8_t SIGNAL_IN_12 = 12;
 const uint8_t SIGNAL_IN_13 = 13;
@@ -160,39 +159,39 @@ typedef struct {
 RelaySensor relaySensors[] = {
 
         // CHILD_ID / presentation / description / pin / pin type / expanderAddress / hasSignalPin / relay
-        {RESET,        V_STATUS, S_BINARY,  "RESET Pin A14 in - A3 out",  68, TRIGGER_PIN, 8, reset},
-        {SIGNAL_IN_11, V_STATUS, S_BINARY,  "Pin 22 in",   22, SIGNAL_PIN, 8, relayE000},
-        {SIGNAL_IN_12, V_STATUS, S_BINARY,  "Pin 23 in",   23, SIGNAL_PIN, 8, relayE001},
-        {SIGNAL_IN_13, V_STATUS, S_BINARY,  "Pin 24 in",   24, SIGNAL_PIN, 8, relayE002},
-        {SIGNAL_IN_14, V_STATUS, S_BINARY,  "Pin 25 in",   25, SIGNAL_PIN, 8, relayE003},
-        {SIGNAL_IN_15, V_STATUS, S_BINARY,  "Pin 26 in",   26, SIGNAL_PIN, 8, relayE004},
-        {SIGNAL_IN_21, V_STATUS, S_BINARY,  "Pin 27 in",   27, SIGNAL_PIN, 8, relayE005},
-        {SIGNAL_IN_22, V_STATUS, S_BINARY,  "Pin 28 in",   28, SIGNAL_PIN, 8, relayE006},
-        {SIGNAL_IN_23, V_STATUS, S_BINARY,  "Pin 29 in",   29, SIGNAL_PIN, 8, relayE007},
-        {SIGNAL_IN_24, V_STATUS, S_BINARY,  "Pin 30 in",   30, SIGNAL_PIN, 8, relayE008},
-        {SIGNAL_IN_31, V_STATUS, S_BINARY,  "Pin 31 in",   31, SIGNAL_PIN, 8, relayE009},
-        {SIGNAL_IN_32, V_STATUS, S_BINARY,  "Pin 32 in",   32, SIGNAL_PIN, 8, relayE010},
-        {SIGNAL_IN_33, V_STATUS, S_BINARY,  "Pin 33 in",   33, SIGNAL_PIN, 8, relayE011},
-        {SIGNAL_IN_34, V_STATUS, S_BINARY,  "Pin 34 in",   34, SIGNAL_PIN, 8, relayE012},
-        {SIGNAL_IN_35, V_STATUS, S_BINARY,  "Pin 35 in",   35, SIGNAL_PIN, 8, relayE013},
-        {SIGNAL_IN_36, V_STATUS, S_BINARY,  "Pin 36 in",   36, SIGNAL_PIN, 8, relayE014},
-        {SIGNAL_IN_37, V_STATUS, S_BINARY,  "Pin 37 in",   37, SIGNAL_PIN, 8, relayE015},
-        {SIGNAL_IN_38, V_STATUS, S_BINARY,  "Pin 38 in",   38, SIGNAL_PIN, 8, relayE100},
-        {SIGNAL_IN_41, V_STATUS, S_BINARY,  "Pin 39 in",   39, SIGNAL_PIN, 8, relayE101},
-        {SIGNAL_IN_42, V_STATUS, S_BINARY,  "Pin 40 in",   40, SIGNAL_PIN, 8, relayE102},
-        {SIGNAL_IN_43, V_STATUS, S_BINARY,  "Pin 41 in",   41, SIGNAL_PIN, 8, relayE103},
-        {SIGNAL_IN_44, V_STATUS, S_BINARY,  "Pin 42 in",   42, SIGNAL_PIN, 8, relayE104},
-        {SIGNAL_IN_45, V_STATUS, S_BINARY,  "Pin 43 in",   43, SIGNAL_PIN, 8, relayE105},
-        {SIGNAL_IN_46, V_STATUS, S_BINARY,  "Pin 44 in",   44, SIGNAL_PIN, 8, relayE106},
-        {SIGNAL_IN_51, V_STATUS, S_BINARY,  "Pin 45 in",   45, SIGNAL_PIN, 8, relayE107},
-        {SIGNAL_IN_52, V_STATUS, S_BINARY,  "Pin 46 in",   46, SIGNAL_PIN, 8, relayE108},
-        {SIGNAL_IN_53, V_STATUS, S_BINARY,  "Pin 47 in",   47, SIGNAL_PIN, 8, relayE109},
-        {SIGNAL_IN_54, V_STATUS, S_BINARY,  "Pin 48 in",   48, SIGNAL_PIN, 8, relayE110},
-        {SIGNAL_IN_55, V_STATUS, S_BINARY,  "Pin A8 in",   62, SIGNAL_PIN, 8, relayE111},
-        {SIGNAL_IN_56, V_STATUS, S_BINARY,  "Pin A9 in",   63, SIGNAL_PIN, 8, relayE112},
-        {SIGNAL_IN_61, V_STATUS, S_BINARY,  "Pin A10 in",  64, SIGNAL_PIN, 8, relayE113},
-        {SIGNAL_IN_62, V_STATUS, S_BINARY,  "Pin A11 in",  65, SIGNAL_PIN, 8, relayE114},
-        {SIGNAL_IN_71, V_STATUS, S_BINARY,  "Pin A12 in",  66, SIGNAL_PIN, 8, relayE115},
+        {SIGNAL_OUT_3,  V_STATUS, S_BINARY, "Pin A14 in - A3 out",  68, TRIGGER_PIN, 8, relayArduino57},
+        {SIGNAL_IN_11,  V_STATUS, S_BINARY, "Pin 22 in",            22, SIGNAL_PIN,  8, relayE000},
+        {SIGNAL_IN_12,  V_STATUS, S_BINARY, "Pin 23 in",            23, SIGNAL_PIN,  8, relayE001},
+        {SIGNAL_IN_13,  V_STATUS, S_BINARY, "Pin 24 in",            24, SIGNAL_PIN,  8, relayE002},
+        {SIGNAL_IN_14,  V_STATUS, S_BINARY, "Pin 25 in",            25, SIGNAL_PIN,  8, relayE003},
+        {SIGNAL_IN_15,  V_STATUS, S_BINARY, "Pin 26 in",            26, SIGNAL_PIN,  8, relayE004},
+        {SIGNAL_IN_21,  V_STATUS, S_BINARY, "Pin 27 in",            27, SIGNAL_PIN,  8, relayE005},
+        {SIGNAL_IN_22,  V_STATUS, S_BINARY, "Pin 28 in",            28, SIGNAL_PIN,  8, relayE006},
+        {SIGNAL_IN_23,  V_STATUS, S_BINARY, "Pin 29 in",            29, SIGNAL_PIN,  8, relayE007},
+        {SIGNAL_IN_24,  V_STATUS, S_BINARY, "Pin 30 in",            30, SIGNAL_PIN,  8, relayE008},
+        {SIGNAL_IN_31,  V_STATUS, S_BINARY, "Pin 31 in",            31, SIGNAL_PIN,  8, relayE009},
+        {SIGNAL_IN_32,  V_STATUS, S_BINARY, "Pin 32 in",            32, SIGNAL_PIN,  8, relayE010},
+        {SIGNAL_IN_33,  V_STATUS, S_BINARY, "Pin 33 in",            33, SIGNAL_PIN,  8, relayE011},
+        {SIGNAL_IN_34,  V_STATUS, S_BINARY, "Pin 34 in",            34, SIGNAL_PIN,  8, relayE012},
+        {SIGNAL_IN_35,  V_STATUS, S_BINARY, "Pin 35 in",            35, SIGNAL_PIN,  8, relayE013},
+        {SIGNAL_IN_36,  V_STATUS, S_BINARY, "Pin 36 in",            36, SIGNAL_PIN,  8, relayE014},
+        {SIGNAL_IN_37,  V_STATUS, S_BINARY, "Pin 37 in",            37, SIGNAL_PIN,  8, relayE015},
+        {SIGNAL_IN_38,  V_STATUS, S_BINARY, "Pin 38 in",            38, SIGNAL_PIN,  8, relayE100},
+        {SIGNAL_IN_41,  V_STATUS, S_BINARY, "Pin 39 in",            39, SIGNAL_PIN,  8, relayE101},
+        {SIGNAL_IN_42,  V_STATUS, S_BINARY, "Pin 40 in",            40, SIGNAL_PIN,  8, relayE102},
+        {SIGNAL_IN_43,  V_STATUS, S_BINARY, "Pin 41 in",            41, SIGNAL_PIN,  8, relayE103},
+        {SIGNAL_IN_44,  V_STATUS, S_BINARY, "Pin 42 in",            42, SIGNAL_PIN,  8, relayE104},
+        {SIGNAL_IN_45,  V_STATUS, S_BINARY, "Pin 43 in",            43, SIGNAL_PIN,  8, relayE105},
+        {SIGNAL_IN_46,  V_STATUS, S_BINARY, "Pin 44 in",            44, SIGNAL_PIN,  8, relayE106},
+        {SIGNAL_IN_51,  V_STATUS, S_BINARY, "Pin 45 in",            45, SIGNAL_PIN,  8, relayE107},
+        {SIGNAL_IN_52,  V_STATUS, S_BINARY, "Pin 46 in",            46, SIGNAL_PIN,  8, relayE108},
+        {SIGNAL_IN_53,  V_STATUS, S_BINARY, "Pin 47 in",            47, SIGNAL_PIN,  8, relayE109},
+        {SIGNAL_IN_54,  V_STATUS, S_BINARY, "Pin 48 in",            48, SIGNAL_PIN,  8, relayE110},
+        {SIGNAL_IN_55,  V_STATUS, S_BINARY, "Pin A8 in",            62, SIGNAL_PIN,  8, relayE111},
+        {SIGNAL_IN_56,  V_STATUS, S_BINARY, "Pin A9 in",            63, SIGNAL_PIN,  8, relayE112},
+        {SIGNAL_IN_61,  V_STATUS, S_BINARY, "Pin A10 in",           64, SIGNAL_PIN,  8, relayE113},
+        {SIGNAL_IN_62,  V_STATUS, S_BINARY, "Pin A11 in",           65, SIGNAL_PIN,  8, relayE114},
+        {SIGNAL_IN_71,  V_STATUS, S_BINARY, "Pin A12 in",           66, SIGNAL_PIN,  8, relayE115},
 // use only with latching relays
         {SIGNAL_OUT_72, V_STATUS, S_BINARY, "Pin A13 in - A15 out", 67, TRIGGER_PIN, 8, relayArduino69},
 };

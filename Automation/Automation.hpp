@@ -9,8 +9,11 @@
  */
 
 void switchRelay(const uint8_t sensorId);
+
 bool updateRelayStateAndSendMessage(const uint8_t sensorId, bool pullUpActive = true);
+
 void myDelay(long interval);
+
 void updateEnvironmentSensors();
 
 
@@ -66,11 +69,10 @@ bool updateRelayStateAndSendMessage(const uint8_t sensorId, bool pullUpActive = 
     }
 
 
-
     uint8_t newState = loadState(sensorId);
     send(relaySensorMessages[getIndex(relaySensor.getId())].set(newState));
 
-    if(oldState == newState) {
+    if (oldState == newState) {
         updated = true;
         Serial.print("updateRelayStateAndSendMessage() called and message send for sensor: ");
         Serial.print(sensorId);
@@ -125,7 +127,7 @@ void switchRelay(const uint8_t sensorId) {
 
     myDelay(250);
 
-    if(updateRelayStateAndSendMessage(sensorId)) {
+    if (updateRelayStateAndSendMessage(sensorId)) {
 
         Serial.print("switchRelay() called for sensor: ");
         Serial.print(sensorId);
