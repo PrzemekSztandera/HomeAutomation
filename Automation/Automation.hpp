@@ -8,7 +8,7 @@
  *
  */
 
-void switchRelay(const uint8_t sensorId);
+void switchRelay(const byte sensorId);
 
 bool updateRelayStateAndSendMessage(const uint8_t sensorId, bool pullUpActive = true);
 
@@ -74,19 +74,19 @@ bool updateRelayStateAndSendMessage(const uint8_t sensorId, bool pullUpActive = 
 
     if (oldState == newState) {
         updated = true;
-        Serial.print("updateRelayStateAndSendMessage() called and message send for sensor: ");
+        Serial.print(F("updateRelayStateAndSendMessage() called and message send for sensor: "));
         Serial.print(sensorId);
-        Serial.print(" New sensor state: ");
+        Serial.print(F(" New sensor state: "));
         Serial.print(newState);
-        Serial.print(", new pin state: ");
+        Serial.print(F(", new pin state: "));
         Serial.println(pinState);
     } else {
         updated = false;
-        Serial.print("updateRelayStateAndSendMessage() called and message send for sensor: ");
+        Serial.print(F("updateRelayStateAndSendMessage() called and message send for sensor: "));
         Serial.print(sensorId);
-        Serial.print(" New sensor state: ");
+        Serial.print(F(" New sensor state: "));
         Serial.print(newState);
-        Serial.print(", new pin state: ");
+        Serial.print(F(", new pin state: "));
         Serial.println(pinState);
     }
     return updated;
@@ -95,7 +95,7 @@ bool updateRelayStateAndSendMessage(const uint8_t sensorId, bool pullUpActive = 
 
 void switchRelay(const uint8_t sensorId) {
 
-    Serial.print("Calling switchRelay() for sensor: ");
+    Serial.print(F("Calling switchRelay() for sensor: "));
     Serial.println(sensorId);
 
     auto relaySensor = getRelaySensor(sensorId);
@@ -129,17 +129,17 @@ void switchRelay(const uint8_t sensorId) {
 
     if (updateRelayStateAndSendMessage(sensorId)) {
 
-        Serial.print("switchRelay() called for sensor: ");
+        Serial.print(F("switchRelay() called for sensor: "));
         Serial.print(sensorId);
-        Serial.print(", new sensor state: ");
+        Serial.print(F(", new sensor state: "));
         Serial.print(loadState(sensorId));
-        Serial.println(", Switch successful.");
+        Serial.println(F(", Switch successful."));
     } else {
-        Serial.print("switchRelay() called for sensor: ");
+        Serial.print(F("switchRelay() called for sensor: "));
         Serial.print(sensorId);
-        Serial.print(", new sensor state: ");
+        Serial.print(F(", new sensor state: "));
         Serial.print(loadState(sensorId));
-        Serial.println(", Switch unsuccessful!!!");
+        Serial.println(F(", Switch unsuccessful!!!"));
     }
 
 }

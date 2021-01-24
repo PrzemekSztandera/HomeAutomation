@@ -20,41 +20,48 @@ DallasTemperature dallasSensors(&oneWire);
 uint8_t sensor1[8] = {0x28, 0xC8, 0xF3, 0x79, 0xA2, 0x00, 0x03, 0xA8};
 
 // CHILD_ID declaration of SensorStruct
-const uint8_t ARDUINO_TIMER = 100;
-const uint8_t BME_TEMP = 101;
-const uint8_t BME_BARO = 102;
-const uint8_t BME_HUM = 103;
-//const uint8_t DALLAS_TEMP = 104;
+#define ARDUINO_TIMER (uint8_t) 100
+#define BME_TEMP (uint8_t) 101
+#define BME_BARO (uint8_t) 102
+#define BME_HUM (uint8_t) 103
+//#define DALLAS_TEMP (uint8_t) 104
 
-typedef struct {
-    const uint8_t id;
-    const mysensors_data_t variableType;
-    const mysensors_sensor_t presentationType;
+
+struct EnvironmentSensor {
+
+    uint8_t id;
+    uint8_t variableType;
+    uint8_t presentationType;
+    uint8_t discoveryType;
     char *description;
 
     uint8_t getId() {
         return id;
     }
 
-    mysensors_data_t getVariableType() {
+    uint8_t getVariableType() {
         return variableType;
     }
 
-    mysensors_sensor_t getPresentationType() {
+    uint8_t getPresentationType() {
         return presentationType;
+    }
+
+    uint8_t getDiscoveryType() {
+        return discoveryType;
     }
 
     char *getDescription() {
         return description;
     }
-} EnvironmentSensor;
+};
 
 EnvironmentSensor environmentSensors[] = {
-        {ARDUINO_TIMER, V_TEXT,     S_INFO, "Arduino Timer"},
-        {BME_TEMP,      V_TEMP,     S_TEMP, "I2C BME_TEMP"},
-        {BME_BARO,      V_PRESSURE, S_BARO, "I2C BME_BARO"},
-        {BME_HUM,       V_HUM,      S_HUM,  "I2C BME_HUM"},
-//        {DALLAS_TEMP, V_TEMP, S_TEMP, "Pin 7 - OneWire"},
+        {ARDUINO_TIMER, V_TEXT,     S_INFO, HA_DISCOVERY, "Arduino Timer"},
+        {BME_TEMP,      V_TEMP,     S_TEMP, HA_DISCOVERY, "I2C BME_TEMP"},
+        {BME_BARO,      V_PRESSURE, S_BARO, HA_DISCOVERY, "I2C BME_BARO"},
+        {BME_HUM,       V_HUM,      S_HUM,  HA_DISCOVERY,  "I2C BME_HUM"},
+//        {DALLAS_TEMP, V_TEMP, S_TEMP, HA_DISCOVERY, "Pin 7 - OneWire"},
 };
 
 const uint8_t numberOfEnvironmentSensors = sizeof(environmentSensors) / sizeof(EnvironmentSensor);

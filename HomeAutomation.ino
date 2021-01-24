@@ -8,34 +8,47 @@
  *
  */
 
-
 // Enable serial gateway
 //#define MY_GATEWAY_SERIAL
+
+ 
+#define MY_GATEWAY_TINYGSM
+#define TINY_GSM_MODEM_ESP8266
+// Use Hardware Serial on Mega, Leonardo, Micro
+#define SerialAT Serial1
+#define MY_GSM_SSID "BTHub6-G83T"
+#define MY_GSM_PSW "UcXJ3Fk4uQXR"
 
 
 // Enable gateway ethernet module type
 #define MY_GATEWAY_W5100
+
+
 #define MY_MAC_ADDRESS 0xDE, 0xAD, 0xBE, 0xEF, 0xFE, 0xED
-//#define MY_IP_ADDRESS 192,168,1,74
+#define MY_IP_ADDRESS 192,168,1,86
 // If using static ip you need to define Gateway and Subnet address as well
-//#define MY_IP_GATEWAY_ADDRESS 192,168,178,1
-//#define MY_IP_SUBNET_ADDRESS 255,255,255,0
+#define MY_IP_GATEWAY_ADDRESS 192,168,1,254
+#define MY_IP_SUBNET_ADDRESS 255,255,255,0
 #define MY_PORT 5003
+
 
 #define MY_GATEWAY_MQTT_CLIENT
 #define MY_CONTROLLER_IP_ADDRESS 192, 168, 1, 73
 #define MY_PORT 1883
 #define MY_MQTT_USER "HAMqTT"
 #define MY_MQTT_PASSWORD "home&assistantMqTT4"
-
-
 #define MY_MQTT_PUBLISH_TOPIC_PREFIX "arduino-out"
 #define MY_MQTT_SUBSCRIBE_TOPIC_PREFIX "arduino-in"
 #define MY_MQTT_CLIENT_ID "arduino-mega"
 
+
 #define MY_DEBUG
+#define SETUP_DEBUG
 #define USE_EXPANDER
 //#define USE_EXPANDER_AS_INPUT
+
+#define HA_DISCOVERY 1
+#define MS_DISCOVERY 2
 
 // Define a lower baud rate for Arduino's running on 8 MHz (Arduino Pro Mini 3.3V & SenseBender)
 #if F_CPU == 16000000L
@@ -63,15 +76,19 @@ void before() {
     initializeRelays();
     initializeEnvironmentSensors();
     initializeTimers();
-    Serial.println("before() called...!");
+    Serial.println(F("before() called...!"));
 }
 
 void setup() {
+  
 #ifdef USE_EXPANDER_AS_INPUT
     initializeMcpPinsAsSignalPinsForRelays();
 #endif
+
+#ifdef SETUP_DEBUG
     printRelaySensorDetails();
-    Serial.println("setup() called...!");
+#endif
+    Serial.println(F("setup() called...!"));
 }
 
 void presentation() {
@@ -89,12 +106,12 @@ void loop() {
 }
 
 void receive(const MyMessage &message) {
-    uint8_t sensorId = message.getSensor();
-    Serial.print("Calling receive() for sensor: ");
+    uint8_t sensorId = message.sensor;
+    Serial.print(F("Calling receive() for sensor: "));
     Serial.println(sensorId);
     if (message.type == getRelaySensor(sensorId).getVariableType()) {
         switchRelay(sensorId);
     }
-    Serial.print("receive() called for sensor: ");
-    Serial.println(message.getSensor());
+    Serial.print(F("receive() called for sensor: "));
+    Serial.println(sensorId);
 }

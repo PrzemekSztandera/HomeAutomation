@@ -49,19 +49,25 @@ void setupButtons() {
 //                buttons[i].attachLongPressStart(switchRelay, relaySensors[i].getId());
 //                buttons[i].attachLongPressStop(switchRelay, relaySensors[i].getId());
                 buttons[i].setPressTicks(1000);
-                Serial.print("Trigger button set for sensor: ");
+#ifdef SETUP_DEBUG
+                Serial.print(F("Trigger button set for sensor: "));
                 Serial.println(relaySensors[i].getId());
+#endif
             } else if (!relay.isLatching() && relay.getPin() == 57) {
                 buttons[i].setDebounceTicks(50);
                 buttons[i].attachClick(switchRelay, relaySensors[i].getId());
                 buttons[i].setPressTicks(1000);
-                Serial.print("Trigger button set for reset sensor: ");
+#ifdef SETUP_DEBUG
+                Serial.print(F("Trigger button set for sensor: "));
                 Serial.println(relaySensors[i].getId());
+#endif
             } else {
-                Serial.print("Error: Wrong relay type for RelaySensor: ");
+#ifdef SETUP_DEBUG
+                Serial.print(F("Error: Wrong relay type for RelaySensor: "));
                 Serial.print(relaySensors[i].getId());
-                Serial.println(" Only latching relay allowed when sensor pin set to: TRIGGER");
-                Serial.println("Refactor code and load again...");
+                Serial.println(F(" Only latching relay allowed when sensor pin set to: TRIGGER"));
+                Serial.println(F("Refactor code and load again..."));
+#endif
                 flag = true;
 
             }
@@ -69,19 +75,25 @@ void setupButtons() {
             if (!relay.isLatching()) {
                 buttons[i].attachLongPressStart(readAndUpdateStateHelper, relaySensors[i].getId());
                 buttons[i].attachLongPressStop(readAndUpdateStateHelper, relaySensors[i].getId());
-                Serial.print("Signal button set for sensor: ");
+#ifdef SETUP_DEBUG
+                Serial.print(F("Signal button set for sensor: "));
                 Serial.println(relaySensors[i].getId());
+#endif
             } else {
-                Serial.print("Error: Wrong relay type for RelaySensor: ");
+#ifdef SETUP_DEBUG
+                Serial.print(F("Error: Wrong relay type for RelaySensor: "));
                 Serial.print(relaySensors[i].getId());
-                Serial.println(" Only non-latching relay allowed when sensor pin set to: SIGNAL");
-                Serial.println("Refactor code and load again...");
+                Serial.println(F(" Only non-latching relay allowed when sensor pin set to: SIGNAL"));
+                Serial.println(F("Refactor code and load again..."));
+#endif
                 flag = true;
             }
         }
     }
     while (flag) {
-        Serial.println("waiting...");
+#ifdef SETUP_DEBUG
+        Serial.println(F("waiting..."));
+#endif
         myDelay(5000);
     }
 }
