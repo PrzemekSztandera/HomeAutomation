@@ -184,7 +184,7 @@ void sendPresentation() {
         }
     }
 
-    send(environmentSensorMessages[0].set(millis() / 1000));
+    send(environmentSensorMessages[0].set(millis()));
 
     Serial.println(F("sendPresentation() called...!"));
 }

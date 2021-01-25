@@ -148,7 +148,7 @@ void updateEnvironmentSensors() {
     unsigned long timer = millis() - currentSensorMillis;
     if (timer > 60000 || timer <= 0) {
 
-        send(environmentSensorMessages[0].set(millis() / 1000));
+        send(environmentSensorMessages[0].set(millis()));
 // Bosh sensor BME280
         float temp(NAN), hum(NAN), pres(NAN);
         BME280::TempUnit tempUnit(BME280::TempUnit_Celsius);
