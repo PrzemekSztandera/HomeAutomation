@@ -187,7 +187,7 @@ char *createPayload(const uint8_t sensorId) {
                 strcat(payloadArr, "\"dev_cla\":\"humidity\",\"unit_of_meas\":\"%\",\"val_tpl\":\"{{ value }}\"");
                 break;
             case V_TEXT:
-                strcat(payloadArr, "\"unit_of_meas\":\"s\",\"val_tpl\":\"{{ value / 1000 }}\"");
+                strcat(payloadArr, "\"unit_of_meas\":\"s\",\"val_tpl\":\"{{ value | int / 1000 }}\"");
                 break;
             default:
 //                strcat(payloadArr, "UNKNOWN_");
