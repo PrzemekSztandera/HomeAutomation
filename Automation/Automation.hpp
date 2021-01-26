@@ -37,17 +37,18 @@ void myDelay(long interval) {
 
 bool updateRelayStateAndSendMessage(const uint8_t sensorId, bool pullUpActive = true) {
 
-    bool updated;
-
-    auto relaySensor = getRelaySensor(sensorId);
-    Relay relay = getRelay(sensorId);
-    uint8_t signalState = relaySensor.readPin();
-    uint8_t relayState = relay.readPin();
+    bool updatedFlag;
     uint8_t oldState = loadState(sensorId);
-    uint8_t pinState;
+
+    Sensor sensor = getSensor(sensorId);
+    uint8_t signalState = sensor.readPin();
+
+    Relay relay = getRelay(sensorId);
+    uint8_t relayState = relay.readPin();
+    uint8_t pinState = -1;
 
 // save state of signal pin to EEPROM
-    if (relaySensor.getPinType() == SIGNAL_PIN) {
+    if (sensor.getPinType() == SIGNAL_PIN) {
         if (pullUpActive) {
             saveState(sensorId, !signalState);
         } else {
@@ -55,7 +56,7 @@ bool updateRelayStateAndSendMessage(const uint8_t sensorId, bool pullUpActive = 
         }
         pinState = signalState;
 // save state of relay pin to EEPROM
-    } else if (relaySensor.getPinType() == TRIGGER_PIN) {
+    } else if (sensor.getPinType() == TRIGGER_PIN) {
         if (relay.isLatching()) {
             if (relay.isLowLevelTrigger()) {
                 saveState(sensorId, !relayState);
@@ -70,10 +71,10 @@ bool updateRelayStateAndSendMessage(const uint8_t sensorId, bool pullUpActive = 
 
 
     uint8_t newState = loadState(sensorId);
-    send(relaySensorMessages[getIndex(relaySensor.getId())].set(newState));
+    send(sensorMessages[getIndex(sensor.getId())].set(newState));
 
     if (oldState == newState) {
-        updated = true;
+        updatedFlag = true;
         Serial.print(F("updateRelayStateAndSendMessage() called and message send for sensor: "));
         Serial.print(sensorId);
         Serial.print(F(" New sensor state: "));
@@ -81,7 +82,7 @@ bool updateRelayStateAndSendMessage(const uint8_t sensorId, bool pullUpActive = 
         Serial.print(F(", new pin state: "));
         Serial.println(pinState);
     } else {
-        updated = false;
+        updatedFlag = false;
         Serial.print(F("updateRelayStateAndSendMessage() called and message send for sensor: "));
         Serial.print(sensorId);
         Serial.print(F(" New sensor state: "));
@@ -89,7 +90,7 @@ bool updateRelayStateAndSendMessage(const uint8_t sensorId, bool pullUpActive = 
         Serial.print(F(", new pin state: "));
         Serial.println(pinState);
     }
-    return updated;
+    return updatedFlag;
 }
 
 
@@ -98,8 +99,8 @@ void switchRelay(const uint8_t sensorId) {
     Serial.print(F("Calling switchRelay() for sensor: "));
     Serial.println(sensorId);
 
-    auto relaySensor = getRelaySensor(sensorId);
     Relay relay = getRelay(sensorId);
+    uint8_t relayPin = relay.getPin();
     uint8_t relayState = relay.readPin();
 
 // save new sensor state to EEPROM
@@ -108,19 +109,19 @@ void switchRelay(const uint8_t sensorId) {
 
     if (relay.isLatching()) {
         if (relay.onExpander()) {
-            expander[relay.getExpanderAddress()].digitalWrite(relay.getPin(), !relayState);
+            expander[relay.getExpanderAddress()].digitalWrite(relayPin, !relayState);
         } else {
-            digitalWrite(relay.getPin(), !relayState);
+            digitalWrite(relayPin, !relayState);
         }
     } else {
         if (relay.onExpander()) {
-            expander[relay.getExpanderAddress()].digitalWrite(relay.getPin(), !relayState);
+            expander[relay.getExpanderAddress()].digitalWrite(relayPin, !relayState);
             delay(125);
-            expander[relay.getExpanderAddress()].digitalWrite(relay.getPin(), relayState);
+            expander[relay.getExpanderAddress()].digitalWrite(relayPin, relayState);
         } else {
-            digitalWrite(relay.getPin(), !relayState);
+            digitalWrite(relayPin, !relayState);
             delay(125);
-            digitalWrite(relay.getPin(), relayState);
+            digitalWrite(relayPin, relayState);
         }
 
     }
@@ -148,15 +149,15 @@ void updateEnvironmentSensors() {
     unsigned long timer = millis() - currentSensorMillis;
     if (timer > 60000 || timer <= 0) {
 
-        send(environmentSensorMessages[0].set(millis()));
+        send(sensorMessages[34].set(millis()));
 // Bosh sensor BME280
         float temp(NAN), hum(NAN), pres(NAN);
         BME280::TempUnit tempUnit(BME280::TempUnit_Celsius);
         BME280::PresUnit presUnit(BME280::PresUnit_Pa);
         bme.read(pres, temp, hum, tempUnit, presUnit);
-        send(environmentSensorMessages[1].set(temp, 1));
-        send(environmentSensorMessages[2].set(pres, 0));
-        send(environmentSensorMessages[3].set(hum, 1));
+        send(sensorMessages[35].set(temp, 1));
+        send(sensorMessages[36].set(pres, 0));
+        send(sensorMessages[37].set(hum, 1));
 
 
 // Dallas temp sensor DS18B20

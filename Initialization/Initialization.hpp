@@ -7,15 +7,13 @@
 
 #pragma once
 
-#include "../Mapping/RelaySensorsMapping.hpp"
-#include "../Mapping/EnvironmentSensorsMapping.hpp"
+#include "../Sensor/Sensor.hpp"
 #include "../DiscoveryMQTT/MQTT_discovery.hpp"
 
 unsigned long currentButtonMillis = 0;
 unsigned long currentSensorMillis = 0;
 
-MyMessage relaySensorMessages[numberOfRelaySensors];
-MyMessage environmentSensorMessages[numberOfEnvironmentSensors];
+MyMessage sensorMessages[numberOfSensors];
 
 void initializeTimers() {
     currentButtonMillis = millis();
@@ -35,71 +33,72 @@ void initializeMCP23017() {
     }
 }
 
-void initializeRelays() {
+void initializeAndSetRelays() {
 
-    for (uint8_t i = 0; i < numberOfRelaySensors; i++) {
-        auto relaySensor = relaySensors[i];
-        uint8_t sensorId = relaySensor.getId();
+    for (uint8_t i = 0; i < numberOfSensors; i++) {
+        Sensor sensor = sensors[i];
+        uint8_t sensorId = sensor.getId();
 
-        Relay relay = getRelay(sensorId);
-        relay.initialize();
+        sensorMessages[i] = MyMessage(sensorId, sensor.getVariableType());
 
-        relaySensorMessages[i] = MyMessage(sensorId, relaySensor.getVariableType());
+        if (sensor.getVariableType() == V_STATUS && sensor.getPresentationType() == S_BINARY) {
 
-        uint8_t currentSensorState = loadState(sensorId);
+            Relay relay = getRelay(sensorId);
+            bool latching = relay.isLatching();
+            bool lowLevel = relay.isLowLevelTrigger();
+            bool onExpander = relay.onExpander();
+            uint8_t relayPin = relay.getPin();
+            relay.initialize();
+
+            uint8_t currentSensorState = loadState(sensorId);
 
 #ifdef SETUP_DEBUG
-        Serial.print(F("Current sensor: "));
-        Serial.println(sensorId);
-        Serial.println(relaySensor.getDescription());
-        Serial.print(F("Current sensor state in initialization: "));
-        Serial.println(currentSensorState);
+            Serial.print(F("Current sensor: "));
+            Serial.println(sensorId);
+            Serial.println(sensor.getDescription());
+            Serial.print(F("Current sensor state in initialization: "));
+            Serial.println(currentSensorState);
 #endif
 
-        // Check whether EEPROM cell was used before
-        if (!(currentSensorState == 0 || currentSensorState == 1)) {
-            currentSensorState = LOW;
-            saveState(sensorId, currentSensorState);
-        }
-
-        uint8_t currentRelayState = loadState(sensorId);
-
-        if (relay.isLatching()) {
-            if (relay.isLowLevelTrigger()) {
-                currentRelayState = !currentRelayState;
+            // Check whether EEPROM cell was used before
+            if (!(currentSensorState == 0 || currentSensorState == 1)) {
+                currentSensorState = LOW;
+                saveState(sensorId, currentSensorState);
             }
-        } else {
-            currentRelayState = (relay.isLowLevelTrigger()) ? HIGH : LOW;
-        }
+
+            uint8_t currentRelayState = loadState(sensorId);
+
+            if (latching) {
+                if (lowLevel) {
+                    currentRelayState = !currentRelayState;
+                }
+            } else {
+                currentRelayState = (lowLevel) ? HIGH : LOW;
+            }
 
 #ifdef SETUP_DEBUG
-        Serial.print(F("Current relay state in initialization: "));
-        Serial.println(currentRelayState);
+            Serial.print(F("Current relay state in initialization: "));
+            Serial.println(currentRelayState);
 #endif
 
-        if (relay.onExpander()) {
-            expander[relay.getExpanderAddress()].digitalWrite(relay.getPin(), currentRelayState);
-        } else {
-            digitalWrite(relay.getPin(), currentRelayState);
-        }
+            if (onExpander) {
+                expander[relay.getExpanderAddress()].digitalWrite(relayPin, currentRelayState);
+            } else {
+                digitalWrite(relayPin, currentRelayState);
+            }
 
 #ifdef SETUP_DEBUG
-        Serial.print(F("Current pin state in initialization: "));
-        Serial.println(digitalRead(relay.getPin()));
+            Serial.print(F("Current pin state in initialization: "));
+            Serial.println(digitalRead(relayPin));
 #endif
 
-        myDelay(250);
-
+            myDelay(250);
+        }
     }
-    Serial.println(F("initializeRelays() called...!"));
+    Serial.println(F("Relays initialized and set up!"));
 }
 
 void initializeEnvironmentSensors() {
-
-    for (uint8_t i = 0; i < numberOfEnvironmentSensors; i++) {
-        auto environmentSensor = environmentSensors[i];
-        environmentSensorMessages[i] = MyMessage(environmentSensor.getId(), environmentSensor.getVariableType());
-    }
 
     // Bosh sensor BME280
     if (!bme.begin()) {
@@ -121,20 +120,20 @@ void initializeEnvironmentSensors() {
 //    Wire.begin();
 //    dallasSensors.begin();
 
-    Serial.println(F("Sensors initialized"));
+    Serial.println(F("Environment sensors initialized!"));
 }
 
-void initializeMcpPinsAsSignalPinsForRelays() {
-    for (uint8_t i = 0; i < numberOfRelaySensors; i++) {
-        auto relaySensor = relaySensors[i];
-        if (relaySensor.onExpander()) {
-            expander[relaySensor.getExpanderAddress()].pinMode(relaySensor.getPin(), INPUT);
-            expander[relaySensor.getExpanderAddress()].pullUp(relaySensor.getPin(), HIGH);
+void initializeSensorPinsOnExpander() {
+    for (uint8_t i = 0; i < numberOfSensors; i++) {
+        Sensor sensor = sensors[i];
+        if (sensor.onExpander()) {
+            expander[sensor.getExpanderAddress()].pinMode(sensor.getPin(), INPUT);
+            expander[sensor.getExpanderAddress()].pullUp(sensor.getPin(), HIGH);
         }
     }
 }
 
-void presentToHA(uint8_t  sensorId) {
+void sendHomeAssistantDiscovery(uint8_t  sensorId) {
 
     char *topic = createTopic(sensorId, DISCOVERY_TOPIC);
     char topicArr[strlen(topic) + 1];
@@ -154,53 +153,38 @@ void presentToHA(uint8_t  sensorId) {
 }
 
 void sendPresentation() {
-    for (uint8_t i = 0; i < numberOfRelaySensors; i++) {
-        auto relaySensor = relaySensors[i];
-        uint8_t discoveryType = relaySensor.getDiscoveryType();
+    for (uint8_t i = 0; i < numberOfSensors; i++) {
+        Sensor sensor = sensors[i];
+        uint8_t discoveryType = sensor.getDiscoveryType();
 
         if (discoveryType == HA_DISCOVERY) {
-            presentToHA(relaySensor.getId());
+            sendHomeAssistantDiscovery(sensor.getId());
         } else if (discoveryType == MS_DISCOVERY) {
-            present(relaySensor.getId(), relaySensor.getPresentationType(), relaySensor.getDescription());
+            present(sensor.getId(), sensor.getPresentationType(), sensor.getDescription());
         } else {
 #ifdef SETUP_DEBUG
             Serial.println(F("Choose presentation type!!!"));
 #endif
         }
-        send(relaySensorMessages[i].set(loadState(relaySensor.getId())));
-    }
-
-    for (uint8_t i = 0; i < numberOfEnvironmentSensors; i++) {
-        auto environmentSensor = environmentSensors[i];
-        uint8_t discoveryType = environmentSensor.getDiscoveryType();
-
-        if (discoveryType == HA_DISCOVERY) {
-            presentToHA(environmentSensor.getId());
-        } else if (discoveryType == MS_DISCOVERY) {
-            present(environmentSensor.getId(), environmentSensor.getPresentationType(), environmentSensor.getDescription());
-        } else {
-#ifdef SETUP_DEBUG
-            Serial.println(F("Choose presentation type!!!"));
-#endif
+        if (sensor.getVariableType() == V_STATUS && sensor.getPresentationType() == S_BINARY) {
+            send(sensorMessages[i].set(loadState(sensor.getId())));
         }
-    }
 
-    send(environmentSensorMessages[0].set(millis()));
+    }
 
     Serial.println(F("sendPresentation() called...!"));
 }
 
-
 void printRelaySensorDetails() {
-    for (uint8_t i = 0; i < numberOfRelaySensors; i++) {
-        auto relaySensor = relaySensors[i];
-        uint8_t sensorId = relaySensor.getId();
-
+    for (uint8_t i = 0; i < numberOfSensors; i++) {
+        Sensor sensor = sensors[i];
+        uint8_t sensorId = sensor.getId();
         Relay relay = getRelay(sensorId);
+
         Serial.print(F("Current sensor: "));
-        Serial.println(relaySensor.id);
+        Serial.println(sensorId);
         Serial.print(F("Current sensor state in setup: "));
-        Serial.println(loadState(relaySensor.getId()));
+        Serial.println(loadState(sensorId));
         Serial.print(F("Current pin state in setup: "));
         Serial.println(digitalRead(relay.getPin()));
     }

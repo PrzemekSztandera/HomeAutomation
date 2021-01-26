@@ -14,7 +14,7 @@ char payloadArr[255];
 char configTopic[50];
 char publishTopic[20];
 
-char *getDeviceType(mysensors_sensor_t type) {
+char *getSensorType(mysensors_sensor_t type) {
     char *name;
 
     switch (type) {
@@ -34,7 +34,7 @@ char *getDeviceType(mysensors_sensor_t type) {
     return name;
 }
 
-char *getDeviceDataType(mysensors_data_t type) {
+char *getSensorDataType(mysensors_data_t type) {
     char *name;
 
     switch (type) {
@@ -67,24 +67,14 @@ char *createTopic(const uint8_t sensorId, const uint8_t topicType) {
     char *discovery_prefix = "homeassistant";
     char *node_id = "0";
     char *config = "config";
-    char *description;
-    char *deviceType;
-    uint8_t variableType = -1;
 
-    if(sensorId > 0 && sensorId < 100) {
-        RelaySensor relaySensor = getRelaySensor(sensorId);
-        description = relaySensor.getDescription();
-        deviceType = getDeviceType(relaySensor.getPresentationType());
-        variableType = static_cast<uint8_t>(relaySensor.getVariableType());
-    } else if (sensorId >= 100) {
-        EnvironmentSensor environmentSensor = getEnvironmentSensor(sensorId);
-        description = environmentSensor.getDescription();
-        deviceType = getDeviceType(environmentSensor.getPresentationType());
-        variableType = static_cast<uint8_t>(environmentSensor.getVariableType());
-    }
+    Sensor sensor = getSensor(sensorId);
+    char *description = sensor.getDescription();
+    char *sensorType = getSensorType(sensor.getPresentationType());
+    uint8_t variableType = static_cast<uint8_t>(sensor.getVariableType());
 
-    char varType[5];
-    itoa(variableType, varType, 10);
+    char variableTypeArray[5];
+    itoa(variableType, variableTypeArray, 10);
 
     char sensor_id[5];
     itoa(sensorId, sensor_id, 10);
@@ -93,7 +83,7 @@ char *createTopic(const uint8_t sensorId, const uint8_t topicType) {
 
         strcpy(configTopic, discovery_prefix);
         strcat(configTopic, "/");
-        strcat(configTopic, deviceType);
+        strcat(configTopic, sensorType);
         strcat(configTopic, "/");
         strcat(configTopic, node_id);
         strcat(configTopic, "/");
@@ -122,7 +112,7 @@ char *createTopic(const uint8_t sensorId, const uint8_t topicType) {
         strcat(publishTopic, "/");
         strcat(publishTopic, "0"); // MySensors ack type
         strcat(publishTopic, "/");
-        strcat(publishTopic, varType); // MySensors variable type
+        strcat(publishTopic, variableTypeArray); // MySensors variable type
 
 //        topic = publishTopic;
         return publishTopic;
@@ -138,40 +128,27 @@ char *createPayload(const uint8_t sensorId) {
 
     char sensor_id[5];
     itoa(sensorId, sensor_id, 10);
-    uint8_t presentationType = -1;
-    uint8_t variableType = -1;
-    uint8_t sensorIndex = -1;
-    char *deviceType;
-    char *deviceDataType;
 
-    if(sensorId > 0 && sensorId < 100) {
-        RelaySensor relaySensor = getRelaySensor(sensorId);
-        variableType = static_cast<uint8_t>(relaySensor.getVariableType());
-        presentationType = static_cast<uint8_t>(relaySensor.getPresentationType());
-        sensorIndex = getIndex(sensorId) + 1;
-        deviceType = getDeviceType(relaySensor.getPresentationType());
-        deviceDataType = getDeviceDataType(relaySensor.getVariableType());
-    } else if (sensorId >= 100) {
-        EnvironmentSensor environmentSensor = getEnvironmentSensor(sensorId);
-        variableType = static_cast<uint8_t>(environmentSensor.getVariableType());
-        presentationType = static_cast<uint8_t>(environmentSensor.getPresentationType());
-        sensorIndex = getSensorIndex(sensorId) + 1;
-        deviceType = getDeviceType(environmentSensor.getPresentationType());
-        deviceDataType = getDeviceDataType(environmentSensor.getVariableType());
-    }
-
+    Sensor sensor = getSensor(sensorId);
+    uint8_t presentationType = static_cast<uint8_t>(sensor.getPresentationType());
+    uint8_t variableType = static_cast<uint8_t>(sensor.getVariableType());
+    uint8_t sensorIndex = getIndex(sensorId) + 1;
+    char *sensorType = getSensorType(sensor.getPresentationType());
+    char *sensorDataType = getSensorDataType(sensor.getVariableType());
 
     char sensor_index[5];
     itoa(sensorIndex, sensor_index, 10);
 
     strcpy(payloadArr, "{\"name\":\"Arduino ");
-    strcat(payloadArr, deviceDataType);
+    strcat(payloadArr, sensorDataType);
     strcat(payloadArr, " ");
-    strcat(payloadArr, deviceType);
-    strcat(payloadArr, "_");
-    strcat(payloadArr, sensor_index);
+    strcat(payloadArr, sensorType);
+    if (variableType == V_STATUS && presentationType == S_BINARY) {
+        strcat(payloadArr, "_");
+        strcat(payloadArr, sensor_index);
+    }
     strcat(payloadArr, "\",\"uniq_id\":\"");
-    strcat(payloadArr, deviceType);
+    strcat(payloadArr, sensorType);
     strcat(payloadArr, "_");
     strcat(payloadArr, sensor_id);
     if (variableType == V_STATUS) {

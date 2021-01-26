@@ -45,6 +45,12 @@
 #define SIGNAL_OUT_72 (uint8_t) 72
 #define SIGNAL_OUT_73 (uint8_t) 73
 
+#define ARDUINO_TIMER (uint8_t) 100
+#define BME_TEMP (uint8_t) 101
+#define BME_BARO (uint8_t) 102
+#define BME_HUM (uint8_t) 103
+//#define DALLAS_TEMP (uint8_t) 104
+
 // Enable serial gateway
 //#define MY_GATEWAY_SERIAL
 
@@ -103,12 +109,11 @@ void before() {
   
     Serial.begin(115200);
     scanI2cDevices();
-    createButtons();
-    setupButtons();
+    createAndSetButtons();
 #ifdef USE_EXPANDER
     initializeMCP23017();
 #endif
-    initializeRelays();
+    initializeAndSetRelays();
     initializeEnvironmentSensors();
     initializeTimers();
     Serial.println(F("before() called...!"));
@@ -117,7 +122,7 @@ void before() {
 void setup() {
   
 #ifdef USE_EXPANDER_AS_INPUT
-    initializeMcpPinsAsSignalPinsForRelays();
+    initializeSensorPinsOnExpander();
 #endif
 
 #ifdef SETUP_DEBUG
@@ -144,7 +149,7 @@ void receive(const MyMessage &message) {
     uint8_t sensorId = message.sensor;
     Serial.print(F("Calling receive() for sensor: "));
     Serial.println(sensorId);
-    if (message.type == getRelaySensor(sensorId).getVariableType()) {
+    if (message.type == getSensor(sensorId).getVariableType()) {
         switchRelay(sensorId);
     }
     Serial.print(F("receive() called for sensor: "));

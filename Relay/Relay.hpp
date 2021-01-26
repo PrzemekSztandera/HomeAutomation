@@ -2,7 +2,7 @@
 // Created by Przemyslaw Sztandera on 22/05/2020.
 //
 #include <Adafruit_MCP23017.h>
-#include "../Mapping/RelaySensorsMapping.hpp"
+#include "../Sensor/Sensor.hpp"
 
 // MCP23017 expander declaration
 uint8_t expanderAddresses[] = {0, 1, 2, 3, 4, 5, 6, 7};
