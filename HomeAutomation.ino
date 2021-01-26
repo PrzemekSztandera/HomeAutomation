@@ -8,6 +8,43 @@
  *
  */
 
+
+// CHILD_ID declaration of sensors
+#define SIGNAL_IN_11 (uint8_t) 11
+#define SIGNAL_IN_12 (uint8_t) 12
+#define SIGNAL_IN_13 (uint8_t) 13
+#define SIGNAL_IN_14 (uint8_t) 14
+#define SIGNAL_IN_15 (uint8_t) 15
+#define SIGNAL_IN_21 (uint8_t) 21
+#define SIGNAL_IN_22 (uint8_t) 22
+#define SIGNAL_IN_23 (uint8_t) 23
+#define SIGNAL_IN_24 (uint8_t) 24
+#define SIGNAL_IN_31 (uint8_t) 31
+#define SIGNAL_IN_32 (uint8_t) 32
+#define SIGNAL_IN_33 (uint8_t) 33
+#define SIGNAL_IN_34 (uint8_t) 34
+#define SIGNAL_IN_35 (uint8_t) 35
+#define SIGNAL_IN_36 (uint8_t) 36
+#define SIGNAL_IN_37 (uint8_t) 37
+#define SIGNAL_IN_38 (uint8_t) 38
+#define SIGNAL_IN_41 (uint8_t) 41
+#define SIGNAL_IN_42 (uint8_t) 42
+#define SIGNAL_IN_43 (uint8_t) 43
+#define SIGNAL_IN_44 (uint8_t) 44
+#define SIGNAL_IN_45 (uint8_t) 45
+#define SIGNAL_IN_46 (uint8_t) 46
+#define SIGNAL_IN_51 (uint8_t) 51
+#define SIGNAL_IN_52 (uint8_t) 52
+#define SIGNAL_IN_53 (uint8_t) 53
+#define SIGNAL_IN_54 (uint8_t) 54
+#define SIGNAL_IN_55 (uint8_t) 55
+#define SIGNAL_IN_56 (uint8_t) 56
+#define SIGNAL_IN_61 (uint8_t) 61
+#define SIGNAL_IN_62 (uint8_t) 62
+#define SIGNAL_IN_71 (uint8_t) 71
+#define SIGNAL_OUT_72 (uint8_t) 72
+#define SIGNAL_OUT_73 (uint8_t) 73
+
 // Enable serial gateway
 //#define MY_GATEWAY_SERIAL
 
@@ -63,9 +100,7 @@
 #include "./I2C/I2C_scanner.hpp"
 
 void before() {
-    // Initialize reset trigger pin to HIGH
-    digitalWrite(relaySensors[0].getRelay().getPin(), HIGH);
-
+  
     Serial.begin(115200);
     scanI2cDevices();
     createButtons();

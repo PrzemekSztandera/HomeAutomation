@@ -40,7 +40,7 @@ void readAndUpdateStateHelper(uint8_t sensorId) {
 void setupButtons() {
     bool flag = false;
     for (uint8_t i = 0; i < numberOfRelaySensors; i++) {
-        Relay relay = relaySensors[i].getRelay();
+        Relay relay = getRelay(relaySensors[i].getId());
 
         if (relaySensors[i].getPinType() == TRIGGER_PIN) {
             if (relay.isLatching()) {

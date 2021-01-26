@@ -40,7 +40,7 @@ bool updateRelayStateAndSendMessage(const uint8_t sensorId, bool pullUpActive = 
     bool updated;
 
     auto relaySensor = getRelaySensor(sensorId);
-    Relay relay = relaySensor.getRelay();
+    Relay relay = getRelay(sensorId);
     uint8_t signalState = relaySensor.readPin();
     uint8_t relayState = relay.readPin();
     uint8_t oldState = loadState(sensorId);
@@ -99,7 +99,7 @@ void switchRelay(const uint8_t sensorId) {
     Serial.println(sensorId);
 
     auto relaySensor = getRelaySensor(sensorId);
-    Relay relay = relaySensor.getRelay();
+    Relay relay = getRelay(sensorId);
     uint8_t relayState = relay.readPin();
 
 // save new sensor state to EEPROM

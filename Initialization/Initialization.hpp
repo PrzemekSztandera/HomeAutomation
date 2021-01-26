@@ -37,19 +37,20 @@ void initializeMCP23017() {
 
 void initializeRelays() {
 
-    for (byte i = 0; i < numberOfRelaySensors; i++) {
+    for (uint8_t i = 0; i < numberOfRelaySensors; i++) {
         auto relaySensor = relaySensors[i];
-        Relay relay = relaySensor.getRelay();
+        uint8_t sensorId = relaySensor.getId();
 
+        Relay relay = getRelay(sensorId);
         relay.initialize();
 
-        relaySensorMessages[i] = MyMessage(relaySensor.getId(), relaySensor.getVariableType());
+        relaySensorMessages[i] = MyMessage(sensorId, relaySensor.getVariableType());
 
-        uint8_t currentSensorState = loadState(relaySensor.getId());
+        uint8_t currentSensorState = loadState(sensorId);
 
 #ifdef SETUP_DEBUG
         Serial.print(F("Current sensor: "));
-        Serial.println(relaySensor.getId());
+        Serial.println(sensorId);
         Serial.println(relaySensor.getDescription());
         Serial.print(F("Current sensor state in initialization: "));
         Serial.println(currentSensorState);
@@ -58,10 +59,10 @@ void initializeRelays() {
         // Check whether EEPROM cell was used before
         if (!(currentSensorState == 0 || currentSensorState == 1)) {
             currentSensorState = LOW;
-            saveState(relaySensor.getId(), currentSensorState);
+            saveState(sensorId, currentSensorState);
         }
 
-        uint8_t currentRelayState = loadState(relaySensor.getId());
+        uint8_t currentRelayState = loadState(sensorId);
 
         if (relay.isLatching()) {
             if (relay.isLowLevelTrigger()) {
@@ -193,7 +194,9 @@ void sendPresentation() {
 void printRelaySensorDetails() {
     for (uint8_t i = 0; i < numberOfRelaySensors; i++) {
         auto relaySensor = relaySensors[i];
-        Relay relay = relaySensor.getRelay();
+        uint8_t sensorId = relaySensor.getId();
+
+        Relay relay = getRelay(sensorId);
         Serial.print(F("Current sensor: "));
         Serial.println(relaySensor.id);
         Serial.print(F("Current sensor state in setup: "));
