@@ -14,7 +14,7 @@ char payloadArr[255];
 char configTopic[50];
 char publishTopic[20];
 
-char *getSensorTypeName(mysensors_sensor_t type) {
+char *getDeviceType(mysensors_sensor_t type) {
     char *name;
 
     switch (type) {
@@ -28,10 +28,35 @@ char *getSensorTypeName(mysensors_sensor_t type) {
             name = "sensor";
             break;
         default:
-            name = "sensor";
+            name = "unknown";
             break;
     }
+    return name;
+}
 
+char *getDeviceDataType(mysensors_data_t type) {
+    char *name;
+
+    switch (type) {
+        case V_STATUS:
+            name = "Power";
+            break;
+        case V_TEMP:
+            name = "Temp";
+            break;
+        case V_PRESSURE:
+            name = "Baro";
+            break;
+        case V_HUM:
+            name = "Hum";
+            break;
+        case V_TEXT:
+            name = "Info";
+            break;
+        default:
+            name = "Unknown";
+            break;
+    }
     return name;
 }
 
@@ -43,18 +68,18 @@ char *createTopic(const uint8_t sensorId, const uint8_t topicType) {
     char *node_id = "0";
     char *config = "config";
     char *description;
-    char *sensorType;
+    char *deviceType;
     uint8_t variableType = -1;
 
     if(sensorId > 0 && sensorId < 100) {
         RelaySensor relaySensor = getRelaySensor(sensorId);
         description = relaySensor.getDescription();
-        sensorType = getSensorTypeName(relaySensor.getPresentationType());
+        deviceType = getDeviceType(relaySensor.getPresentationType());
         variableType = static_cast<uint8_t>(relaySensor.getVariableType());
     } else if (sensorId >= 100) {
         EnvironmentSensor environmentSensor = getEnvironmentSensor(sensorId);
         description = environmentSensor.getDescription();
-        sensorType = getSensorTypeName(environmentSensor.getPresentationType());
+        deviceType = getDeviceType(environmentSensor.getPresentationType());
         variableType = static_cast<uint8_t>(environmentSensor.getVariableType());
     }
 
@@ -68,7 +93,7 @@ char *createTopic(const uint8_t sensorId, const uint8_t topicType) {
 
         strcpy(configTopic, discovery_prefix);
         strcat(configTopic, "/");
-        strcat(configTopic, sensorType);
+        strcat(configTopic, deviceType);
         strcat(configTopic, "/");
         strcat(configTopic, node_id);
         strcat(configTopic, "/");
@@ -115,55 +140,39 @@ char *createPayload(const uint8_t sensorId) {
     itoa(sensorId, sensor_id, 10);
     uint8_t presentationType = -1;
     uint8_t variableType = -1;
+    uint8_t sensorIndex = -1;
+    char *deviceType;
+    char *deviceDataType;
 
     if(sensorId > 0 && sensorId < 100) {
         RelaySensor relaySensor = getRelaySensor(sensorId);
         variableType = static_cast<uint8_t>(relaySensor.getVariableType());
         presentationType = static_cast<uint8_t>(relaySensor.getPresentationType());
+        sensorIndex = getIndex(sensorId) + 1;
+        deviceType = getDeviceType(relaySensor.getPresentationType());
+        deviceDataType = getDeviceDataType(relaySensor.getVariableType());
     } else if (sensorId >= 100) {
         EnvironmentSensor environmentSensor = getEnvironmentSensor(sensorId);
         variableType = static_cast<uint8_t>(environmentSensor.getVariableType());
         presentationType = static_cast<uint8_t>(environmentSensor.getPresentationType());
+        sensorIndex = getSensorIndex(sensorId) + 1;
+        deviceType = getDeviceType(environmentSensor.getPresentationType());
+        deviceDataType = getDeviceDataType(environmentSensor.getVariableType());
     }
 
 
-    strcpy(payloadArr, "{\"name\":\"Arduino_");
-    switch (presentationType) {
-        case S_BINARY:
-            strcat(payloadArr, "POWER_");
-            break;
-        case S_TEMP:
-            strcat(payloadArr, "TEMP_");
-            break;
-        case S_BARO:
-            strcat(payloadArr, "BARO_");
-            break;
-        case S_HUM:
-            strcat(payloadArr, "HUM_");
-            break;
-        case S_INFO:
-            strcat(payloadArr, "INFO_");
-            break;
-        default:
-            strcat(payloadArr, "UNKNOWN_");
-            break;
-    }
-//    strcat(payloadArr, getSensorTypeName(relaySensor.getPresentationType()));
-    switch (presentationType) {
-        case S_BINARY:
-            strcat(payloadArr, "Switch_");
-            break;
-        case S_TEMP:
-        case S_BARO:
-        case S_HUM:
-        case S_INFO:
-            strcat(payloadArr, "Sensor_");
-            break;
-        default:
-            strcat(payloadArr, "Unknown_");
-            break;
-    }
-//    strcat(payloadArr, "_");
+    char sensor_index[5];
+    itoa(sensorIndex, sensor_index, 10);
+
+    strcpy(payloadArr, "{\"name\":\"Arduino ");
+    strcat(payloadArr, deviceDataType);
+    strcat(payloadArr, " ");
+    strcat(payloadArr, deviceType);
+    strcat(payloadArr, "_");
+    strcat(payloadArr, sensor_index);
+    strcat(payloadArr, "\",\"uniq_id\":\"");
+    strcat(payloadArr, deviceType);
+    strcat(payloadArr, "_");
     strcat(payloadArr, sensor_id);
     if (variableType == V_STATUS) {
         strcat(payloadArr, "\",\"cmd_t\":\"");
@@ -171,31 +180,28 @@ char *createPayload(const uint8_t sensorId) {
     }
     strcat(payloadArr, "\",\"stat_t\":\"");
     strcat(payloadArr, createTopic(sensorId, STATE_TOPIC));
-    strcat(payloadArr, "\",");
+    strcat(payloadArr, "\"");
     if (variableType == V_STATUS) {
-        strcat(payloadArr, "\"pl_off\":\"0\",\"pl_on\":\"1\",\"stat_off\":\"0\",\"stat_on\":\"1\"");
+        strcat(payloadArr, ",\"pl_off\":\"0\",\"pl_on\":\"1\",\"stat_off\":\"0\",\"stat_on\":\"1\",\"opt\":\"false\",\"ret\":\"true\"");
     } else {
         switch (variableType) {
 
             case V_TEMP:
-                strcat(payloadArr, "\"dev_cla\":\"temperature\",\"unit_of_meas\":\"°C\",\"val_tpl\":\"{{ value }}\"");
+                strcat(payloadArr, ",\"dev_cla\":\"temperature\",\"unit_of_meas\":\"°C\",\"val_tpl\":\"{{ value }}\"");
                 break;
             case V_PRESSURE:
-                strcat(payloadArr, "\"dev_cla\":\"pressure\",\"unit_of_meas\":\"hPa\",\"val_tpl\":\"{{ value | float / 100}}\"");
+                strcat(payloadArr, ",\"dev_cla\":\"pressure\",\"unit_of_meas\":\"hPa\",\"val_tpl\":\"{{ value | float / 100}}\"");
                 break;
             case V_HUM:
-                strcat(payloadArr, "\"dev_cla\":\"humidity\",\"unit_of_meas\":\"%\",\"val_tpl\":\"{{ value }}\"");
+                strcat(payloadArr, ",\"dev_cla\":\"humidity\",\"unit_of_meas\":\"%\",\"val_tpl\":\"{{ value }}\"");
                 break;
             case V_TEXT:
-                strcat(payloadArr, "\"unit_of_meas\":\"s\",\"val_tpl\":\"{{ value | int / 1000 }}\"");
+                strcat(payloadArr, ",\"unit_of_meas\":\"min\",\"val_tpl\":\"{{ value | int / 60000 }}\"");
                 break;
             default:
 //                strcat(payloadArr, "UNKNOWN_");
                 break;
         }
-    }
-    if (variableType == V_STATUS) {
-        strcat(payloadArr, ",\"opt\":\"false\",\"ret\":\"true\"");
     }
     strcat(payloadArr, "}");
 

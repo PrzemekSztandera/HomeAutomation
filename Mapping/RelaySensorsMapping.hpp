@@ -100,8 +100,8 @@ Relay relayArduino69(69, true, true, 8);
 struct RelaySensor {
 
     uint8_t id;
-    uint8_t variableType;
-    uint8_t presentationType;
+    mysensors_data_t variableType;
+    mysensors_sensor_t presentationType;
     uint8_t discoveryType;
     char *description;
     uint8_t _pin;
@@ -205,7 +205,7 @@ const uint8_t numberOfRelaySensors = sizeof(relaySensors) / sizeof(RelaySensor);
 
 //    const uint8_t sensorId = static_cast<uint8_t>(reinterpret_cast<intptr_t>(pSensorId));
 
-byte getIndex(uint8_t sensorId) {
+uint8_t getIndex(uint8_t sensorId) {
     for (uint8_t i = 0; i < numberOfRelaySensors; i++) {
         if (relaySensors[i].getId() == sensorId) return (i);
     }

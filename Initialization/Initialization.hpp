@@ -146,8 +146,8 @@ void presentToHA(uint8_t  sensorId) {
     _MQTT_client.publish(topicArr, payloadArr, true);
 
 #ifdef SETUP_DEBUG
-    Serial.println(topic);
-    Serial.println(payload);
+    Serial.println(topicArr);
+    Serial.println(payloadArr);
 #endif
     myDelay(100);
 }

@@ -30,8 +30,8 @@ uint8_t sensor1[8] = {0x28, 0xC8, 0xF3, 0x79, 0xA2, 0x00, 0x03, 0xA8};
 struct EnvironmentSensor {
 
     uint8_t id;
-    uint8_t variableType;
-    uint8_t presentationType;
+    mysensors_data_t variableType;
+    mysensors_sensor_t presentationType;
     uint8_t discoveryType;
     char *description;
 
@@ -66,7 +66,7 @@ EnvironmentSensor environmentSensors[] = {
 
 const uint8_t numberOfEnvironmentSensors = sizeof(environmentSensors) / sizeof(EnvironmentSensor);
 
-byte getSensorIndex(uint8_t sensorId) {
+uint8_t getSensorIndex(uint8_t sensorId) {
     for (uint8_t i = 0; i < numberOfEnvironmentSensors; i++) {
         if (environmentSensors[i].getId() == sensorId) return (i);
     }
