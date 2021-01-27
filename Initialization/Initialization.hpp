@@ -10,19 +10,19 @@
 #include "../Sensor/Sensor.hpp"
 #include "../DiscoveryMQTT/MQTT_discovery.hpp"
 
-unsigned long currentButtonMillis = 0;
+//unsigned long currentButtonMillis = 0;
 unsigned long currentSensorMillis = 0;
 
 MyMessage sensorMessages[numberOfSensors];
 
 void initializeTimers() {
-    currentButtonMillis = millis();
+//    currentButtonMillis = millis();
     currentSensorMillis = millis();
 }
 
 void resetTimers() {
     if (millis() == 0) {
-        currentButtonMillis = millis();
+//        currentButtonMillis = millis();
         currentSensorMillis = millis();
     }
 }
@@ -151,21 +151,21 @@ void sendHomeAssistantDiscovery(uint8_t  sensorId) {
 void sendPresentation() {
     for (uint8_t i = 0; i < numberOfSensors; i++) {
         Sensor sensor = sensors[i];
+        uint8_t sensorId = sensor.getId();
         uint8_t discoveryType = sensor.getDiscoveryType();
 
         if (discoveryType == HA_DISCOVERY) {
-            sendHomeAssistantDiscovery(sensor.getId());
+            sendHomeAssistantDiscovery(sensorId);
         } else if (discoveryType == MS_DISCOVERY) {
-            present(sensor.getId(), sensor.getPresentationType(), sensor.getDescription());
+            present(sensorId, sensor.getPresentationType(), sensor.getDescription());
         } else {
 #ifdef SETUP_DEBUG
             Serial.println(F("Choose presentation type!!!"));
 #endif
         }
         if (sensor.getVariableType() == V_STATUS && sensor.getPresentationType() == S_BINARY) {
-            send(sensorMessages[i].set(loadState(sensor.getId())));
+            updateRelayStateAndSendMessage(sensorId);
         }
-
     }
 
     Serial.println(F("sendPresentation() called...!"));

@@ -43,8 +43,9 @@
 #define SIGNAL_IN_61 (uint8_t) 61
 #define SIGNAL_IN_62 (uint8_t) 62
 #define SIGNAL_IN_71 (uint8_t) 71
-#define SIGNAL_OUT_72 (uint8_t) 72
-#define SIGNAL_OUT_73 (uint8_t) 73
+#define SIGNAL_IN_72 (uint8_t) 72
+#define SIGNAL_IN_73 (uint8_t) 73
+#define SIGNAL_IN_74 (uint8_t) 74
 
 #define ARDUINO_TIMER (uint8_t) 100
 #define BME_TEMP (uint8_t) 101
@@ -135,7 +136,7 @@ void presentation() {
     // Send the sketch version information to the gateway and Controller
     sendSketchInfo("Arduino", "MQTT");
     sendPresentation();
-    Serial.println("presentation() called...!");
+    Serial.println(F("presentation() called...!"));
 }
 
 void loop() {

@@ -16,6 +16,8 @@ void myDelay(long interval);
 
 void updateEnvironmentSensors();
 
+int freeRam ();
+
 
 #pragma once
 
@@ -71,7 +73,7 @@ bool updateRelayStateAndSendMessage(const uint8_t sensorId, bool pullUpActive = 
 
 
     uint8_t newState = loadState(sensorId);
-    send(sensorMessages[getIndex(sensor.getId())].set(newState));
+    send(sensorMessages[getIndex(sensorId)].set(newState));
 
     if (oldState == newState) {
         updatedFlag = true;
@@ -149,18 +151,27 @@ void updateEnvironmentSensors() {
     unsigned long timer = millis() - currentSensorMillis;
     if (timer > 60000 || timer <= 0) {
 
-        send(sensorMessages[34].set(millis()));
+        send(sensorMessages[getIndex(ARDUINO_TIMER)].set(millis()));
 // Bosh sensor BME280
         float temp(NAN), hum(NAN), pres(NAN);
         BME280::TempUnit tempUnit(BME280::TempUnit_Celsius);
         BME280::PresUnit presUnit(BME280::PresUnit_Pa);
         bmeSensor.read(pres, temp, hum, tempUnit, presUnit);
-        send(sensorMessages[35].set(temp, 1));
-        send(sensorMessages[36].set(pres, 0));
-        send(sensorMessages[37].set(hum, 1));
+        send(sensorMessages[getIndex(BME_TEMP)].set(temp, 1));
+        send(sensorMessages[getIndex(BME_BARO)].set(pres, 0));
+        send(sensorMessages[getIndex(BME_HUM)].set(hum, 1));
+
+        Serial.print(F("Free RAM: "));
+        Serial.println(freeRam());
 
         currentSensorMillis = millis();
     }
+}
+
+int freeRam () {
+    extern int __heap_start, *__brkval;
+    int v;
+    return (int) &v - (__brkval == 0 ? (int) &__heap_start : (int) __brkval);
 }
 
 

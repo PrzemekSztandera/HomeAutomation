@@ -27,6 +27,10 @@ char *getSensorType(mysensors_sensor_t type) {
         case S_HUM:
             name = "sensor";
             break;
+        case S_DOOR:
+        case S_MOTION:
+            name = "binary_sensor";
+            break;
         default:
             name = "unknown";
             break;
@@ -52,6 +56,9 @@ char *getSensorDataType(mysensors_data_t type) {
             break;
         case V_HUM:
             name = "Hum";
+            break;
+        case V_TRIPPED:
+            name = "Tripp";
             break;
         default:
             name = "Unknown";
@@ -110,7 +117,7 @@ char *createTopic(const uint8_t sensorId, const uint8_t topicType) {
         strcat(publishTopic, "/");
         strcat(publishTopic, "1"); // MySensors command type (set)
         strcat(publishTopic, "/");
-        strcat(publishTopic, "0"); // MySensors ack type
+        strcat(publishTopic, "0"); // MySensors ack type - leave 0
         strcat(publishTopic, "/");
         strcat(publishTopic, variableTypeArray); // MySensors variable type
 
@@ -147,6 +154,10 @@ char *createPayload(const uint8_t sensorId) {
         strcat(payloadArr, " ");
         strcat(payloadArr, sensor_index);
     }
+    if (variableType == V_TRIPPED && (presentationType == S_DOOR || presentationType == S_MOTION) ) {
+        strcat(payloadArr, " ");
+        strcat(payloadArr, sensor_index);
+    }
     strcat(payloadArr, "\",\"uniq_id\":\"");
     strcat(payloadArr, sensorType);
     strcat(payloadArr, "_");
@@ -159,7 +170,7 @@ char *createPayload(const uint8_t sensorId) {
     strcat(payloadArr, createTopic(sensorId, STATE_TOPIC));
     strcat(payloadArr, "\"");
     if (variableType == V_STATUS) {
-        strcat(payloadArr, ",\"pl_off\":\"0\",\"pl_on\":\"1\",\"stat_off\":\"0\",\"stat_on\":\"1\",\"opt\":\"false\",\"ret\":\"true\"");
+        strcat(payloadArr, ",\"pl_off\":\"0\",\"pl_on\":\"1\",\"stat_off\":\"0\",\"stat_on\":\"1\",\"opt\":\"false\",\"ret\":\"false\"");
     } else {
         switch (variableType) {
             case V_TEXT:
@@ -173,6 +184,9 @@ char *createPayload(const uint8_t sensorId) {
                 break;
             case V_HUM:
                 strcat(payloadArr, ",\"dev_cla\":\"humidity\",\"unit_of_meas\":\"%\",\"val_tpl\":\"{{ value }}\"");
+                break;
+            case V_TRIPPED:
+                strcat(payloadArr, ",\"dev_cla\":\"motion\",\"pl_off\":\"0\",\"pl_on\":\"1\"");
                 break;
             default:
                 break;

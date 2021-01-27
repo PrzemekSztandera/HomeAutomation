@@ -24,16 +24,18 @@ void readAndUpdateStateHelper(uint8_t sensorId) {
 void createAndSetButtons() {
     bool flag = false;
     for (uint8_t i = 0; i < numberOfSensors; i++) {
+
         Sensor sensor = sensors[i];
+        uint8_t sensorId = sensor.getId();
+
+
 
         if (sensor.getVariableType() == V_STATUS && sensor.getPresentationType() == S_BINARY) {
 
-            uint8_t sensorId = sensor.getId();
+            buttons[i] = OneButton(sensor.getPin(), true, true);
 
             Relay relay = getRelay(sensorId);
             bool latching = relay.isLatching();
-
-            buttons[i] = OneButton(sensor.getPin(), true, true);
 
             if (sensor.getPinType() == TRIGGER_PIN) {
                 if (latching) {
@@ -74,6 +76,10 @@ void createAndSetButtons() {
 #endif
                 }
             }
+        } else if (sensor.getVariableType() == V_TRIPPED && sensor.getPresentationType() == S_MOTION) {
+            buttons[i] = OneButton(sensor.getPin(), true, true);
+            buttons[i].attachLongPressStart(readAndUpdateStateHelper, sensorId);
+            buttons[i].attachLongPressStop(readAndUpdateStateHelper, sensorId);
         }
     }
 
@@ -87,7 +93,7 @@ void createAndSetButtons() {
 
 
 void readButtons() {
-    for (uint8_t i = 0; i < 34; i++) {
+    for (uint8_t i = 0; i < 35; i++) {
         buttons[i].tick();
     }
 }
