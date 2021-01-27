@@ -101,11 +101,11 @@ void initializeAndSetRelays() {
 void initializeEnvironmentSensors() {
 
     // Bosh sensor BME280
-    if (!bme.begin()) {
+    if (!bmeSensor.begin()) {
         Serial.println(F("Could not find BME280 sensor!"));
     }
 
-    switch (bme.chipModel()) {
+    switch (bmeSensor.chipModel()) {
         case BME280::ChipModel_BME280:
             Serial.println(F("Found BME280 sensor! Success."));
             break;
@@ -115,10 +115,6 @@ void initializeEnvironmentSensors() {
         default:
             Serial.println(F("Found UNKNOWN sensor! Error!"));
     }
-// Dallas temp sensor DS18B20
-
-//    Wire.begin();
-//    dallasSensors.begin();
 
     Serial.println(F("Environment sensors initialized!"));
 }

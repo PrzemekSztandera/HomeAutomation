@@ -21,10 +21,10 @@ char *getSensorType(mysensors_sensor_t type) {
         case S_BINARY:
             name = "switch";
             break;
+        case S_INFO:
         case S_TEMP:
         case S_BARO:
         case S_HUM:
-        case S_INFO:
             name = "sensor";
             break;
         default:
@@ -41,6 +41,9 @@ char *getSensorDataType(mysensors_data_t type) {
         case V_STATUS:
             name = "Power";
             break;
+        case V_TEXT:
+            name = "Info";
+            break;
         case V_TEMP:
             name = "Temp";
             break;
@@ -49,9 +52,6 @@ char *getSensorDataType(mysensors_data_t type) {
             break;
         case V_HUM:
             name = "Hum";
-            break;
-        case V_TEXT:
-            name = "Info";
             break;
         default:
             name = "Unknown";
@@ -144,7 +144,7 @@ char *createPayload(const uint8_t sensorId) {
     strcat(payloadArr, " ");
     strcat(payloadArr, sensorType);
     if (variableType == V_STATUS && presentationType == S_BINARY) {
-        strcat(payloadArr, "_");
+        strcat(payloadArr, " ");
         strcat(payloadArr, sensor_index);
     }
     strcat(payloadArr, "\",\"uniq_id\":\"");
@@ -162,7 +162,9 @@ char *createPayload(const uint8_t sensorId) {
         strcat(payloadArr, ",\"pl_off\":\"0\",\"pl_on\":\"1\",\"stat_off\":\"0\",\"stat_on\":\"1\",\"opt\":\"false\",\"ret\":\"true\"");
     } else {
         switch (variableType) {
-
+            case V_TEXT:
+                strcat(payloadArr, ",\"unit_of_meas\":\"min\",\"val_tpl\":\"{{ value | int / 60000 }}\"");
+                break;
             case V_TEMP:
                 strcat(payloadArr, ",\"dev_cla\":\"temperature\",\"unit_of_meas\":\"°C\",\"val_tpl\":\"{{ value }}\"");
                 break;
@@ -172,11 +174,7 @@ char *createPayload(const uint8_t sensorId) {
             case V_HUM:
                 strcat(payloadArr, ",\"dev_cla\":\"humidity\",\"unit_of_meas\":\"%\",\"val_tpl\":\"{{ value }}\"");
                 break;
-            case V_TEXT:
-                strcat(payloadArr, ",\"unit_of_meas\":\"min\",\"val_tpl\":\"{{ value | int / 60000 }}\"");
-                break;
             default:
-//                strcat(payloadArr, "UNKNOWN_");
                 break;
         }
     }

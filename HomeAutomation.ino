@@ -1,3 +1,4 @@
+
 /**
  *
  * @file automatykaMegaGateway.ino
@@ -49,7 +50,6 @@
 #define BME_TEMP (uint8_t) 101
 #define BME_BARO (uint8_t) 102
 #define BME_HUM (uint8_t) 103
-//#define DALLAS_TEMP (uint8_t) 104
 
 // Enable serial gateway
 //#define MY_GATEWAY_SERIAL

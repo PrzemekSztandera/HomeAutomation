@@ -154,22 +154,11 @@ void updateEnvironmentSensors() {
         float temp(NAN), hum(NAN), pres(NAN);
         BME280::TempUnit tempUnit(BME280::TempUnit_Celsius);
         BME280::PresUnit presUnit(BME280::PresUnit_Pa);
-        bme.read(pres, temp, hum, tempUnit, presUnit);
+        bmeSensor.read(pres, temp, hum, tempUnit, presUnit);
         send(sensorMessages[35].set(temp, 1));
         send(sensorMessages[36].set(pres, 0));
         send(sensorMessages[37].set(hum, 1));
 
-
-// Dallas temp sensor DS18B20
-//        dallasSensors.requestTemperatures();
-//        for (uint8_t i = 0; i < numberOfEnvironmentSensors; i++) {
-//            auto environmentSensor = environmentSensors[i];
-//            if (environmentSensor.getId() == DALLAS_TEMP) {
-//                send(sensorMsgs[i].set(dallasSensors.getTempC(sensor1), 1));
-//            }
-//        }
-
-//        Serial.println("Server update");
         currentSensorMillis = millis();
     }
 }

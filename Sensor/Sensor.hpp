@@ -10,23 +10,12 @@
 
 #pragma once
 
-#include "../Relay/Relay.hpp"
-
-#include <Wire.h>
-#include <OneWire.h>
 #include <BME280I2C.h>
 #include <DallasTemperature.h>
+#include "../Relay/Relay.hpp"
 
 // Bosh sensor BME280
-BME280I2C bme;
-
-// Dallas temp sensor DS18B20
-#define ONE_WIRE_BUS 7
-OneWire oneWire(ONE_WIRE_BUS);
-DallasTemperature dallasSensors(&oneWire);
-// Address of 1 DS18B20s
-uint8_t sensor1[8] = {0x28, 0xC8, 0xF3, 0x79, 0xA2, 0x00, 0x03, 0xA8};
-
+BME280I2C bmeSensor;
 
 // RelaySensor pin type
 #define SIGNAL_PIN (uint8_t) 1
@@ -47,7 +36,7 @@ private:
 
 public:
     Sensor(uint8_t id, mysensors_data_t dataType, mysensors_sensor_t sensorType, uint8_t discovery,
-                char *description, uint8_t pin = -1, uint8_t pinType = NO_PIN, uint8_t expander = 8) {
+           char *description, uint8_t pin = -1, uint8_t pinType = NO_PIN, uint8_t expander = 8) {
         this->id = id;
         this->variableType = dataType;
         this->presentationType = sensorType;
@@ -104,47 +93,46 @@ public:
 Sensor sensors[] = {
 
         // CHILD_ID / variable / presentation / discovery / description / pin / pin type / expanderAddress / hasSignalPin / relay
-        {SIGNAL_IN_11,  V_STATUS,   S_BINARY, HA_DISCOVERY, "Pin 22 in",            22, SIGNAL_PIN,  8},
-        {SIGNAL_IN_12,  V_STATUS,   S_BINARY, HA_DISCOVERY, "Pin 23 in",            23, SIGNAL_PIN,  8},
-        {SIGNAL_IN_13,  V_STATUS,   S_BINARY, HA_DISCOVERY, "Pin 24 in",            24, SIGNAL_PIN,  8},
-        {SIGNAL_IN_14,  V_STATUS,   S_BINARY, HA_DISCOVERY, "Pin 25 in",            25, SIGNAL_PIN,  8},
-        {SIGNAL_IN_15,  V_STATUS,   S_BINARY, HA_DISCOVERY, "Pin 26 in",            26, SIGNAL_PIN,  8},
-        {SIGNAL_IN_21,  V_STATUS,   S_BINARY, HA_DISCOVERY, "Pin 27 in",            27, SIGNAL_PIN,  8},
-        {SIGNAL_IN_22,  V_STATUS,   S_BINARY, HA_DISCOVERY, "Pin 28 in",            28, SIGNAL_PIN,  8},
-        {SIGNAL_IN_23,  V_STATUS,   S_BINARY, HA_DISCOVERY, "Pin 29 in",            29, SIGNAL_PIN,  8},
-        {SIGNAL_IN_24,  V_STATUS,   S_BINARY, HA_DISCOVERY, "Pin 30 in",            30, SIGNAL_PIN,  8},
-        {SIGNAL_IN_31,  V_STATUS,   S_BINARY, HA_DISCOVERY, "Pin 31 in",            31, SIGNAL_PIN,  8},
-        {SIGNAL_IN_32,  V_STATUS,   S_BINARY, HA_DISCOVERY, "Pin 32 in",            32, SIGNAL_PIN,  8},
-        {SIGNAL_IN_33,  V_STATUS,   S_BINARY, HA_DISCOVERY, "Pin 33 in",            33, SIGNAL_PIN,  8},
-        {SIGNAL_IN_34,  V_STATUS,   S_BINARY, HA_DISCOVERY, "Pin 34 in",            34, SIGNAL_PIN,  8},
-        {SIGNAL_IN_35,  V_STATUS,   S_BINARY, HA_DISCOVERY, "Pin 35 in",            35, SIGNAL_PIN,  8},
-        {SIGNAL_IN_36,  V_STATUS,   S_BINARY, HA_DISCOVERY, "Pin 36 in",            36, SIGNAL_PIN,  8},
-        {SIGNAL_IN_37,  V_STATUS,   S_BINARY, HA_DISCOVERY, "Pin 37 in",            37, SIGNAL_PIN,  8},
-        {SIGNAL_IN_38,  V_STATUS,   S_BINARY, HA_DISCOVERY, "Pin 38 in",            38, SIGNAL_PIN,  8},
-        {SIGNAL_IN_41,  V_STATUS,   S_BINARY, HA_DISCOVERY, "Pin 39 in",            39, SIGNAL_PIN,  8},
-        {SIGNAL_IN_42,  V_STATUS,   S_BINARY, HA_DISCOVERY, "Pin 40 in",            40, SIGNAL_PIN,  8},
-        {SIGNAL_IN_43,  V_STATUS,   S_BINARY, HA_DISCOVERY, "Pin 41 in",            41, SIGNAL_PIN,  8},
-        {SIGNAL_IN_44,  V_STATUS,   S_BINARY, HA_DISCOVERY, "Pin 42 in",            42, SIGNAL_PIN,  8},
-        {SIGNAL_IN_45,  V_STATUS,   S_BINARY, HA_DISCOVERY, "Pin 43 in",            43, SIGNAL_PIN,  8},
-        {SIGNAL_IN_46,  V_STATUS,   S_BINARY, HA_DISCOVERY, "Pin 44 in",            44, SIGNAL_PIN,  8},
-        {SIGNAL_IN_51,  V_STATUS,   S_BINARY, HA_DISCOVERY, "Pin 45 in",            45, SIGNAL_PIN,  8},
-        {SIGNAL_IN_52,  V_STATUS,   S_BINARY, HA_DISCOVERY, "Pin 46 in",            46, SIGNAL_PIN,  8},
-        {SIGNAL_IN_53,  V_STATUS,   S_BINARY, HA_DISCOVERY, "Pin 47 in",            47, SIGNAL_PIN,  8},
-        {SIGNAL_IN_54,  V_STATUS,   S_BINARY, HA_DISCOVERY, "Pin 48 in",            48, SIGNAL_PIN,  8},
-        {SIGNAL_IN_55,  V_STATUS,   S_BINARY, HA_DISCOVERY, "Pin A8 in",            62, SIGNAL_PIN,  8},
-        {SIGNAL_IN_56,  V_STATUS,   S_BINARY, HA_DISCOVERY, "Pin A9 in",            63, SIGNAL_PIN,  8},
-        {SIGNAL_IN_61,  V_STATUS,   S_BINARY, HA_DISCOVERY, "Pin A10 in",           64, SIGNAL_PIN,  8},
-        {SIGNAL_IN_62,  V_STATUS,   S_BINARY, HA_DISCOVERY, "Pin A11 in",           65, SIGNAL_PIN,  8},
-        {SIGNAL_IN_71,  V_STATUS,   S_BINARY, HA_DISCOVERY, "Pin A12 in",           66, SIGNAL_PIN,  8},
+        {SIGNAL_IN_11,  V_STATUS,   S_BINARY,      HA_DISCOVERY, "Pin 22 in",            22, SIGNAL_PIN,  8},
+        {SIGNAL_IN_12,  V_STATUS,   S_BINARY,      HA_DISCOVERY, "Pin 23 in",            23, SIGNAL_PIN,  8},
+        {SIGNAL_IN_13,  V_STATUS,   S_BINARY,      HA_DISCOVERY, "Pin 24 in",            24, SIGNAL_PIN,  8},
+        {SIGNAL_IN_14,  V_STATUS,   S_BINARY,      HA_DISCOVERY, "Pin 25 in",            25, SIGNAL_PIN,  8},
+        {SIGNAL_IN_15,  V_STATUS,   S_BINARY,      HA_DISCOVERY, "Pin 26 in",            26, SIGNAL_PIN,  8},
+        {SIGNAL_IN_21,  V_STATUS,   S_BINARY,      HA_DISCOVERY, "Pin 27 in",            27, SIGNAL_PIN,  8},
+        {SIGNAL_IN_22,  V_STATUS,   S_BINARY,      HA_DISCOVERY, "Pin 28 in",            28, SIGNAL_PIN,  8},
+        {SIGNAL_IN_23,  V_STATUS,   S_BINARY,      HA_DISCOVERY, "Pin 29 in",            29, SIGNAL_PIN,  8},
+        {SIGNAL_IN_24,  V_STATUS,   S_BINARY,      HA_DISCOVERY, "Pin 30 in",            30, SIGNAL_PIN,  8},
+        {SIGNAL_IN_31,  V_STATUS,   S_BINARY,      HA_DISCOVERY, "Pin 31 in",            31, SIGNAL_PIN,  8},
+        {SIGNAL_IN_32,  V_STATUS,   S_BINARY,      HA_DISCOVERY, "Pin 32 in",            32, SIGNAL_PIN,  8},
+        {SIGNAL_IN_33,  V_STATUS,   S_BINARY,      HA_DISCOVERY, "Pin 33 in",            33, SIGNAL_PIN,  8},
+        {SIGNAL_IN_34,  V_STATUS,   S_BINARY,      HA_DISCOVERY, "Pin 34 in",            34, SIGNAL_PIN,  8},
+        {SIGNAL_IN_35,  V_STATUS,   S_BINARY,      HA_DISCOVERY, "Pin 35 in",            35, SIGNAL_PIN,  8},
+        {SIGNAL_IN_36,  V_STATUS,   S_BINARY,      HA_DISCOVERY, "Pin 36 in",            36, SIGNAL_PIN,  8},
+        {SIGNAL_IN_37,  V_STATUS,   S_BINARY,      HA_DISCOVERY, "Pin 37 in",            37, SIGNAL_PIN,  8},
+        {SIGNAL_IN_38,  V_STATUS,   S_BINARY,      HA_DISCOVERY, "Pin 38 in",            38, SIGNAL_PIN,  8},
+        {SIGNAL_IN_41,  V_STATUS,   S_BINARY,      HA_DISCOVERY, "Pin 39 in",            39, SIGNAL_PIN,  8},
+        {SIGNAL_IN_42,  V_STATUS,   S_BINARY,      HA_DISCOVERY, "Pin 40 in",            40, SIGNAL_PIN,  8},
+        {SIGNAL_IN_43,  V_STATUS,   S_BINARY,      HA_DISCOVERY, "Pin 41 in",            41, SIGNAL_PIN,  8},
+        {SIGNAL_IN_44,  V_STATUS,   S_BINARY,      HA_DISCOVERY, "Pin 42 in",            42, SIGNAL_PIN,  8},
+        {SIGNAL_IN_45,  V_STATUS,   S_BINARY,      HA_DISCOVERY, "Pin 43 in",            43, SIGNAL_PIN,  8},
+        {SIGNAL_IN_46,  V_STATUS,   S_BINARY,      HA_DISCOVERY, "Pin 44 in",            44, SIGNAL_PIN,  8},
+        {SIGNAL_IN_51,  V_STATUS,   S_BINARY,      HA_DISCOVERY, "Pin 45 in",            45, SIGNAL_PIN,  8},
+        {SIGNAL_IN_52,  V_STATUS,   S_BINARY,      HA_DISCOVERY, "Pin 46 in",            46, SIGNAL_PIN,  8},
+        {SIGNAL_IN_53,  V_STATUS,   S_BINARY,      HA_DISCOVERY, "Pin 47 in",            47, SIGNAL_PIN,  8},
+        {SIGNAL_IN_54,  V_STATUS,   S_BINARY,      HA_DISCOVERY, "Pin 48 in",            48, SIGNAL_PIN,  8},
+        {SIGNAL_IN_55,  V_STATUS,   S_BINARY,      HA_DISCOVERY, "Pin A8 in",            62, SIGNAL_PIN,  8},
+        {SIGNAL_IN_56,  V_STATUS,   S_BINARY,      HA_DISCOVERY, "Pin A9 in",            63, SIGNAL_PIN,  8},
+        {SIGNAL_IN_61,  V_STATUS,   S_BINARY,      HA_DISCOVERY, "Pin A10 in",           64, SIGNAL_PIN,  8},
+        {SIGNAL_IN_62,  V_STATUS,   S_BINARY,      HA_DISCOVERY, "Pin A11 in",           65, SIGNAL_PIN,  8},
+        {SIGNAL_IN_71,  V_STATUS,   S_BINARY,      HA_DISCOVERY, "Pin A12 in",           66, SIGNAL_PIN,  8},
         // use only with latching relays
-        {SIGNAL_OUT_72, V_STATUS,   S_BINARY, HA_DISCOVERY, "Pin A13 in - A15 out", 67, TRIGGER_PIN, 8},
-        {SIGNAL_OUT_73, V_STATUS,   S_BINARY, HA_DISCOVERY, "Pin A14 in - A3 out",  68, TRIGGER_PIN, 8},
+        {SIGNAL_OUT_72, V_STATUS,   S_BINARY,      HA_DISCOVERY, "Pin A13 in - A15 out", 67, TRIGGER_PIN, 8},
+        {SIGNAL_OUT_73, V_STATUS,   S_BINARY,      HA_DISCOVERY, "Pin A14 in - A3 out",  68, TRIGGER_PIN, 8},
         // Environment sensors
-        {ARDUINO_TIMER, V_TEXT,     S_INFO,   HA_DISCOVERY, "Arduino Timer"},
-        {BME_TEMP,      V_TEMP,     S_TEMP,   HA_DISCOVERY, "I2C BME_TEMP"},
-        {BME_BARO,      V_PRESSURE, S_BARO,   HA_DISCOVERY, "I2C BME_BARO"},
-        {BME_HUM,       V_HUM,      S_HUM,    HA_DISCOVERY, "I2C BME_HUM"},
-//        {DALLAS_TEMP, V_TEMP, S_TEMP, HA_DISCOVERY, "Pin 7 - OneWire"},
+        {ARDUINO_TIMER, V_TEXT,     S_INFO,        HA_DISCOVERY, "Arduino Timer"},
+        {BME_TEMP,      V_TEMP,     S_TEMP,        HA_DISCOVERY, "I2C BME_TEMP"},
+        {BME_BARO,      V_PRESSURE, S_BARO,        HA_DISCOVERY, "I2C BME_BARO"},
+        {BME_HUM,       V_HUM,      S_HUM,         HA_DISCOVERY, "I2C BME_HUM"},
 };
 
 const uint8_t numberOfSensors = sizeof(sensors) / sizeof(Sensor);
