@@ -2,7 +2,8 @@
  * Created by Przemyslaw Sztandera on 21/01/2021.
  */
 
-// homeassistant/switch/arduino_0/sensorId/config
+
+#pragma once
 
 
 #define DISCOVERY_TOPIC (uint8_t) 1
@@ -11,11 +12,10 @@
 
 
 char payloadArr[255];
-char configTopic[50];
-char publishTopic[20];
+char topic[50];
 
-char *getSensorType(mysensors_sensor_t type) {
-    char *name;
+char const *getSensorTypeString(mysensors_sensor_t type) {
+    char const *name;
 
     switch (type) {
         case S_BINARY:
@@ -38,8 +38,8 @@ char *getSensorType(mysensors_sensor_t type) {
     return name;
 }
 
-char *getSensorDataType(mysensors_data_t type) {
-    char *name;
+char const *getSensorDataTypeString(mysensors_data_t type) {
+    char const *name;
 
     switch (type) {
         case V_STATUS:
@@ -71,13 +71,12 @@ char *getSensorDataType(mysensors_data_t type) {
 char *createTopic(const uint8_t sensorId, const uint8_t topicType) {
 
 
-    char *discovery_prefix = "homeassistant";
-    char *node_id = "0";
-    char *config = "config";
+    char discovery_prefix[] = "homeassistant";
+    char node_id[] = "0";
+    char config[] = "config";
 
     Sensor sensor = getSensor(sensorId);
-    char *description = sensor.getDescription();
-    char *sensorType = getSensorType(sensor.getPresentationType());
+    char const *sensorType = getSensorTypeString(sensor.getPresentationType());
     uint8_t variableType = static_cast<uint8_t>(sensor.getVariableType());
 
     char variableTypeArray[5];
@@ -86,22 +85,21 @@ char *createTopic(const uint8_t sensorId, const uint8_t topicType) {
     char sensor_id[5];
     itoa(sensorId, sensor_id, 10);
 
-    if (topicType == DISCOVERY_TOPIC) {
+    if (topicType == DISCOVERY_TOPIC) { // homeassistant/sensorType/arduino_0/sensorId/config
 
-        strcpy(configTopic, discovery_prefix);
-        strcat(configTopic, "/");
-        strcat(configTopic, sensorType);
-        strcat(configTopic, "/");
-        strcat(configTopic, node_id);
-        strcat(configTopic, "/");
-        strcat(configTopic, sensor_id);
-        strcat(configTopic, "/");
-        strcat(configTopic, config);
+        strcpy(topic, discovery_prefix);
+        strcat(topic, "/");
+        strcat(topic, sensorType);
+        strcat(topic, "/");
+        strcat(topic, node_id);
+        strcat(topic, "/");
+        strcat(topic, sensor_id);
+        strcat(topic, "/");
+        strcat(topic, config);
 
-//        topic = configTopic;
-        return configTopic;
+        return topic;
     } else if (topicType == STATE_TOPIC || topicType == CMD_TOPIC) {
-        char *topicPrefix;
+        char const *topicPrefix;
         if (topicType == STATE_TOPIC) {
             topicPrefix = MY_MQTT_PUBLISH_TOPIC_PREFIX;
         } else if (topicType == CMD_TOPIC) {
@@ -109,26 +107,23 @@ char *createTopic(const uint8_t sensorId, const uint8_t topicType) {
         }
 
 
-        strcpy(publishTopic, topicPrefix);
-        strcat(publishTopic, "/");
-        strcat(publishTopic, node_id);
-        strcat(publishTopic, "/");
-        strcat(publishTopic, sensor_id);
-        strcat(publishTopic, "/");
-        strcat(publishTopic, "1"); // MySensors command type (set)
-        strcat(publishTopic, "/");
-        strcat(publishTopic, "0"); // MySensors ack type - leave 0
-        strcat(publishTopic, "/");
-        strcat(publishTopic, variableTypeArray); // MySensors variable type
+        strcpy(topic, topicPrefix);
+        strcat(topic, "/");
+        strcat(topic, node_id);
+        strcat(topic, "/");
+        strcat(topic, sensor_id);
+        strcat(topic, "/");
+        strcat(topic, "1"); // MySensors command type (set)
+        strcat(topic, "/");
+        strcat(topic, "0"); // MySensors ack type - leave 0
+        strcat(topic, "/");
+        strcat(topic, variableTypeArray); // MySensors variable type
 
-//        topic = publishTopic;
-        return publishTopic;
     } else {
         Serial.println(F("ERROR: Bad topic type!!!"));
-        return;
     }
 
-    return nullptr;
+    return topic;
 }
 
 char *createPayload(const uint8_t sensorId) {
@@ -140,8 +135,9 @@ char *createPayload(const uint8_t sensorId) {
     uint8_t presentationType = static_cast<uint8_t>(sensor.getPresentationType());
     uint8_t variableType = static_cast<uint8_t>(sensor.getVariableType());
     uint8_t sensorIndex = getIndex(sensorId) + 1;
-    char *sensorType = getSensorType(sensor.getPresentationType());
-    char *sensorDataType = getSensorDataType(sensor.getVariableType());
+    char const *sensorType = getSensorTypeString(sensor.getPresentationType());
+    char const *sensorDataType = getSensorDataTypeString(sensor.getVariableType());
+    char const *description = sensor.getDescription();
 
     char sensor_index[5];
     itoa(sensorIndex, sensor_index, 10);
@@ -162,11 +158,15 @@ char *createPayload(const uint8_t sensorId) {
     strcat(payloadArr, sensorType);
     strcat(payloadArr, "_");
     strcat(payloadArr, sensor_id);
+    strcat(payloadArr, "\",\"dev\":{\"identifiers\":[\"");
+    strcat(payloadArr,description);
+    strcat(payloadArr, "\"]}");
     if (variableType == V_STATUS) {
-        strcat(payloadArr, "\",\"cmd_t\":\"");
+        strcat(payloadArr, ",\"cmd_t\":\"");
         strcat(payloadArr, createTopic(sensorId, CMD_TOPIC));
+        strcat(payloadArr, "\"");
     }
-    strcat(payloadArr, "\",\"stat_t\":\"");
+    strcat(payloadArr, ",\"stat_t\":\"");
     strcat(payloadArr, createTopic(sensorId, STATE_TOPIC));
     strcat(payloadArr, "\"");
     if (variableType == V_STATUS) {

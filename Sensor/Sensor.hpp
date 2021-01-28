@@ -11,7 +11,6 @@
 #pragma once
 
 #include <BME280I2C.h>
-#include <DallasTemperature.h>
 #include "../Relay/Relay.hpp"
 
 // Bosh sensor BME280
@@ -29,14 +28,14 @@ private:
     mysensors_data_t variableType;
     mysensors_sensor_t presentationType;
     uint8_t discoveryType;
-    char *description;
+    char const *description;
     uint8_t pin;
     uint8_t pinType;
     uint8_t expanderAddress;
 
 public:
     Sensor(uint8_t id, mysensors_data_t dataType, mysensors_sensor_t sensorType, uint8_t discovery,
-           char *description, uint8_t pin = -1, uint8_t pinType = NO_PIN, uint8_t expander = 8) {
+           char const *description, uint8_t pin = -1, uint8_t pinType = NO_PIN, uint8_t expander = 8) {
         this->id = id;
         this->variableType = dataType;
         this->presentationType = sensorType;
@@ -51,11 +50,11 @@ public:
         return id;
     }
 
-    uint8_t getVariableType() {
+    mysensors_data_t getVariableType() {
         return variableType;
     }
 
-    uint8_t getPresentationType() {
+    mysensors_sensor_t getPresentationType() {
         return presentationType;
     }
 
@@ -63,7 +62,7 @@ public:
         return discoveryType;
     }
 
-    char *getDescription() {
+    char const *getDescription() {
         return description;
     }
 

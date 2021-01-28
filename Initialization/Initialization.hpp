@@ -20,13 +20,6 @@ void initializeTimers() {
     currentSensorMillis = millis();
 }
 
-void resetTimers() {
-    if (millis() == 0) {
-//        currentButtonMillis = millis();
-        currentSensorMillis = millis();
-    }
-}
-
 void initializeMCP23017() {
     for (uint8_t i = 0; i < numberOfExpanders; i++) {
         expander[i].begin(expanderAddresses[i]);

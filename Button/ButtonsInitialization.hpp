@@ -80,6 +80,10 @@ void createAndSetButtons() {
             buttons[i] = OneButton(sensor.getPin(), true, true);
             buttons[i].attachLongPressStart(readAndUpdateStateHelper, sensorId);
             buttons[i].attachLongPressStop(readAndUpdateStateHelper, sensorId);
+#ifdef SETUP_DEBUG
+            Serial.print(F("Signal button set for sensor: "));
+            Serial.println(sensorId);
+#endif
         }
     }
 

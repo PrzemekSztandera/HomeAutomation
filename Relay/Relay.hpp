@@ -1,6 +1,8 @@
 //
 // Created by Przemyslaw Sztandera on 22/05/2020.
 //
+#pragma once
+
 #include <Adafruit_MCP23017.h>
 #include "../Sensor/Sensor.hpp"
 
@@ -18,8 +20,6 @@ private:
     uint8_t _sensorId;
 
 public:
-    Relay();
-
     Relay(uint8_t pin, bool lowLevelTrigger, bool latching = false, uint8_t expanderAddress = 8, uint8_t sensorId = 0) {
         _pin = pin;
         _lowLevelTrigger = lowLevelTrigger;

@@ -12,7 +12,7 @@ void switchRelay(const byte sensorId);
 
 bool updateRelayStateAndSendMessage(const uint8_t sensorId, bool pullUpActive = true);
 
-void myDelay(long interval);
+void myDelay(unsigned long interval);
 
 void updateEnvironmentSensors();
 
@@ -25,16 +25,9 @@ int freeRam ();
 #include "../Button/ButtonsInitialization.hpp"
 
 
-void myDelay(long interval) {
-    unsigned long currentMillis = millis();
-    bool flag = true;
-    while (flag) {
-        if (millis() - currentMillis < interval && millis() - currentMillis >= 0) {
-            flag = true;
-        } else {
-            flag = false;
-        }
-    }
+void myDelay(unsigned long interval) {
+    unsigned long current = millis();
+    while ((millis() - current < interval) && (millis() - current >= 0)) {}
 }
 
 bool updateRelayStateAndSendMessage(const uint8_t sensorId, bool pullUpActive = true) {
@@ -128,7 +121,7 @@ void switchRelay(const uint8_t sensorId) {
 
     }
 
-    myDelay(250);
+    myDelay(200);
 
     if (updateRelayStateAndSendMessage(sensorId)) {
 
@@ -162,7 +155,8 @@ void updateEnvironmentSensors() {
         send(sensorMessages[getIndex(BME_HUM)].set(hum, 1));
 
         Serial.print(F("Free RAM: "));
-        Serial.println(freeRam());
+        Serial.print(freeRam());
+        Serial.println(F(" bytes"));
 
         currentSensorMillis = millis();
     }

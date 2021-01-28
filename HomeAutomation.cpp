@@ -1,13 +1,4 @@
-
-/**
- *
- * @file automatykaMegaGateway.ino
- * @author Przemyslaw Sztandera
- * based on https://github.com/Kirizaki/mysensors
- * Implementation of the MySensors Gateway.
- * @license GPL V2
- *
- */
+#include <Arduino.h>
 
 
 // CHILD_ID declaration of sensors
@@ -94,13 +85,14 @@
 #define HA_DISCOVERY 1
 #define MS_DISCOVERY 2
 
+
 // Define a lower baud rate for Arduino's running on 8 MHz (Arduino Pro Mini 3.3V & SenseBender)
 #if F_CPU == 16000000L
 #define MY_BAUD_RATE 115200
 #endif
 
 // Remember to add library to Arduino path
-#include <Ethernet.h>
+// #include <Ethernet.h>
 #include <MySensors.h>
 #include "./Automation/Automation.hpp"
 #include "./Initialization/Initialization.hpp"
@@ -140,15 +132,13 @@ void presentation() {
 }
 
 void loop() {
-    resetTimers();
     readButtons();
     updateEnvironmentSensors();
-    resetTimers();
 }
 
 void receive(const MyMessage &message) {
     uint8_t sensorId = message.sensor;
-    Serial.print(F("Calling receive() for sensor: "));
+    Serial.print(F("calling receive() for sensor: "));
     Serial.println(sensorId);
     if (message.type == getSensor(sensorId).getVariableType()) {
         switchRelay(sensorId);
