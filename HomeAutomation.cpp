@@ -39,9 +39,9 @@
 #define SIGNAL_IN_74 (uint8_t) 74
 
 #define ARDUINO_TIMER (uint8_t) 100
-#define BME_TEMP (uint8_t) 101
-#define BME_BARO (uint8_t) 102
-#define BME_HUM (uint8_t) 103
+#define ARDUINO_TEMP (uint8_t) 101
+#define ARDUINO_LIGHT (uint8_t) 102
+// #define ARDUINO_TIME (uint8_t) 103
 
 // Enable serial gateway
 //#define MY_GATEWAY_SERIAL
@@ -59,12 +59,13 @@
 #define MY_GATEWAY_W5100
 
 
-#define MY_MAC_ADDRESS 0xDE, 0xAD, 0xBE, 0xEF, 0xFE, 0xED
+// #define MY_MAC_ADDRESS 0xDE, 0xAD, 0xBE, 0xEF, 0xFE, 0xED
+#define MY_MAC_ADDRESS 0xE0, 0x98, 0x06, 0x25, 0x49, 0xEC
 #define MY_IP_ADDRESS 192,168,1,86
 // If using static ip you need to define Gateway and Subnet address as well
-#define MY_IP_GATEWAY_ADDRESS 192,168,1,254
-#define MY_IP_SUBNET_ADDRESS 255,255,255,0
-#define MY_PORT 5003
+// #define MY_IP_GATEWAY_ADDRESS 192,168,1,254
+// #define MY_IP_SUBNET_ADDRESS 255,255,255,0
+// #define MY_PORT 5003
 
 
 #define MY_GATEWAY_MQTT_CLIENT
@@ -80,7 +81,8 @@
 #define MY_DEBUG
 #define SETUP_DEBUG
 #define USE_EXPANDER
-//#define USE_EXPANDER_AS_INPUT
+#define EEPROM_CLEAR
+#define TIMER
 
 #define HA_DISCOVERY 1
 #define MS_DISCOVERY 2
@@ -92,31 +94,35 @@
 #endif
 
 // Remember to add library to Arduino path
-// #include <Ethernet.h>
+#include <Ethernet.h>
 #include <MySensors.h>
 #include "./Automation/Automation.hpp"
 #include "./Initialization/Initialization.hpp"
 #include "./I2C/I2C_scanner.hpp"
 
 void before() {
-  
+    
+#ifdef EEPROM_CLEAR
+    clearEeprom();
+#endif
+
     Serial.begin(115200);
     scanI2cDevices();
-    createAndSetButtons();
+
+    initializeTimers();
+
 #ifdef USE_EXPANDER
     initializeMCP23017();
 #endif
+
     initializeAndSetRelays();
     initializeEnvironmentSensors();
-    initializeTimers();
     Serial.println(F("before() called...!"));
 }
 
 void setup() {
-  
-#ifdef USE_EXPANDER_AS_INPUT
-    initializeSensorPinsOnExpander();
-#endif
+
+    createAndSetButtons();
 
 #ifdef SETUP_DEBUG
     printRelaySensorDetails();

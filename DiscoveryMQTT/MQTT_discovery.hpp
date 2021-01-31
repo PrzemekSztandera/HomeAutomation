@@ -25,6 +25,7 @@ char const *getSensorTypeString(mysensors_sensor_t type) {
         case S_TEMP:
         case S_BARO:
         case S_HUM:
+        case S_LIGHT_LEVEL:
             name = "sensor";
             break;
         case S_DOOR:
@@ -59,6 +60,9 @@ char const *getSensorDataTypeString(mysensors_data_t type) {
             break;
         case V_TRIPPED:
             name = "Tripp";
+            break;
+        case V_LEVEL:
+            name = "Lux";
             break;
         default:
             name = "Unknown";
@@ -158,9 +162,9 @@ char *createPayload(const uint8_t sensorId) {
     strcat(payloadArr, sensorType);
     strcat(payloadArr, "_");
     strcat(payloadArr, sensor_id);
-    strcat(payloadArr, "\",\"dev\":{\"identifiers\":[\"");
+    strcat(payloadArr, "\",\"dev\":{\"ids\":[\"");
     strcat(payloadArr,description);
-    strcat(payloadArr, "\"]}");
+    strcat(payloadArr, "\"],\"mf\":\"PSZ\"}");
     if (variableType == V_STATUS) {
         strcat(payloadArr, ",\"cmd_t\":\"");
         strcat(payloadArr, createTopic(sensorId, CMD_TOPIC));
@@ -187,6 +191,9 @@ char *createPayload(const uint8_t sensorId) {
                 break;
             case V_TRIPPED:
                 strcat(payloadArr, ",\"dev_cla\":\"motion\",\"pl_off\":\"0\",\"pl_on\":\"1\"");
+                break;
+            case V_LEVEL:
+                strcat(payloadArr, ",\"dev_cla\":\"illuminance\",\"unit_of_meas\":\"lx\",\"val_tpl\":\"{{ value }}\"");
                 break;
             default:
                 break;

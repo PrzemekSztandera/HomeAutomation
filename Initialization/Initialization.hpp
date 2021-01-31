@@ -7,17 +7,25 @@
 
 #pragma once
 
+#include <EEPROM.h>
+#include <BH1750.h>
 #include "../Sensor/Sensor.hpp"
 #include "../DiscoveryMQTT/MQTT_discovery.hpp"
+#include "../Timer/Timer.hpp"
 
-//unsigned long currentButtonMillis = 0;
-unsigned long currentSensorMillis = 0;
+BH1750 lightMeter(0x23);
 
 MyMessage sensorMessages[numberOfSensors];
 
+
+
 void initializeTimers() {
-//    currentButtonMillis = millis();
-    currentSensorMillis = millis();
+
+#ifdef TIMER
+    initializeTime();
+#endif
+
+    sensorsTimerHelper = getEpochInSeconds();
 }
 
 void initializeMCP23017() {
@@ -25,6 +33,16 @@ void initializeMCP23017() {
         expander[i].begin(expanderAddresses[i]);
     }
 }
+
+// void initializeSensorPinsOnExpander() {
+//     for (uint8_t i = 0; i < numberOfSensors; i++) {
+//         Sensor sensor = sensors[i];
+//         if (sensor.onExpander()) {
+//             expander[sensor.getExpanderAddress()].pinMode(sensor.getPin(), INPUT);
+//             expander[sensor.getExpanderAddress()].pullUp(sensor.getPin(), HIGH);
+//         }
+//     }
+// }
 
 void initializeAndSetRelays() {
 
@@ -93,34 +111,15 @@ void initializeAndSetRelays() {
 
 void initializeEnvironmentSensors() {
 
-    // Bosh sensor BME280
-    if (!bmeSensor.begin()) {
-        Serial.println(F("Could not find BME280 sensor!"));
-    }
-
-    switch (bmeSensor.chipModel()) {
-        case BME280::ChipModel_BME280:
-            Serial.println(F("Found BME280 sensor! Success."));
-            break;
-        case BME280::ChipModel_BMP280:
-            Serial.println(F("Found BMP280 sensor! No Humidity available."));
-            break;
-        default:
-            Serial.println(F("Found UNKNOWN sensor! Error!"));
+    if (lightMeter.begin(BH1750::CONTINUOUS_HIGH_RES_MODE)) {
+        Serial.println(F("BH1750 Advanced begin"));
+    } else {
+        Serial.println(F("Error initialising BH1750"));
     }
 
     Serial.println(F("Environment sensors initialized!"));
 }
 
-void initializeSensorPinsOnExpander() {
-    for (uint8_t i = 0; i < numberOfSensors; i++) {
-        Sensor sensor = sensors[i];
-        if (sensor.onExpander()) {
-            expander[sensor.getExpanderAddress()].pinMode(sensor.getPin(), INPUT);
-            expander[sensor.getExpanderAddress()].pullUp(sensor.getPin(), HIGH);
-        }
-    }
-}
 
 void sendHomeAssistantDiscovery(uint8_t  sensorId) {
 
@@ -178,3 +177,30 @@ void printRelaySensorDetails() {
         Serial.println(digitalRead(relay.getPin()));
     }
 }
+
+
+
+void clearEeprom() {
+  // initialize the LED pin as an output.
+  pinMode(13, OUTPUT);
+  
+  /***
+    Iterate through each byte of the EEPROM storage.
+
+    Larger AVR processors have larger EEPROM sizes, E.g:
+    - Arduno Duemilanove: 512b EEPROM storage.
+    - Arduino Uno:        1kb EEPROM storage.
+    - Arduino Mega:       4kb EEPROM storage.
+
+    Rather than hard-coding the length, you should use the pre-provided length function.
+    This will make your code portable to all AVR processors.
+  ***/
+
+  for (unsigned int i = 0 ; i < EEPROM.length() ; i++) {
+    EEPROM.write(i, 0);
+  }
+
+  // turn the LED on when we're done
+  digitalWrite(13, HIGH);
+}
+

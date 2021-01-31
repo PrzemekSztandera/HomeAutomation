@@ -7,31 +7,29 @@
  * @license GPL V2
  *
  */
-
-void switchRelay(const byte sensorId);
-
-bool updateRelayStateAndSendMessage(const uint8_t sensorId, bool pullUpActive = true);
+#pragma once
 
 void myDelay(unsigned long interval);
+
+bool updateRelayStateAndSendMessage(const uint8_t sensorId);
+
+void switchRelay(const byte sensorId);
 
 void updateEnvironmentSensors();
 
 int freeRam ();
 
+void printTime();
 
-#pragma once
 
 #include "../Initialization/Initialization.hpp"
 #include "../Button/ButtonsInitialization.hpp"
+#include "../Timer/Timer.hpp"
 
 
-void myDelay(unsigned long interval) {
-    unsigned long current = millis();
-    while ((millis() - current < interval) && (millis() - current >= 0)) {}
-}
+bool updateRelayStateAndSendMessage(const uint8_t sensorId) {
 
-bool updateRelayStateAndSendMessage(const uint8_t sensorId, bool pullUpActive = true) {
-
+    bool pullUpActive = true;
     bool updatedFlag;
     uint8_t oldState = loadState(sensorId);
 
@@ -141,24 +139,30 @@ void switchRelay(const uint8_t sensorId) {
 }
 
 void updateEnvironmentSensors() {
-    unsigned long timer = millis() - currentSensorMillis;
-    if (timer > 60000 || timer <= 0) {
+
+    if (timer(60)) {
 
         send(sensorMessages[getIndex(ARDUINO_TIMER)].set(millis()));
-// Bosh sensor BME280
-        float temp(NAN), hum(NAN), pres(NAN);
-        BME280::TempUnit tempUnit(BME280::TempUnit_Celsius);
-        BME280::PresUnit presUnit(BME280::PresUnit_Pa);
-        bmeSensor.read(pres, temp, hum, tempUnit, presUnit);
-        send(sensorMessages[getIndex(BME_TEMP)].set(temp, 1));
-        send(sensorMessages[getIndex(BME_BARO)].set(pres, 0));
-        send(sensorMessages[getIndex(BME_HUM)].set(hum, 1));
+        send(sensorMessages[getIndex(ARDUINO_TEMP)].set((float)clock.temp() / 100, 1));
+
+        printTimeAndTemp();
+ 
+        if (lightMeter.measurementReady()) {
+            float lux = lightMeter.readLightLevel();
+            Serial.print(F("Light: "));
+            Serial.print(lux);
+            Serial.println(F(" lx"));
+            send(sensorMessages[getIndex(ARDUINO_LIGHT)].set(lux, 1));
+        }
+
+        Serial.print(F("EPOCH: "));
+        Serial.print(getEpochInSeconds());
+        Serial.println(F(" s"));
 
         Serial.print(F("Free RAM: "));
         Serial.print(freeRam());
         Serial.println(F(" bytes"));
 
-        currentSensorMillis = millis();
     }
 }
 
@@ -167,5 +171,3 @@ int freeRam () {
     int v;
     return (int) &v - (__brkval == 0 ? (int) &__heap_start : (int) __brkval);
 }
-
-

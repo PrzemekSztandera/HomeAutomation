@@ -91,7 +91,7 @@ void createAndSetButtons() {
 #ifdef SETUP_DEBUG
         Serial.println(F("waiting..."));
 #endif
-        myDelay(5000);
+        delay(5000);
     }
 }
 

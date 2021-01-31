@@ -9,12 +9,8 @@
  */
 
 #pragma once
-
-#include <BME280I2C.h>
 #include "../Relay/Relay.hpp"
 
-// Bosh sensor BME280
-BME280I2C bmeSensor;
 
 // RelaySensor pin type
 #define SIGNAL_PIN (uint8_t) 1
@@ -130,10 +126,10 @@ Sensor sensors[] = {
         {SIGNAL_IN_74,  V_TRIPPED,  S_MOTION, HA_DISCOVERY, "A15",    69, SIGNAL_PIN,  8},
 
         // Environment sensors
-        {ARDUINO_TIMER, V_TEXT,     S_INFO,   HA_DISCOVERY, "TIMER"},
-        {BME_TEMP,      V_TEMP,     S_TEMP,   HA_DISCOVERY, "TEMP"},
-        {BME_BARO,      V_PRESSURE, S_BARO,   HA_DISCOVERY, "BARO"},
-        {BME_HUM,       V_HUM,      S_HUM,    HA_DISCOVERY, "HUM"},
+        {ARDUINO_TIMER, V_TEXT,     S_INFO,         HA_DISCOVERY, "TIMER"},
+        {ARDUINO_TEMP,  V_TEMP,     S_TEMP,         HA_DISCOVERY, "TEMP"},
+        {ARDUINO_LIGHT, V_LEVEL,    S_LIGHT_LEVEL,  HA_DISCOVERY, "LIGHT"},
+        // {ARDUINO_TIME,  V_TEXT,     S_INFO,   HA_DISCOVERY, "TIME"},
 };
 
 const uint8_t numberOfSensors = sizeof(sensors) / sizeof(Sensor);
