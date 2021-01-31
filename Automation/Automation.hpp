@@ -9,8 +9,6 @@
  */
 #pragma once
 
-void myDelay(unsigned long interval);
-
 bool updateRelayStateAndSendMessage(const uint8_t sensorId);
 
 void switchRelay(const byte sensorId);

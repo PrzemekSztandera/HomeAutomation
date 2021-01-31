@@ -42,9 +42,9 @@ void initializeTime() {
 	if (clock.lostPower()) {
 		Serial.print(F("POWER FAILED. Clearing flag..."));
 		clock.lostPowerClear();
-		Serial.println(F(" done."));
+		Serial.println(F(" done.\n"));
 	} else {
-		Serial.println(F("POWER OK"));
+		Serial.println(F("POWER OK\n"));
 	}
 
     clock.alarmClearFlag(URTCLIB_ALARM_1);

@@ -59,8 +59,7 @@
 #define MY_GATEWAY_W5100
 
 
-// #define MY_MAC_ADDRESS 0xDE, 0xAD, 0xBE, 0xEF, 0xFE, 0xED
-#define MY_MAC_ADDRESS 0xE0, 0x98, 0x06, 0x25, 0x49, 0xEC
+#define MY_MAC_ADDRESS 0xDE, 0xAD, 0xBE, 0xEF, 0xFE, 0xED
 #define MY_IP_ADDRESS 192,168,1,86
 // If using static ip you need to define Gateway and Subnet address as well
 // #define MY_IP_GATEWAY_ADDRESS 192,168,1,254
@@ -81,7 +80,7 @@
 #define MY_DEBUG
 #define SETUP_DEBUG
 #define USE_EXPANDER
-#define EEPROM_CLEAR
+// #define EEPROM_CLEAR
 #define TIMER
 
 #define HA_DISCOVERY 1
@@ -117,6 +116,7 @@ void before() {
 
     initializeAndSetRelays();
     initializeEnvironmentSensors();
+
     Serial.println(F("before() called...!"));
 }
 
@@ -127,6 +127,7 @@ void setup() {
 #ifdef SETUP_DEBUG
     printRelaySensorDetails();
 #endif
+
     Serial.println(F("setup() called...!"));
 }
 
@@ -134,6 +135,7 @@ void presentation() {
     // Send the sketch version information to the gateway and Controller
     sendSketchInfo("Arduino", "MQTT");
     sendPresentation();
+    
     Serial.println(F("presentation() called...!"));
 }
 

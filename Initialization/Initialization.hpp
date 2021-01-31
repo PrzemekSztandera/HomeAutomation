@@ -18,7 +18,6 @@ BH1750 lightMeter(0x23);
 MyMessage sensorMessages[numberOfSensors];
 
 
-
 void initializeTimers() {
 
 #ifdef TIMER
