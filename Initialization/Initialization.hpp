@@ -24,7 +24,7 @@ void initializeTimers() {
     initializeTime();
 #endif
 
-    sensorsTimerHelper = getEpochInSeconds();
+    // sensorsTimerHelper = getEpochInSeconds();
 }
 
 void initializeMCP23017() {
@@ -105,18 +105,18 @@ void initializeAndSetRelays() {
             myDelay(250);
         }
     }
-    Serial.println(F("Relays initialized and set up!"));
+    Serial.println(F("Relays initialized and set up."));
 }
 
 void initializeEnvironmentSensors() {
 
     if (lightMeter.begin(BH1750::CONTINUOUS_HIGH_RES_MODE)) {
-        Serial.println(F("BH1750 Advanced begin"));
+        Serial.println(F("BH1750 initialized."));
     } else {
-        Serial.println(F("Error initialising BH1750"));
+        Serial.println(F("Error initialising BH1750!"));
     }
 
-    Serial.println(F("Environment sensors initialized!"));
+    Serial.println(F("Environment sensors initialized."));
 }
 
 

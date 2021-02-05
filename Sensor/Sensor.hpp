@@ -120,7 +120,7 @@ Sensor sensors[] = {
         {SIGNAL_IN_61,  V_STATUS,   S_BINARY, HA_DISCOVERY, "A10",    64, SIGNAL_PIN,  8}, // 30
         {SIGNAL_IN_62,  V_STATUS,   S_BINARY, HA_DISCOVERY, "A11",    65, SIGNAL_PIN,  8}, // 31
         {SIGNAL_IN_71,  V_STATUS,   S_BINARY, HA_DISCOVERY, "A12",    66, SIGNAL_PIN,  8}, // 32
-        {SIGNAL_IN_72,  V_STATUS,   S_BINARY, HA_DISCOVERY, "A13/A3", 67, TRIGGER_PIN, 8}, // 33 use only with latching relays
+        {SIGNAL_IN_72,  V_STATUS,   S_BINARY, HA_DISCOVERY, "A13/A0", 67, TRIGGER_PIN, 8}, // 33 use only with latching relays
 
         {SIGNAL_IN_73,  V_TRIPPED,  S_MOTION, HA_DISCOVERY, "A14",    68, SIGNAL_PIN,  8},
         {SIGNAL_IN_74,  V_TRIPPED,  S_MOTION, HA_DISCOVERY, "A15",    69, SIGNAL_PIN,  8},

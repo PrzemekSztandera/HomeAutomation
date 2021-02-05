@@ -141,9 +141,10 @@ void updateEnvironmentSensors() {
     if (timer(60)) {
 
         send(sensorMessages[getIndex(ARDUINO_TIMER)].set(millis()));
-        send(sensorMessages[getIndex(ARDUINO_TEMP)].set((float)clock.temp() / 100, 1));
+        send(sensorMessages[getIndex(ARDUINO_TEMP)].set((float)rtc.getTemperature(), 1));
 
-        printTimeAndTemp();
+        // printTimeAndTemp();
+        printDateAndTime();
  
         if (lightMeter.measurementReady()) {
             float lux = lightMeter.readLightLevel();
@@ -152,10 +153,6 @@ void updateEnvironmentSensors() {
             Serial.println(F(" lx"));
             send(sensorMessages[getIndex(ARDUINO_LIGHT)].set(lux, 1));
         }
-
-        Serial.print(F("EPOCH: "));
-        Serial.print(getEpochInSeconds());
-        Serial.println(F(" s"));
 
         Serial.print(F("Free RAM: "));
         Serial.print(freeRam());
@@ -168,4 +165,18 @@ int freeRam () {
     extern int __heap_start, *__brkval;
     int v;
     return (int) &v - (__brkval == 0 ? (int) &__heap_start : (int) __brkval);
+}
+
+void printReset() {
+    unsigned char ResetSrc = MCUSR;   // save reset source
+   
+    if (ResetSrc & _BV(PORF) )
+        Serial.println(F("PWR RESET"));
+    if (ResetSrc & _BV(EXTRF))
+        Serial.println(F("EXT RESET"));
+    if (ResetSrc & _BV(BORF))
+        Serial.println(F("BOD RESET"));
+    if (ResetSrc & _BV(WDRF))
+        Serial.println(F("WDT RESET"));
+    MCUSR = 0x00;  // clear reset source
 }

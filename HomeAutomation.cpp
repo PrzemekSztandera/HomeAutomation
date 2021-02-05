@@ -44,9 +44,9 @@
 // #define ARDUINO_TIME (uint8_t) 103
 
 // Enable serial gateway
-//#define MY_GATEWAY_SERIAL
+#define MY_GATEWAY_SERIAL
 
- 
+ // Enable ESP8266 as WIFI modem gateway
 #define MY_GATEWAY_TINYGSM
 #define TINY_GSM_MODEM_ESP8266
 // Use Hardware Serial on Mega, Leonardo, Micro
@@ -60,15 +60,16 @@
 
 
 #define MY_MAC_ADDRESS 0xDE, 0xAD, 0xBE, 0xEF, 0xFE, 0xED
-#define MY_IP_ADDRESS 192,168,1,86
+// Enable MY_IP_ADDRESS here if you want a static ip address (no DHCP)
+// #define MY_IP_ADDRESS 192,168,1,86
 // If using static ip you need to define Gateway and Subnet address as well
 // #define MY_IP_GATEWAY_ADDRESS 192,168,1,254
 // #define MY_IP_SUBNET_ADDRESS 255,255,255,0
-// #define MY_PORT 5003
 
 
-#define MY_GATEWAY_MQTT_CLIENT
+#define MY_CONTROLLER_URL_ADDRESS "http://192.168.1.73:8123"
 #define MY_CONTROLLER_IP_ADDRESS 192, 168, 1, 73
+#define MY_GATEWAY_MQTT_CLIENT
 #define MY_PORT 1883
 #define MY_MQTT_USER "HAMqTT"
 #define MY_MQTT_PASSWORD "home&assistantMqTT4"
@@ -77,8 +78,10 @@
 #define MY_MQTT_CLIENT_ID "arduino-mega"
 
 
+
 #define MY_DEBUG
-#define SETUP_DEBUG
+#define TRANSPORT_DEBUG
+// #define SETUP_DEBUG
 #define USE_EXPANDER
 // #define EEPROM_CLEAR
 #define TIMER
@@ -109,6 +112,7 @@ void before() {
     scanI2cDevices();
 
     initializeTimers();
+    printReset();
 
 #ifdef USE_EXPANDER
     initializeMCP23017();
