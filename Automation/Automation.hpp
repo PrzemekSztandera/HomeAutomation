@@ -19,6 +19,7 @@ int freeRam ();
 
 void printTime();
 
+void receiveData();
 
 #include "../Initialization/Initialization.hpp"
 #include "../Button/ButtonsInitialization.hpp"
@@ -117,7 +118,7 @@ void switchRelay(const uint8_t sensorId) {
 
     }
 
-    myDelay(200);
+    myDelay(150);
 
     if (updateRelayStateAndSendMessage(sensorId)) {
 
@@ -157,7 +158,18 @@ void updateEnvironmentSensors() {
         Serial.print(F("Free RAM: "));
         Serial.print(freeRam());
         Serial.println(F(" bytes"));
+        Serial.println();
 
+
+        Serial.print(F("Modem info: "));
+        Serial.println(modem.getModemInfo());
+        Serial.print(F("IP: "));
+        Serial.println(modem.getLocalIP());
+        Serial.print(F("Signal quality: "));
+        Serial.print(modem.getSignalQuality());
+        Serial.println(F(" dB"));
+        Serial.println();
+        
     }
 }
 
@@ -167,16 +179,14 @@ int freeRam () {
     return (int) &v - (__brkval == 0 ? (int) &__heap_start : (int) __brkval);
 }
 
-void printReset() {
-    unsigned char ResetSrc = MCUSR;   // save reset source
-   
-    if (ResetSrc & _BV(PORF) )
-        Serial.println(F("PWR RESET"));
-    if (ResetSrc & _BV(EXTRF))
-        Serial.println(F("EXT RESET"));
-    if (ResetSrc & _BV(BORF))
-        Serial.println(F("BOD RESET"));
-    if (ResetSrc & _BV(WDRF))
-        Serial.println(F("WDT RESET"));
-    MCUSR = 0x00;  // clear reset source
+bool resetMiniPro = true;
+
+void resetArduinoMiniPro(int resetPin) {
+    pinMode(resetPin, OUTPUT);
+    digitalWrite(resetPin, LOW);
+    if (resetMiniPro) {
+        // reset pin
+        digitalWrite(resetPin, HIGH);
+        resetMiniPro = false;
+    }
 }

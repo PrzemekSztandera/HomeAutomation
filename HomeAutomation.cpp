@@ -46,6 +46,9 @@
 // Enable serial gateway
 #define MY_GATEWAY_SERIAL
 
+// Enable gateway ethernet module type
+#define MY_GATEWAY_W5100
+
  // Enable ESP8266 as WIFI modem gateway
 #define MY_GATEWAY_TINYGSM
 #define TINY_GSM_MODEM_ESP8266
@@ -55,19 +58,18 @@
 #define MY_GSM_PSW "UcXJ3Fk4uQXR"
 
 
-// Enable gateway ethernet module type
-#define MY_GATEWAY_W5100
+
 
 
 #define MY_MAC_ADDRESS 0xDE, 0xAD, 0xBE, 0xEF, 0xFE, 0xED
 // Enable MY_IP_ADDRESS here if you want a static ip address (no DHCP)
-// #define MY_IP_ADDRESS 192,168,1,86
+#define MY_IP_ADDRESS 192,168,1,86
 // If using static ip you need to define Gateway and Subnet address as well
 // #define MY_IP_GATEWAY_ADDRESS 192,168,1,254
 // #define MY_IP_SUBNET_ADDRESS 255,255,255,0
 
 
-#define MY_CONTROLLER_URL_ADDRESS "http://192.168.1.73:8123"
+// #define MY_CONTROLLER_URL_ADDRESS "http://192.168.1.73:8123"
 #define MY_CONTROLLER_IP_ADDRESS 192, 168, 1, 73
 #define MY_GATEWAY_MQTT_CLIENT
 #define MY_PORT 1883
@@ -85,15 +87,15 @@
 #define USE_EXPANDER
 // #define EEPROM_CLEAR
 #define TIMER
-
 #define HA_DISCOVERY 1
 #define MS_DISCOVERY 2
 
 
 // Define a lower baud rate for Arduino's running on 8 MHz (Arduino Pro Mini 3.3V & SenseBender)
 #if F_CPU == 16000000L
-#define MY_BAUD_RATE 115200
+#define SERIAL_BAUD_RATE 115200
 #endif
+#define SERIAL2_BAUD_RATE 9600
 
 // Remember to add library to Arduino path
 #include <Ethernet.h>
@@ -101,6 +103,9 @@
 #include "./Automation/Automation.hpp"
 #include "./Initialization/Initialization.hpp"
 #include "./I2C/I2C_scanner.hpp"
+#include "./Serial/SerialMessage.hpp"
+
+bool miniUpdateTimer = true;
 
 void before() {
     
@@ -108,11 +113,11 @@ void before() {
     clearEeprom();
 #endif
 
-    Serial.begin(115200);
+    Serial.begin(SERIAL_BAUD_RATE);
+    Serial2.begin(SERIAL2_BAUD_RATE);
     scanI2cDevices();
 
     initializeTimers();
-    printReset();
 
 #ifdef USE_EXPANDER
     initializeMCP23017();
@@ -125,12 +130,14 @@ void before() {
 }
 
 void setup() {
-
+    
     createAndSetButtons();
 
 #ifdef SETUP_DEBUG
     printRelaySensorDetails();
 #endif
+
+    resetArduinoMiniPro(4);
 
     Serial.println(F("setup() called...!"));
 }
@@ -144,8 +151,36 @@ void presentation() {
 }
 
 void loop() {
+    
     readButtons();
     updateEnvironmentSensors();
+
+}
+
+void serialEvent2() {
+
+       myDelay(50); //allows all serial sent to be received together
+
+        Serial.println(F("Serial: "));
+        Serial.println(Serial2.available());
+
+        Serial.println(F("Serial_availableForWrite: "));
+        Serial.println(Serial2.availableForWrite());
+        
+        if(Serial2.available() == sizeof(SerialData)) {
+            // char receivedMessage[30];
+            // strcpy(receivedMessage, receiveSerialMessage());
+            if(strcmp("getTime", receiveSerialMessage()) == 0) {
+                char dateTimeBuffer[] = {"MMM DD YYYY hh:mm:ss"};
+                sendSerialMessage(rtc.now().toString(dateTimeBuffer));
+            } else {
+                Serial.print(F("Received Data: "));
+                Serial.println(receiveSerialMessage());
+                sendSerialMessage(F("Received"));
+            }
+        }
+    
+    flushSerialBuffer(2);
 }
 
 void receive(const MyMessage &message) {

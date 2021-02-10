@@ -110,7 +110,7 @@ Relay relays[] = {
         {13, true, false, 1, SIGNAL_IN_61},
         {14, true, false, 1, SIGNAL_IN_62},
         {15, true, false, 1, SIGNAL_IN_71},
-        {54, true, true,  8, SIGNAL_IN_72}, // A3
+        {54, true, true,  8, SIGNAL_IN_72}, // A0
 //        {69, true, true,  8, SIGNAL_OUT_73}, // A15
 };
 
