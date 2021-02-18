@@ -24,6 +24,7 @@ void receiveData();
 #include "../Initialization/Initialization.hpp"
 #include "../Button/ButtonsInitialization.hpp"
 #include "../Timer/Timer.hpp"
+#include "../Serial/SerialMessage.hpp"
 
 
 bool updateRelayStateAndSendMessage(const uint8_t sensorId) {
@@ -64,6 +65,10 @@ bool updateRelayStateAndSendMessage(const uint8_t sensorId) {
 
     uint8_t newState = loadState(sensorId);
     send(sensorMessages[getIndex(sensorId)].set(newState));
+    // char id[4];
+    // // itoa(sensorId, id, 4);
+    // sprintf_P(id, (PGM_P)F("%05d"), sensorId);
+    // sendSerialMessage("MS", "BI", id, newState);
 
     if (oldState == newState) {
         updatedFlag = true;
@@ -139,7 +144,7 @@ void switchRelay(const uint8_t sensorId) {
 
 void updateEnvironmentSensors() {
 
-    if (timer(60)) {
+    if (timer1(60)) {
 
         send(sensorMessages[getIndex(ARDUINO_TIMER)].set(millis()));
         send(sensorMessages[getIndex(ARDUINO_TEMP)].set((float)rtc.getTemperature(), 1));

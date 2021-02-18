@@ -14,6 +14,8 @@
 char payloadArr[255];
 char topic[50];
 
+
+
 char const *getSensorTypeString(mysensors_sensor_t type) {
     char const *name;
 
@@ -131,6 +133,22 @@ char *createTopic(const uint8_t sensorId, const uint8_t topicType) {
 }
 
 char *createPayload(const uint8_t sensorId) {
+    const int buffer_size = 85;
+    char buffer[buffer_size];
+    const __FlashStringHelper *emptyString = F("");
+    const __FlashStringHelper *string1 = F("{\"name\":\"Arduino ");
+    const __FlashStringHelper *string2 = F("\",\"uniq_id\":\"");
+    const __FlashStringHelper *string3 = F("\",\"dev\":{\"ids\":[\"");
+    const __FlashStringHelper *string4 = F("\"],\"mf\":\"PSZ\"}");
+    const __FlashStringHelper *string5 = F(",\"cmd_t\":\"");
+    const __FlashStringHelper *string6 = F(",\"stat_t\":\"");
+    const __FlashStringHelper *string7 = F(",\"pl_off\":\"0\",\"pl_on\":\"1\",\"stat_off\":\"0\",\"stat_on\":\"1\",\"opt\":\"false\",\"ret\":\"false\"");
+    const __FlashStringHelper *string8 = F(",\"unit_of_meas\":\"min\",\"val_tpl\":\"{{ value | int / 60000 }}\"");
+    const __FlashStringHelper *string9 = F(",\"dev_cla\":\"temperature\",\"unit_of_meas\":\"°C\",\"val_tpl\":\"{{ value }}\"");
+    const __FlashStringHelper *string10 = F(",\"dev_cla\":\"pressure\",\"unit_of_meas\":\"hPa\",\"val_tpl\":\"{{ value | float / 100}}\"");
+    const __FlashStringHelper *string11 = F(",\"dev_cla\":\"humidity\",\"unit_of_meas\":\"%\",\"val_tpl\":\"{{ value }}\"");
+    const __FlashStringHelper *string12 = F(",\"dev_cla\":\"motion\",\"pl_off\":\"0\",\"pl_on\":\"1\"");
+    const __FlashStringHelper *string13 = F(",\"dev_cla\":\"illuminance\",\"unit_of_meas\":\"lx\",\"val_tpl\":\"{{ value }}\"");
 
     char sensor_id[5];
     itoa(sensorId, sensor_id, 10);
@@ -146,7 +164,11 @@ char *createPayload(const uint8_t sensorId) {
     char sensor_index[5];
     itoa(sensorIndex, sensor_index, 10);
 
-    strcpy(payloadArr, "{\"name\":\"Arduino ");
+
+    memcpy_P(buffer, string1, buffer_size);
+    strcpy(payloadArr, buffer);
+    memcpy_P(buffer, emptyString, buffer_size);
+
     strcat(payloadArr, sensorDataType);
     strcat(payloadArr, " ");
     strcat(payloadArr, sensorType);
@@ -158,42 +180,83 @@ char *createPayload(const uint8_t sensorId) {
         strcat(payloadArr, " ");
         strcat(payloadArr, sensor_index);
     }
-    strcat(payloadArr, "\",\"uniq_id\":\"");
+
+    memcpy_P(buffer, string2, buffer_size);
+    strcat(payloadArr, buffer);
+    memcpy_P(buffer, emptyString, buffer_size);
+
     strcat(payloadArr, sensorType);
     strcat(payloadArr, "_");
     strcat(payloadArr, sensor_id);
-    strcat(payloadArr, "\",\"dev\":{\"ids\":[\"");
+
+    memcpy_P(buffer, string3, buffer_size);
+    strcat(payloadArr, buffer);
+    memcpy_P(buffer, emptyString, buffer_size);
+
     strcat(payloadArr,description);
-    strcat(payloadArr, "\"],\"mf\":\"PSZ\"}");
+
+    memcpy_P(buffer, string4, buffer_size);
+    strcat(payloadArr, buffer);
+    memcpy_P(buffer, emptyString, buffer_size);
+
     if (variableType == V_STATUS) {
-        strcat(payloadArr, ",\"cmd_t\":\"");
+
+        memcpy_P(buffer, string5, buffer_size);
+        strcat(payloadArr, buffer);
+        memcpy_P(buffer, emptyString, buffer_size);
+
         strcat(payloadArr, createTopic(sensorId, CMD_TOPIC));
         strcat(payloadArr, "\"");
     }
-    strcat(payloadArr, ",\"stat_t\":\"");
+
+    memcpy_P(buffer, string6, buffer_size);
+    strcat(payloadArr, buffer);
+    memcpy_P(buffer, emptyString, buffer_size);
+
     strcat(payloadArr, createTopic(sensorId, STATE_TOPIC));
     strcat(payloadArr, "\"");
     if (variableType == V_STATUS) {
-        strcat(payloadArr, ",\"pl_off\":\"0\",\"pl_on\":\"1\",\"stat_off\":\"0\",\"stat_on\":\"1\",\"opt\":\"false\",\"ret\":\"false\"");
+
+        memcpy_P(buffer, string7, buffer_size);
+        strcat(payloadArr, buffer);
+        memcpy_P(buffer, emptyString, buffer_size);
     } else {
         switch (variableType) {
             case V_TEXT:
-                strcat(payloadArr, ",\"unit_of_meas\":\"min\",\"val_tpl\":\"{{ value | int / 60000 }}\"");
+
+                memcpy_P(buffer, string8, buffer_size);
+                strcat(payloadArr, buffer);
+                memcpy_P(buffer, emptyString, buffer_size);
                 break;
             case V_TEMP:
-                strcat(payloadArr, ",\"dev_cla\":\"temperature\",\"unit_of_meas\":\"°C\",\"val_tpl\":\"{{ value }}\"");
+
+                memcpy_P(buffer, string9, buffer_size);
+                strcat(payloadArr, buffer);
+                memcpy_P(buffer, emptyString, buffer_size);
                 break;
             case V_PRESSURE:
-                strcat(payloadArr, ",\"dev_cla\":\"pressure\",\"unit_of_meas\":\"hPa\",\"val_tpl\":\"{{ value | float / 100}}\"");
+
+                memcpy_P(buffer, string10, buffer_size);
+                strcat(payloadArr, buffer);
+                memcpy_P(buffer, emptyString, buffer_size);
                 break;
             case V_HUM:
-                strcat(payloadArr, ",\"dev_cla\":\"humidity\",\"unit_of_meas\":\"%\",\"val_tpl\":\"{{ value }}\"");
+
+                memcpy_P(buffer, string11, buffer_size);
+                strcat(payloadArr, buffer);
+                memcpy_P(buffer, emptyString, buffer_size);
                 break;
             case V_TRIPPED:
-                strcat(payloadArr, ",\"dev_cla\":\"motion\",\"pl_off\":\"0\",\"pl_on\":\"1\"");
+
+                memcpy_P(buffer, string12, buffer_size);
+                strcat(payloadArr, buffer);
+                memcpy_P(buffer, emptyString, buffer_size);
                 break;
             case V_LEVEL:
-                strcat(payloadArr, ",\"dev_cla\":\"illuminance\",\"unit_of_meas\":\"lx\",\"val_tpl\":\"{{ value }}\"");
+
+                memcpy_P(buffer, string13, buffer_size);
+                strcat(payloadArr, buffer);
+                memcpy_P(buffer, emptyString, buffer_size);
                 break;
             default:
                 break;

@@ -59,8 +59,6 @@
 
 
 
-
-
 #define MY_MAC_ADDRESS 0xDE, 0xAD, 0xBE, 0xEF, 0xFE, 0xED
 // Enable MY_IP_ADDRESS here if you want a static ip address (no DHCP)
 #define MY_IP_ADDRESS 192,168,1,86
@@ -103,7 +101,6 @@
 #include "./Automation/Automation.hpp"
 #include "./Initialization/Initialization.hpp"
 #include "./I2C/I2C_scanner.hpp"
-#include "./Serial/SerialMessage.hpp"
 
 bool miniUpdateTimer = true;
 
@@ -114,7 +111,7 @@ void before() {
 #endif
 
     Serial.begin(SERIAL_BAUD_RATE);
-    Serial2.begin(SERIAL2_BAUD_RATE);
+    
     scanI2cDevices();
 
     initializeTimers();
@@ -138,6 +135,7 @@ void setup() {
 #endif
 
     resetArduinoMiniPro(4);
+    Serial2.begin(SERIAL2_BAUD_RATE);
 
     Serial.println(F("setup() called...!"));
 }
@@ -155,32 +153,30 @@ void loop() {
     readButtons();
     updateEnvironmentSensors();
 
+    if(timer2(60)) {
+        sendSerialMessage(F("MS"), F("WF"), F(""), modem.getSignalQuality());
+    }
+
 }
 
 void serialEvent2() {
 
-       myDelay(50); //allows all serial sent to be received together
+    while((unsigned int)Serial2.available() < sizeof(SerialData)) {
+         return;
+     }
 
-        Serial.println(F("Serial: "));
-        Serial.println(Serial2.available());
+    Serial.print(F("Serial2 buffer: "));
+    Serial.println(Serial2.available());
 
-        Serial.println(F("Serial_availableForWrite: "));
-        Serial.println(Serial2.availableForWrite());
-        
-        if(Serial2.available() == sizeof(SerialData)) {
-            // char receivedMessage[30];
-            // strcpy(receivedMessage, receiveSerialMessage());
-            if(strcmp("getTime", receiveSerialMessage()) == 0) {
-                char dateTimeBuffer[] = {"MMM DD YYYY hh:mm:ss"};
-                sendSerialMessage(rtc.now().toString(dateTimeBuffer));
-            } else {
-                Serial.print(F("Received Data: "));
-                Serial.println(receiveSerialMessage());
-                sendSerialMessage(F("Received"));
-            }
-        }
-    
-    flushSerialBuffer(2);
+    Serial.print(F("Serial2 availableForWrite buffer: "));
+    Serial.println(Serial2.availableForWrite());
+
+    if((unsigned int)Serial2.available() > sizeof(SerialData)){
+        flushSerialBuffer(2);
+    } else if ((unsigned int)Serial2.available() == sizeof(SerialData)) {
+        receiveSerialMessage();
+    }
+
 }
 
 void receive(const MyMessage &message) {
