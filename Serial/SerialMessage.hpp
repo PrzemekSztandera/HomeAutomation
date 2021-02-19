@@ -91,6 +91,7 @@ bool flushSerialBuffer(int serial) {
 
 bool sendSerialMessage(const char *code, const char *param, const char *data, unsigned long numData) {
    
+#ifdef SERIAL2_DEBUG
     Serial.println(F(""));
     Serial.println(F("Message send."));
 
@@ -106,6 +107,7 @@ bool sendSerialMessage(const char *code, const char *param, const char *data, un
     Serial.print(F("NumData: "));
     Serial.println(serialDataSend.setNumData(numData));
     Serial.println(F(""));
+#endif
 
     memcpy(messageBuffer, &serialDataSend, sizeof(SerialData));
     Serial2.write(messageBuffer, sizeof(SerialData));
@@ -121,6 +123,7 @@ bool sendSerialMessage(const __FlashStringHelper *code, const __FlashStringHelpe
     memcpy_P(param_buffer, param, 3);
     memcpy_P(data_buffer, data, 25);
 
+#ifdef SERIAL2_DEBUG
     Serial.println(F(""));
     Serial.println(F("Message send."));
 
@@ -136,6 +139,7 @@ bool sendSerialMessage(const __FlashStringHelper *code, const __FlashStringHelpe
     Serial.print(F("NumData: "));
     Serial.println(serialDataSend.setNumData(numData));
     Serial.println(F(""));
+#endif
 
     memcpy(messageBuffer, &serialDataSend, sizeof(SerialData));
     Serial2.write(messageBuffer, sizeof(SerialData));
@@ -151,6 +155,7 @@ SerialData *receiveSerialMessage() {
     char *receivedData = serialDataReceived.getData();
     unsigned long receivedNumData = serialDataReceived.getNumData();
 
+#ifdef SERIAL2_DEBUG
     Serial.println(F(""));
     Serial.println(F("Message received: "));
     Serial.print(F("Code: "));
@@ -165,11 +170,14 @@ SerialData *receiveSerialMessage() {
     Serial.print(F("NumData: "));
     Serial.println(receivedNumData);
     Serial.println(F(""));
+#endif
     
     if(strcmp("RQ", receivedCode) == 0 && strcmp("TM", receivedParameter) == 0) {
-        sendSerialMessage(F("RS"), F("TM"), F(""), rtc.now().secondstime());
+        sendSerialMessage(F("RS"), F("TM"), F("Time update"), rtc.now().secondstime());
     } else if(strcmp("MS", receivedCode) == 0) {
         sendSerialMessage(F("RS"), F(""), F("Received"), 0);
+    } else if(strcmp("RQ", receivedCode) == 0 && strcmp("HB", receivedParameter) == 0) {
+        sendSerialMessage(F("RS"), F("HB"), F("Heart beat"), 1);
     }
 
     flushSerialBuffer(2);

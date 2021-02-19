@@ -82,6 +82,7 @@
 #define MY_DEBUG
 #define TRANSPORT_DEBUG
 // #define SETUP_DEBUG
+#define SERIAL2_DEBUG
 #define USE_EXPANDER
 // #define EEPROM_CLEAR
 #define TIMER
@@ -96,11 +97,14 @@
 #define SERIAL2_BAUD_RATE 9600
 
 // Remember to add library to Arduino path
+
+#include "./Timer/Timer.hpp"
 #include <Ethernet.h>
 #include <MySensors.h>
+#include "./I2C/I2C_scanner.hpp"
+#include "./Serial/SerialMessage.hpp"
 #include "./Automation/Automation.hpp"
 #include "./Initialization/Initialization.hpp"
-#include "./I2C/I2C_scanner.hpp"
 
 bool miniUpdateTimer = true;
 
@@ -131,6 +135,11 @@ void setup() {
     createAndSetButtons();
 
 #ifdef SETUP_DEBUG
+    Serial.print(F("Modem info: "));
+    Serial.println(modem.getModemInfo());
+    Serial.print(F("IP: "));
+    Serial.println(modem.getLocalIP());
+    Serial.print(F("Signal quality: "));
     printRelaySensorDetails();
 #endif
 
@@ -149,12 +158,15 @@ void presentation() {
 }
 
 void loop() {
+
+    nowRTC = rtc.now();
+    now = time(nullptr);
     
     readButtons();
     updateEnvironmentSensors();
 
     if(timer2(60)) {
-        sendSerialMessage(F("MS"), F("WF"), F(""), modem.getSignalQuality());
+        sendSerialMessage(F("MS"), F("WF"), F("Wifi signal"), modem.getSignalQuality());
     }
 
 }
@@ -165,11 +177,13 @@ void serialEvent2() {
          return;
      }
 
+#ifdef SERIAL2_DEBUG
     Serial.print(F("Serial2 buffer: "));
     Serial.println(Serial2.available());
 
     Serial.print(F("Serial2 availableForWrite buffer: "));
     Serial.println(Serial2.availableForWrite());
+#endif
 
     if((unsigned int)Serial2.available() > sizeof(SerialData)){
         flushSerialBuffer(2);

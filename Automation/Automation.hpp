@@ -23,8 +23,6 @@ void receiveData();
 
 #include "../Initialization/Initialization.hpp"
 #include "../Button/ButtonsInitialization.hpp"
-#include "../Timer/Timer.hpp"
-#include "../Serial/SerialMessage.hpp"
 
 
 bool updateRelayStateAndSendMessage(const uint8_t sensorId) {
@@ -148,9 +146,6 @@ void updateEnvironmentSensors() {
 
         send(sensorMessages[getIndex(ARDUINO_TIMER)].set(millis()));
         send(sensorMessages[getIndex(ARDUINO_TEMP)].set((float)rtc.getTemperature(), 1));
-
-        // printTimeAndTemp();
-        printDateAndTime();
  
         if (lightMeter.measurementReady()) {
             float lux = lightMeter.readLightLevel();
@@ -160,17 +155,21 @@ void updateEnvironmentSensors() {
             send(sensorMessages[getIndex(ARDUINO_LIGHT)].set(lux, 1));
         }
 
+
+        Serial.println();
+        Serial.print(F("Date & Time: "));
+        currentTime = gmtime(&now);
+        Serial.println(asctime(currentTime));
+        Serial.println();
+        Serial.print(F("Temperature: "));
+        Serial.print(rtc.getTemperature());
+        Serial.println(F(" C"));
+        Serial.println();
         Serial.print(F("Free RAM: "));
         Serial.print(freeRam());
         Serial.println(F(" bytes"));
         Serial.println();
-
-
-        Serial.print(F("Modem info: "));
-        Serial.println(modem.getModemInfo());
-        Serial.print(F("IP: "));
-        Serial.println(modem.getLocalIP());
-        Serial.print(F("Signal quality: "));
+        Serial.print(F("WI-FI: "));
         Serial.print(modem.getSignalQuality());
         Serial.println(F(" dB"));
         Serial.println();
@@ -195,3 +194,16 @@ void resetArduinoMiniPro(int resetPin) {
         resetMiniPro = false;
     }
 }
+
+void clearEeprom() {
+  // initialize the LED pin as an output.
+  pinMode(13, OUTPUT);
+
+  for (unsigned int i = 0 ; i < EEPROM.length() ; i++) {
+    EEPROM.write(i, 0);
+  }
+
+  // turn the LED on when we're done
+  digitalWrite(13, HIGH);
+}
+

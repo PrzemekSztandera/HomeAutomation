@@ -17,17 +17,18 @@ const uint8_t interrPin = 2;
 
 // char daysOfTheWeek[7][12] = {"Sunday", "Monday", "Tuesday", "Wednesday", "Thursday", "Friday", "Saturday"};
 
+DateTime nowRTC;
+time_t now;
+struct tm *currentTime;
+
 unsigned long timer1helper;
 unsigned long timer2helper;
 unsigned long timer3helper;
-int secondCounter = 0;
-
 
 void myDelay(unsigned long interval) {
     unsigned long current = millis();
     while ((millis() - current < interval) && (millis() - current >= 0)) {}
 }
-
 
 
 void rtc_interrupt()
@@ -39,8 +40,6 @@ void initializeTime() {
 
     if(!rtc.begin()) {
         Serial.println(F("Couldn't find RTC!"));
-        // Serial.flush();
-        // abort();
     }
 
 
@@ -50,7 +49,7 @@ void initializeTime() {
     // rtc.adjust(DateTime(F(__DATE__), F(__TIME__)));
     // This line sets the RTC with an explicit date & time, for example to set
     // January 21, 2014 at 3am you would call:
-    // rtc.adjust(DateTime(2021, 2, 15, 10, 30, 15));
+    // rtc.adjust(DateTime(2021, 2, 19, 22, 12, 00));
 
     if(rtc.lostPower()) {
         // this will adjust to the date and time at compilation
@@ -90,75 +89,93 @@ void initializeTime() {
    
 }
 
-void printDateAndTime() {
-    DateTime now = rtc.now();
+// void printDateAndTime() {
 
-    Serial.print(F("("));
+    // Serial.print(F("("));
     // Serial.print(daysOfTheWeek[now.dayOfTheWeek()]);
-    Serial.print(F(") "));
-    Serial.print(now.year(), DEC);
-    Serial.print(F("/"));
-    Serial.print(now.month(), DEC);
-    Serial.print(F("/"));
-    Serial.print(now.day(), DEC);
-    Serial.print(F("....."));
-    Serial.print(now.hour(), DEC);
-    Serial.print(F(":"));
-    Serial.print(now.minute(), DEC);
-    Serial.print(F(":"));
-    Serial.print(now.second(), DEC);
-    Serial.println();
+    // Serial.print(F(") "));
+    // Serial.print(now.year(), DEC);
+    // Serial.print(F("/"));
+    // Serial.print(now.month(), DEC);
+    // Serial.print(F("/"));
+    // Serial.print(now.day(), DEC);
+    // Serial.print(F("....."));
+    // Serial.print(now.hour(), DEC);
+    // Serial.print(F(":"));
+    // Serial.print(now.minute(), DEC);
+    // Serial.print(F(":"));
+    // Serial.print(now.second(), DEC);
+    // Serial.println();
 
-    Serial.print(F("EPOCH: "));
-    Serial.print(now.unixtime());
-    Serial.println(F("s"));
+    // Serial.print(F("EPOCH: "));
+    // Serial.print(now.unixtime());
+    // Serial.println(F("s"));
 
     // calculate a date which is 7 days and 30 seconds into the future
-    DateTime future (now + TimeSpan(7,12,30,6));
+    // DateTime future (now + TimeSpan(7,12,30,6));
 
-    Serial.print(F("Temperature: "));
-    Serial.print(rtc.getTemperature());
-    Serial.println(F(" C"));
+// }
 
-    Serial.println(F("----------------"));
+bool timer1(unsigned long interval) { 
+    if((millis() - timer1helper) > (interval * 1000UL)) {
 
-    time_t now2 = time(nullptr);
-    struct tm *currentTime = gmtime(&now2);
-    Serial.println(asctime(currentTime));
-    Serial.println(isotime(currentTime));
-
-}
-
-
-bool timer1(unsigned long interval) {
-    DateTime now = rtc.now();  
-    if((now.unixtime() - timer1helper) > interval) {
-
-        timer1helper = now.unixtime();
+        timer1helper = millis();
         return true;
 
     }
     return false;
 }
 
-bool timer2(unsigned long interval) {
-    DateTime now = rtc.now();  
-    if((now.unixtime() - timer2helper) > interval) {
+bool timer2(unsigned long interval) { 
+    if((millis() - timer2helper) > (interval * 1000UL)) {
 
-        timer2helper = now.unixtime();
+        timer2helper = millis();
         return true;
 
     }
     return false;
 }
 
-bool timer3(unsigned long interval) {
-    DateTime now = rtc.now();  
-    if((now.unixtime() - timer3helper) > interval) {
+bool timer3(unsigned long interval) { 
+    if((millis() - timer3helper) > (interval * 1000UL)) {
 
-        timer3helper = now.unixtime();
+        timer3helper = millis();
         return true;
 
     }
     return false;
 }
+
+
+// bool timer1(unsigned long interval) {
+
+//     if((nowRTC.unixtime() - timer1helper) > interval) {
+
+//         timer1helper = nowRTC.unixtime();
+//         return true;
+
+//     }
+//     return false;
+// }
+
+// bool timer2(unsigned long interval) {
+
+//     if((nowRTC.unixtime() - timer2helper) > interval) {
+
+//         timer2helper = nowRTC.unixtime();
+//         return true;
+
+//     }
+//     return false;
+// }
+
+// bool timer3(unsigned long interval) {
+
+//     if((nowRTC.unixtime() - timer3helper) > interval) {
+
+//         timer3helper = nowRTC.unixtime();
+//         return true;
+
+//     }
+//     return false;
+// }

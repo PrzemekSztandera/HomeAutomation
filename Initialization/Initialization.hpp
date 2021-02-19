@@ -11,7 +11,6 @@
 #include <BH1750.h>
 #include "../Sensor/Sensor.hpp"
 #include "../DiscoveryMQTT/MQTT_discovery.hpp"
-#include "../Timer/Timer.hpp"
 
 BH1750 lightMeter(0x23);
 
@@ -24,7 +23,6 @@ void initializeTimers() {
     initializeTime();
 #endif
 
-    // sensorsTimerHelper = getEpochInSeconds();
 }
 
 void initializeMCP23017() {
@@ -176,30 +174,3 @@ void printRelaySensorDetails() {
         Serial.println(digitalRead(relay.getPin()));
     }
 }
-
-
-
-void clearEeprom() {
-  // initialize the LED pin as an output.
-  pinMode(13, OUTPUT);
-  
-  /***
-    Iterate through each byte of the EEPROM storage.
-
-    Larger AVR processors have larger EEPROM sizes, E.g:
-    - Arduno Duemilanove: 512b EEPROM storage.
-    - Arduino Uno:        1kb EEPROM storage.
-    - Arduino Mega:       4kb EEPROM storage.
-
-    Rather than hard-coding the length, you should use the pre-provided length function.
-    This will make your code portable to all AVR processors.
-  ***/
-
-  for (unsigned int i = 0 ; i < EEPROM.length() ; i++) {
-    EEPROM.write(i, 0);
-  }
-
-  // turn the LED on when we're done
-  digitalWrite(13, HIGH);
-}
-
