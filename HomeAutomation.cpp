@@ -1,6 +1,17 @@
+/**
+ *
+ * @file HomeAutomation.hpp
+ * @author Przemyslaw Sztandera
+ * Automation for buttons & sensors
+ * @license GPL V2
+ *
+ */
 #include <Arduino.h>
 
-
+/**
+* For MQTT Discovery to work the MQTT_MAX_PACKET_SIZE needs to be increased up to 320
+* in /MySensors/drivers/PubSubClient/PubSubClient.h library
+*/
 // CHILD_ID declaration of sensors
 #define SIGNAL_IN_11 (uint8_t) 11
 #define SIGNAL_IN_12 (uint8_t) 12
@@ -96,8 +107,6 @@
 #endif
 #define SERIAL2_BAUD_RATE 9600
 
-// Remember to add library to Arduino path
-
 #include "./Timer/Timer.hpp"
 #include <Ethernet.h>
 #include <MySensors.h>
@@ -144,6 +153,7 @@ void setup() {
 #endif
 
     resetArduinoMiniPro(4);
+
     Serial2.begin(SERIAL2_BAUD_RATE);
 
     Serial.println(F("setup() called...!"));

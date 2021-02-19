@@ -1,8 +1,7 @@
 /**
  *
- * @file AutomationMega.hpp
+ * @file Automation.hpp
  * @author Przemyslaw Sztandera
- * based on https://github.com/Kirizaki/mysensors
  * Automation for buttons & sensors
  * @license GPL V2
  *
@@ -24,11 +23,12 @@ void receiveData();
 #include "../Initialization/Initialization.hpp"
 #include "../Button/ButtonsInitialization.hpp"
 
+bool resetMiniPro = true;
 
 bool updateRelayStateAndSendMessage(const uint8_t sensorId) {
 
+    bool updated;
     bool pullUpActive = true;
-    bool updatedFlag;
     uint8_t oldState = loadState(sensorId);
 
     Sensor sensor = getSensor(sensorId);
@@ -69,7 +69,7 @@ bool updateRelayStateAndSendMessage(const uint8_t sensorId) {
     // sendSerialMessage("MS", "BI", id, newState);
 
     if (oldState == newState) {
-        updatedFlag = true;
+        updated = true;
         Serial.print(F("updateRelayStateAndSendMessage() called and message send for sensor: "));
         Serial.print(sensorId);
         Serial.print(F(" New sensor state: "));
@@ -77,7 +77,7 @@ bool updateRelayStateAndSendMessage(const uint8_t sensorId) {
         Serial.print(F(", new pin state: "));
         Serial.println(pinState);
     } else {
-        updatedFlag = false;
+        updated = false;
         Serial.print(F("updateRelayStateAndSendMessage() called and message send for sensor: "));
         Serial.print(sensorId);
         Serial.print(F(" New sensor state: "));
@@ -85,7 +85,7 @@ bool updateRelayStateAndSendMessage(const uint8_t sensorId) {
         Serial.print(F(", new pin state: "));
         Serial.println(pinState);
     }
-    return updatedFlag;
+    return updated;
 }
 
 
@@ -182,8 +182,6 @@ int freeRam () {
     int v;
     return (int) &v - (__brkval == 0 ? (int) &__heap_start : (int) __brkval);
 }
-
-bool resetMiniPro = true;
 
 void resetArduinoMiniPro(int resetPin) {
     pinMode(resetPin, OUTPUT);

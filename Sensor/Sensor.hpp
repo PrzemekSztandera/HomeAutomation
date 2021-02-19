@@ -1,9 +1,7 @@
 /**
  *
- * @file MappingMega.hpp
+ * @file Sensor.hpp
  * @author Przemyslaw Sztandera
- * based on https://github.com/Kirizaki/mysensors
- * Mappings
  * @license GPL V2
  *
  */

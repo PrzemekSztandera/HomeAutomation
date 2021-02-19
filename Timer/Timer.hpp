@@ -15,8 +15,6 @@
 RTC_DS3231 rtc;
 const uint8_t interrPin = 2;
 
-// char daysOfTheWeek[7][12] = {"Sunday", "Monday", "Tuesday", "Wednesday", "Thursday", "Friday", "Saturday"};
-
 DateTime nowRTC;
 time_t now;
 struct tm *currentTime;
@@ -29,7 +27,6 @@ void myDelay(unsigned long interval) {
     unsigned long current = millis();
     while ((millis() - current < interval) && (millis() - current >= 0)) {}
 }
-
 
 void rtc_interrupt()
 {
@@ -88,33 +85,6 @@ void initializeTime() {
     set_position(51.8965858, 19.8226161);
    
 }
-
-// void printDateAndTime() {
-
-    // Serial.print(F("("));
-    // Serial.print(daysOfTheWeek[now.dayOfTheWeek()]);
-    // Serial.print(F(") "));
-    // Serial.print(now.year(), DEC);
-    // Serial.print(F("/"));
-    // Serial.print(now.month(), DEC);
-    // Serial.print(F("/"));
-    // Serial.print(now.day(), DEC);
-    // Serial.print(F("....."));
-    // Serial.print(now.hour(), DEC);
-    // Serial.print(F(":"));
-    // Serial.print(now.minute(), DEC);
-    // Serial.print(F(":"));
-    // Serial.print(now.second(), DEC);
-    // Serial.println();
-
-    // Serial.print(F("EPOCH: "));
-    // Serial.print(now.unixtime());
-    // Serial.println(F("s"));
-
-    // calculate a date which is 7 days and 30 seconds into the future
-    // DateTime future (now + TimeSpan(7,12,30,6));
-
-// }
 
 bool timer1(unsigned long interval) { 
     if((millis() - timer1helper) > (interval * 1000UL)) {

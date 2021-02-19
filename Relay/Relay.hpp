@@ -1,6 +1,11 @@
-//
-// Created by Przemyslaw Sztandera on 22/05/2020.
-//
+/**
+ *
+ * @file Relay.hpp
+ * @author Przemyslaw Sztandera
+ * @license GPL V2
+ *
+ */
+
 #pragma once
 
 #include <Adafruit_MCP23017.h>
@@ -71,8 +76,6 @@ public:
     }
 
 };
-
-
 
 // Default relays declaration
 // Relay(uint8_t pin, bool lowLevelTrigger = false, bool latching = false, expanderAddress = 8)
