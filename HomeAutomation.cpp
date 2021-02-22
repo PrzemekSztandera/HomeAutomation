@@ -107,17 +107,26 @@
 #endif
 #define SERIAL2_BAUD_RATE 9600
 
+static bool heartBeat = true;
+static int Mega1StateLed;
+static int Mega2StateLed;
+static int ledState2;
+static int ledState3;
+
 #include "./Timer/Timer.hpp"
 #include <Ethernet.h>
 #include <MySensors.h>
 #include "./I2C/I2C_scanner.hpp"
 #include "./Serial/SerialMessage.hpp"
+#include "./Led/Led.hpp"
 #include "./Automation/Automation.hpp"
 #include "./Initialization/Initialization.hpp"
 
 bool miniUpdateTimer = true;
 
 void before() {
+
+    initializeLedsBefore();
     
 #ifdef EEPROM_CLEAR
     clearEeprom();
@@ -140,6 +149,8 @@ void before() {
 }
 
 void setup() {
+
+    initializeLedsSetup();
     
     createAndSetButtons();
 
@@ -178,6 +189,12 @@ void loop() {
     if(timer2(60)) {
         sendSerialMessage(F("MS"), F("WF"), F("Wifi signal"), modem.getSignalQuality());
     }
+
+    lightLeds();
+    // if(heartBeatTimer(10)) {
+    //     heartBeat = false;
+    //     sendSerialMessage(F("RQ"), F("HB"), F(""), 1);
+    // }
 
 }
 

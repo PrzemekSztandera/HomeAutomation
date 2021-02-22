@@ -22,6 +22,7 @@ struct tm *currentTime;
 unsigned long timer1helper;
 unsigned long timer2helper;
 unsigned long timer3helper;
+unsigned long heartBeatTimerHelper;
 
 void myDelay(unsigned long interval) {
     unsigned long current = millis();
@@ -110,6 +111,16 @@ bool timer3(unsigned long interval) {
     if((millis() - timer3helper) > (interval * 1000UL)) {
 
         timer3helper = millis();
+        return true;
+
+    }
+    return false;
+}
+
+bool heartBeatTimer(unsigned long interval) { 
+    if((millis() - heartBeatTimerHelper) > (interval * 1000UL)) {
+
+        heartBeatTimerHelper = millis();
         return true;
 
     }

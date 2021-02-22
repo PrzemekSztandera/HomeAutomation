@@ -176,8 +176,9 @@ SerialData *receiveSerialMessage() {
         sendSerialMessage(F("RS"), F("TM"), F("Time update"), rtc.now().secondstime());
     } else if(strcmp("MS", receivedCode) == 0) {
         sendSerialMessage(F("RS"), F(""), F("Received"), 0);
-    } else if(strcmp("RQ", receivedCode) == 0 && strcmp("HB", receivedParameter) == 0) {
-        sendSerialMessage(F("RS"), F("HB"), F("Heart beat"), 1);
+    } else if(strcmp("RS", receivedCode) == 0 && strcmp("HB", receivedParameter) == 0) {
+        Mega2StateLed = receivedNumData;
+        heartBeat = true;
     }
 
     flushSerialBuffer(2);
