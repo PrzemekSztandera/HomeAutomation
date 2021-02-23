@@ -1,7 +1,11 @@
 /**
- * Created by Przemyslaw Sztandera on 21/01/2021.
+ *
+ * @file MQTT_discovery.hpp
+ * @author Przemyslaw Sztandera
+ * Automation for buttons & sensors
+ * @license GPL V2
+ *
  */
-
 
 #pragma once
 

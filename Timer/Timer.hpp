@@ -13,7 +13,7 @@
 #include <time.h>
 
 RTC_DS3231 rtc;
-const uint8_t interrPin = 2;
+const uint8_t tiemerInterruptPin = 2;
 
 DateTime nowRTC;
 time_t now;
@@ -22,7 +22,7 @@ struct tm *currentTime;
 unsigned long timer1helper;
 unsigned long timer2helper;
 unsigned long timer3helper;
-unsigned long heartBeatTimerHelper;
+unsigned long timer4helper;
 
 void myDelay(unsigned long interval) {
     unsigned long current = millis();
@@ -61,8 +61,8 @@ void initializeTime() {
     // Keep the time in sync using the one-pulse-per-second output of the
     // RTC as an interrupt source and calling system_tick() from the
     // interrupt service routine.
-    pinMode(interrPin, INPUT_PULLUP);
-    attachInterrupt(digitalPinToInterrupt(interrPin), system_tick, FALLING);
+    pinMode(tiemerInterruptPin, INPUT_PULLUP);
+    attachInterrupt(digitalPinToInterrupt(tiemerInterruptPin), system_tick, FALLING);
     // attachInterrupt(digitalPinToInterrupt(interrPin), rtc_interrupt, FALLING);
 
     rtc.clearAlarm(1);
@@ -87,7 +87,7 @@ void initializeTime() {
    
 }
 
-bool timer1(unsigned long interval) { 
+bool sensorTimer(unsigned long interval) { 
     if((millis() - timer1helper) > (interval * 1000UL)) {
 
         timer1helper = millis();
@@ -97,7 +97,7 @@ bool timer1(unsigned long interval) {
     return false;
 }
 
-bool timer2(unsigned long interval) { 
+bool serialCommunicationTimer(unsigned long interval) { 
     if((millis() - timer2helper) > (interval * 1000UL)) {
 
         timer2helper = millis();
@@ -107,7 +107,7 @@ bool timer2(unsigned long interval) {
     return false;
 }
 
-bool timer3(unsigned long interval) { 
+bool ledTimer(unsigned long interval) { 
     if((millis() - timer3helper) > (interval * 1000UL)) {
 
         timer3helper = millis();
@@ -118,9 +118,9 @@ bool timer3(unsigned long interval) {
 }
 
 bool heartBeatTimer(unsigned long interval) { 
-    if((millis() - heartBeatTimerHelper) > (interval * 1000UL)) {
+    if((millis() - timer4helper) > (interval * 1000UL)) {
 
-        heartBeatTimerHelper = millis();
+        timer4helper = millis();
         return true;
 
     }

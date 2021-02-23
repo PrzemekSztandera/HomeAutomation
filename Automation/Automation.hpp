@@ -23,9 +23,11 @@ void receiveData();
 #include "../Initialization/Initialization.hpp"
 #include "../Button/ButtonsInitialization.hpp"
 
-bool resetMiniPro = true;
+bool resetMiniMega = true;
 
 bool updateRelayStateAndSendMessage(const uint8_t sensorId) {
+
+    strip.setPixelColor(Led3, strip.Color(0, 0, 50));
 
     bool updated;
     bool pullUpActive = true;
@@ -142,7 +144,9 @@ void switchRelay(const uint8_t sensorId) {
 
 void updateEnvironmentSensors() {
 
-    if (timer1(60)) {
+    if (sensorTimer(60)) {
+
+        strip.setPixelColor(Led3, strip.Color(0, 0, 50));
 
         send(sensorMessages[getIndex(ARDUINO_TIMER)].set(millis()));
         send(sensorMessages[getIndex(ARDUINO_TEMP)].set((float)rtc.getTemperature(), 1));
@@ -183,13 +187,14 @@ int freeRam () {
     return (int) &v - (__brkval == 0 ? (int) &__heap_start : (int) __brkval);
 }
 
-void resetArduinoMiniPro(int resetPin) {
+void resetArduinoMiniMega(int resetPin) {
     pinMode(resetPin, OUTPUT);
-    digitalWrite(resetPin, LOW);
-    if (resetMiniPro) {
-        // reset pin
+    if (resetMiniMega) {
+        digitalWrite(resetPin, LOW);
         digitalWrite(resetPin, HIGH);
-        resetMiniPro = false;
+        resetMiniMega = false;
+    } else {
+        digitalWrite(resetPin, HIGH);
     }
 }
 

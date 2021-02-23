@@ -107,27 +107,28 @@
 #endif
 #define SERIAL2_BAUD_RATE 9600
 
-static bool heartBeat = true;
-static int Mega1StateLed;
-static int Mega2StateLed;
-static int ledState2;
-static int ledState3;
+const uint8_t miniMegaStatusInterruptPin = 3;
+const uint8_t miniMegaResetPin = 4;
 
 #include "./Timer/Timer.hpp"
 #include <Ethernet.h>
 #include <MySensors.h>
 #include "./I2C/I2C_scanner.hpp"
+#include "./Sensor/Sensor.hpp"
 #include "./Serial/SerialMessage.hpp"
 #include "./Led/Led.hpp"
 #include "./Automation/Automation.hpp"
 #include "./Initialization/Initialization.hpp"
 
-bool miniUpdateTimer = true;
 
 void before() {
 
+    pinMode(miniMegaStatusInterruptPin, INPUT_PULLUP);
+    attachInterrupt(digitalPinToInterrupt(miniMegaStatusInterruptPin), setMegaMiniStatus, CHANGE);
+
     initializeLedsBefore();
-    
+
+
 #ifdef EEPROM_CLEAR
     clearEeprom();
 #endif
@@ -163,7 +164,7 @@ void setup() {
     printRelaySensorDetails();
 #endif
 
-    resetArduinoMiniPro(4);
+    resetArduinoMiniMega(miniMegaResetPin);
 
     Serial2.begin(SERIAL2_BAUD_RATE);
 
@@ -179,23 +180,22 @@ void presentation() {
 }
 
 void loop() {
-
+// Time update
     nowRTC = rtc.now();
     now = time(nullptr);
-    
+
+//Read buttons and sensors
     readButtons();
     updateEnvironmentSensors();
 
-    if(timer2(60)) {
+// Serial communication
+    if(serialCommunicationTimer(60)) {
         sendSerialMessage(F("MS"), F("WF"), F("Wifi signal"), modem.getSignalQuality());
     }
 
+//  LEDs  
     lightLeds();
-    // if(heartBeatTimer(10)) {
-    //     heartBeat = false;
-    //     sendSerialMessage(F("RQ"), F("HB"), F(""), 1);
-    // }
-
+    
 }
 
 void serialEvent2() {

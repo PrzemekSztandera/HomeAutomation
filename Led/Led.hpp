@@ -1,3 +1,13 @@
+/**
+ *
+ * @file Led.hpp
+ * @author Przemyslaw Sztandera
+ * Automation for buttons & sensors
+ * @license GPL V2
+ *
+ */
+#pragma once
+
 #include <Adafruit_NeoPixel.h>
 
 #define PIN 5
@@ -14,7 +24,9 @@ void initializeLedsBefore() {
     strip.begin(); // INITIALIZE NeoPixel strip object (REQUIRED)
     strip.clear();
     strip.setPixelColor(Mega1Led, strip.Color(50, 0, 0));
-    
+    strip.setPixelColor(Mega2Led, strip.Color(50, 0, 0));
+    strip.setPixelColor(Led3, strip.Color(50, 0, 0));
+    strip.setPixelColor(Led4, strip.Color(50, 0, 0));
     strip.show();
 }
 
@@ -22,27 +34,33 @@ void initializeLedsSetup() {
     strip.clear();
     strip.setPixelColor(Mega1Led, strip.Color(50, 30, 0));
     strip.setPixelColor(Mega2Led, strip.Color(50, 0, 0));
+    strip.setPixelColor(Led3, strip.Color(50, 0, 0));
+    strip.setPixelColor(Led4, strip.Color(50, 0, 0));
     strip.show();
 }
 
 void lightLeds() {
-    
-        // strip.clear(); // Set all pixel colors to 'off'
-
-    
+    strip.show();
+    myDelay(50);
     if(heartBeatTimer(10)) {
-        heartBeat = false;
-        
-        sendSerialMessage(F("RQ"), F("HB"), F(""), 1);
         strip.setPixelColor(Mega1Led, strip.Color(0, 0, 0));
-        
     } else {
         strip.setPixelColor(Mega1Led, strip.Color(0, 50, 0));
     }
+    strip.setPixelColor(Led3, strip.Color(50, 30, 0));
 
-    if(heartBeat) {
-        strip.setPixelColor(Mega2Led, strip.Color(0, 50, 0));
+    if(digitalRead(getRelay(SIGNAL_IN_72).getPin()) == LOW) {
+        strip.setPixelColor(Led4, strip.Color(0, 0, 50));
+    } else {
+        strip.setPixelColor(Led4, strip.Color(50, 0, 0));
     }
-           
-    strip.show();
+    
+}
+
+void setMegaMiniStatus() {
+    if(digitalRead(miniMegaStatusInterruptPin) == HIGH) {
+        strip.setPixelColor(Mega2Led, strip.Color(0, 50, 0));
+    } else if (digitalRead(miniMegaStatusInterruptPin) == LOW) {
+        strip.setPixelColor(Mega2Led, strip.Color(0, 0, 0));
+    }
 }

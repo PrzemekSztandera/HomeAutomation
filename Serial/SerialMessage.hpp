@@ -1,4 +1,12 @@
-#include <Arduino.h>
+/**
+ *
+ * @file Serial.hpp
+ * @author Przemyslaw Sztandera
+ * Automation for buttons & sensors
+ * @license GPL V2
+ *
+ */
+#pragma once
 
 bool sendSerialMessage(const char *code, const char *param, const char *data, unsigned long numData);
 bool sendSerialMessage(const __FlashStringHelper *code, const __FlashStringHelper *param, const __FlashStringHelper *data, unsigned long numData);
@@ -176,11 +184,8 @@ SerialData *receiveSerialMessage() {
         sendSerialMessage(F("RS"), F("TM"), F("Time update"), rtc.now().secondstime());
     } else if(strcmp("MS", receivedCode) == 0) {
         sendSerialMessage(F("RS"), F(""), F("Received"), 0);
-    } else if(strcmp("RS", receivedCode) == 0 && strcmp("HB", receivedParameter) == 0) {
-        Mega2StateLed = receivedNumData;
-        heartBeat = true;
     }
-
+    
     flushSerialBuffer(2);
 
     return &serialDataReceived;
