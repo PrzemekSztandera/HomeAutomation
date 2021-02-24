@@ -2,8 +2,6 @@
  *
  * @file Automation.hpp
  * @author Przemyslaw Sztandera
- * Automation for buttons & sensors
- * @license GPL V2
  *
  */
 #pragma once
@@ -27,7 +25,7 @@ bool resetMiniMega = true;
 
 bool updateRelayStateAndSendMessage(const uint8_t sensorId) {
 
-    strip.setPixelColor(Led3, strip.Color(0, 0, 50));
+    strip.setPixelColor(Led3, strip.Color(0, 5, 25));
 
     bool updated;
     bool pullUpActive = true;
@@ -144,47 +142,46 @@ void switchRelay(const uint8_t sensorId) {
 
 void updateEnvironmentSensors() {
 
-    if (sensorTimer(60)) {
+    strip.setPixelColor(Led3, strip.Color(0, 5, 25));
 
-        strip.setPixelColor(Led3, strip.Color(0, 0, 50));
-
-        send(sensorMessages[getIndex(ARDUINO_TIMER)].set(millis()));
-        send(sensorMessages[getIndex(ARDUINO_TEMP)].set((float)rtc.getTemperature(), 1));
+    send(sensorMessages[getIndex(ARDUINO_TIMER)].set(millis()));
  
-        if (lightMeter.measurementReady()) {
-            float lux = lightMeter.readLightLevel();
-            Serial.print(F("Light: "));
-            Serial.print(lux);
-            Serial.println(F(" lx"));
-            send(sensorMessages[getIndex(ARDUINO_LIGHT)].set(lux, 1));
-        }
-
-
-        Serial.println();
-        Serial.print(F("Date & Time: "));
-        currentTime = gmtime(&now);
-        Serial.println(asctime(currentTime));
-        Serial.println();
-        Serial.print(F("Temperature: "));
-        Serial.print(rtc.getTemperature());
-        Serial.println(F(" C"));
-        Serial.println();
-        Serial.print(F("Free RAM: "));
-        Serial.print(freeRam());
-        Serial.println(F(" bytes"));
-        Serial.println();
-        Serial.print(F("WI-FI: "));
-        Serial.print(modem.getSignalQuality());
-        Serial.println(F(" dB"));
-        Serial.println();
-        
+    if (lightMeter.measurementReady()) {
+        float lux = lightMeter.readLightLevel();
+        Serial.print(F("Light: "));
+        Serial.print(lux);
+        Serial.println(F(" lx"));
+        send(sensorMessages[getIndex(ARDUINO_LIGHT)].set(lux, 1));
     }
-}
 
-int freeRam () {
-    extern int __heap_start, *__brkval;
-    int v;
-    return (int) &v - (__brkval == 0 ? (int) &__heap_start : (int) __brkval);
+    // Bosh sensor BME280
+       float temp(NAN), hum(NAN), pres(NAN);
+       BME280::TempUnit tempUnit(BME280::TempUnit_Celsius);
+       BME280::PresUnit presUnit(BME280::PresUnit_Pa);
+       bme.read(pres, temp, hum, tempUnit, presUnit);
+       send(sensorMessages[getIndex(BME280_TEMP)].set(temp, 1));
+       send(sensorMessages[getIndex(BME280_BARO)].set(pres, 0));
+       send(sensorMessages[getIndex(BME280_HUM)].set(hum, 1));
+
+
+    Serial.println();
+    Serial.print(F("Date & Time: "));
+    currentTime = gmtime(&now);
+    Serial.println(asctime(currentTime));
+    Serial.println();
+    Serial.print(F("Temperature: "));
+    Serial.print(rtc.getTemperature());
+    Serial.println(F(" C"));
+    Serial.println();
+    Serial.print(F("Free RAM: "));
+    Serial.print(freeRam());
+    Serial.println(F(" bytes"));
+    Serial.println();
+    Serial.print(F("WI-FI: "));
+    Serial.print(modem.getSignalQuality());
+    Serial.println(F(" dB"));
+    Serial.println();
+        
 }
 
 void resetArduinoMiniMega(int resetPin) {
@@ -196,6 +193,12 @@ void resetArduinoMiniMega(int resetPin) {
     } else {
         digitalWrite(resetPin, HIGH);
     }
+}
+
+int freeRam () {
+    extern int __heap_start, *__brkval;
+    int v;
+    return (int) &v - (__brkval == 0 ? (int) &__heap_start : (int) __brkval);
 }
 
 void clearEeprom() {

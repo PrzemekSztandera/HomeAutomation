@@ -2,8 +2,6 @@
  *
  * @file ButtonsInitialization.hpp
  * @author Przemyslaw Sztandera
- * Buttons
- * @license GPL V2
  *
  */
 

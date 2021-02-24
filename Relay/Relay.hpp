@@ -2,7 +2,6 @@
  *
  * @file Relay.hpp
  * @author Przemyslaw Sztandera
- * @license GPL V2
  *
  */
 

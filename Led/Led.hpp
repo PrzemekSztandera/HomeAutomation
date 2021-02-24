@@ -2,10 +2,9 @@
  *
  * @file Led.hpp
  * @author Przemyslaw Sztandera
- * Automation for buttons & sensors
- * @license GPL V2
  *
  */
+
 #pragma once
 
 #include <Adafruit_NeoPixel.h>
@@ -23,19 +22,19 @@ Adafruit_NeoPixel strip(NUMPIXELS, PIN, NEO_GRB + NEO_KHZ800);
 void initializeLedsBefore() {
     strip.begin(); // INITIALIZE NeoPixel strip object (REQUIRED)
     strip.clear();
-    strip.setPixelColor(Mega1Led, strip.Color(50, 0, 0));
-    strip.setPixelColor(Mega2Led, strip.Color(50, 0, 0));
-    strip.setPixelColor(Led3, strip.Color(50, 0, 0));
-    strip.setPixelColor(Led4, strip.Color(50, 0, 0));
+    strip.setPixelColor(Mega1Led, strip.Color(25, 0, 0));
+    strip.setPixelColor(Mega2Led, strip.Color(25, 0, 0));
+    strip.setPixelColor(Led3, strip.Color(25, 0, 0));
+    strip.setPixelColor(Led4, strip.Color(25, 0, 0));
     strip.show();
 }
 
 void initializeLedsSetup() {
     strip.clear();
-    strip.setPixelColor(Mega1Led, strip.Color(50, 30, 0));
-    strip.setPixelColor(Mega2Led, strip.Color(50, 0, 0));
-    strip.setPixelColor(Led3, strip.Color(50, 0, 0));
-    strip.setPixelColor(Led4, strip.Color(50, 0, 0));
+    strip.setPixelColor(Mega1Led, strip.Color(25, 25, 0));
+    strip.setPixelColor(Mega2Led, strip.Color(25, 0, 0));
+    strip.setPixelColor(Led3, strip.Color(25, 0, 0));
+    strip.setPixelColor(Led4, strip.Color(25, 0, 0));
     strip.show();
 }
 
@@ -45,21 +44,21 @@ void lightLeds() {
     if(heartBeatTimer(10)) {
         strip.setPixelColor(Mega1Led, strip.Color(0, 0, 0));
     } else {
-        strip.setPixelColor(Mega1Led, strip.Color(0, 50, 0));
+        strip.setPixelColor(Mega1Led, strip.Color(0, 25, 0));
     }
-    strip.setPixelColor(Led3, strip.Color(50, 30, 0));
+    strip.setPixelColor(Led3, strip.Color(25, 25, 0));
 
     if(digitalRead(getRelay(SIGNAL_IN_72).getPin()) == LOW) {
-        strip.setPixelColor(Led4, strip.Color(0, 0, 50));
+        strip.setPixelColor(Led4, strip.Color(0, 5, 25));
     } else {
-        strip.setPixelColor(Led4, strip.Color(50, 0, 0));
+        strip.setPixelColor(Led4, strip.Color(25, 0, 0));
     }
     
 }
 
 void setMegaMiniStatus() {
     if(digitalRead(miniMegaStatusInterruptPin) == HIGH) {
-        strip.setPixelColor(Mega2Led, strip.Color(0, 50, 0));
+        strip.setPixelColor(Mega2Led, strip.Color(0, 25, 0));
     } else if (digitalRead(miniMegaStatusInterruptPin) == LOW) {
         strip.setPixelColor(Mega2Led, strip.Color(0, 0, 0));
     }

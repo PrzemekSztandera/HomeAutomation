@@ -2,10 +2,9 @@
  *
  * @file HomeAutomation.hpp
  * @author Przemyslaw Sztandera
- * Automation for buttons & sensors
- * @license GPL V2
  *
  */
+
 #include <Arduino.h>
 
 /**
@@ -50,9 +49,14 @@
 #define SIGNAL_IN_74 (uint8_t) 74
 
 #define ARDUINO_TIMER (uint8_t) 100
-#define ARDUINO_TEMP (uint8_t) 101
-#define ARDUINO_LIGHT (uint8_t) 102
-// #define ARDUINO_TIME (uint8_t) 103
+#define ARDUINO_LIGHT (uint8_t) 101
+#define BME280_TEMP (uint8_t) 102
+#define BME280_BARO (uint8_t) 103
+#define BME280_HUM (uint8_t) 104
+
+// HomeAssistant or MySensors Discovery
+#define HA_DISCOVERY 1
+#define MS_DISCOVERY 2
 
 // Enable serial gateway
 #define MY_GATEWAY_SERIAL
@@ -97,8 +101,6 @@
 #define USE_EXPANDER
 // #define EEPROM_CLEAR
 #define TIMER
-#define HA_DISCOVERY 1
-#define MS_DISCOVERY 2
 
 
 // Define a lower baud rate for Arduino's running on 8 MHz (Arduino Pro Mini 3.3V & SenseBender)
@@ -115,10 +117,10 @@ const uint8_t miniMegaResetPin = 4;
 #include <MySensors.h>
 #include "./I2C/I2C_scanner.hpp"
 #include "./Sensor/Sensor.hpp"
-#include "./Serial/SerialMessage.hpp"
 #include "./Led/Led.hpp"
 #include "./Automation/Automation.hpp"
 #include "./Initialization/Initialization.hpp"
+#include "./Serial/SerialMessage.hpp"
 
 
 void before() {
@@ -180,14 +182,19 @@ void presentation() {
 }
 
 void loop() {
+    
 // Time update
     nowRTC = rtc.now();
     now = time(nullptr);
 
-//Read buttons and sensors
+//Read buttons
     readButtons();
-    updateEnvironmentSensors();
 
+//Read sensors
+    if (sensorTimer(60)) {
+        updateEnvironmentSensors();
+    }
+    
 // Serial communication
     if(serialCommunicationTimer(60)) {
         sendSerialMessage(F("MS"), F("WF"), F("Wifi signal"), modem.getSignalQuality());

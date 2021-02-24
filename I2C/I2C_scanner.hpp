@@ -1,7 +1,9 @@
 /**
- * Created by Przemyslaw Sztandera on 30/10/2020.
+ *
+ * @file I2C_scanner.hpp
+ * @author Przemyslaw Sztandera
+ *
  */
-
 #pragma once
 
 #include <Wire.h>

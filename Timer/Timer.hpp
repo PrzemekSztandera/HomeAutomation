@@ -2,11 +2,9 @@
  *
  * @file Timer.hpp
  * @author Przemyslaw Sztandera
- * based on https://github.com/Kirizaki/mysensors
- * Automation for buttons & sensors
- * @license GPL V2
  *
  */
+
 #pragma once
 
 #include <RTClib.h>
@@ -29,10 +27,6 @@ void myDelay(unsigned long interval) {
     while ((millis() - current < interval) && (millis() - current >= 0)) {}
 }
 
-void rtc_interrupt()
-{
-  Serial.println(F("second"));
-}
 
 void initializeTime() {
 

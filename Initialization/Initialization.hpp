@@ -1,21 +1,22 @@
 /**
- * Created by Przemyslaw Sztandera on 21/05/2020.
+ *
+ * @file Initialization.hpp
+ * @author Przemyslaw Sztandera
+ *
  */
-
-
-// Functions prototypes
 
 #pragma once
 
 #include <EEPROM.h>
 #include <BH1750.h>
+#include <BME280I2C.h>
 #include "../Sensor/Sensor.hpp"
 #include "../DiscoveryMQTT/MQTT_discovery.hpp"
 
 BH1750 lightMeter(0x23);
+BME280I2C bme;
 
 MyMessage sensorMessages[numberOfSensors];
-
 
 void initializeTimers() {
 
@@ -112,6 +113,23 @@ void initializeEnvironmentSensors() {
         Serial.println(F("BH1750 initialized."));
     } else {
         Serial.println(F("Error initialising BH1750!"));
+    }
+
+    // Bosh sensor BME280
+    Wire.begin();
+    if (!bme.begin()) {
+        Serial.println(F("Could not find BME280 sensor!"));
+    }
+
+    switch (bme.chipModel()) {
+        case BME280::ChipModel_BME280:
+            Serial.println(F("Found BME280 sensor! Success."));
+            break;
+        case BME280::ChipModel_BMP280:
+            Serial.println(F("Found BMP280 sensor! No Humidity available."));
+            break;
+        default:
+            Serial.println(F("Found UNKNOWN sensor! Error!"));
     }
 
     Serial.println(F("Environment sensors initialized."));

@@ -2,7 +2,6 @@
  *
  * @file Sensor.hpp
  * @author Przemyslaw Sztandera
- * @license GPL V2
  *
  */
 
@@ -125,9 +124,10 @@ Sensor sensors[] = {
 
         // Environment sensors
         {ARDUINO_TIMER, V_TEXT,     S_INFO,         HA_DISCOVERY, "TIMER"},
-        {ARDUINO_TEMP,  V_TEMP,     S_TEMP,         HA_DISCOVERY, "TEMP"},
         {ARDUINO_LIGHT, V_LEVEL,    S_LIGHT_LEVEL,  HA_DISCOVERY, "LIGHT"},
-        // {ARDUINO_TIME,  V_TEXT,     S_INFO,   HA_DISCOVERY, "TIME"},
+        {BME280_TEMP,   V_TEMP,     S_TEMP,         HA_DISCOVERY, "BME_T"},
+        {BME280_BARO,   V_PRESSURE, S_BARO,         HA_DISCOVERY, "BME_P"},
+        {BME280_HUM,    V_HUM,      S_HUM,          HA_DISCOVERY, "BME_H"},
 };
 
 const uint8_t numberOfSensors = sizeof(sensors) / sizeof(Sensor);

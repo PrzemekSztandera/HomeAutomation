@@ -2,8 +2,6 @@
  *
  * @file MQTT_discovery.hpp
  * @author Przemyslaw Sztandera
- * Automation for buttons & sensors
- * @license GPL V2
  *
  */
 
@@ -17,8 +15,6 @@
 
 char payloadArr[255];
 char topic[50];
-
-
 
 char const *getSensorTypeString(mysensors_sensor_t type) {
     char const *name;

@@ -2,10 +2,9 @@
  *
  * @file Serial.hpp
  * @author Przemyslaw Sztandera
- * Automation for buttons & sensors
- * @license GPL V2
  *
  */
+
 #pragma once
 
 bool sendSerialMessage(const char *code, const char *param, const char *data, unsigned long numData);
@@ -182,8 +181,6 @@ SerialData *receiveSerialMessage() {
     
     if(strcmp("RQ", receivedCode) == 0 && strcmp("TM", receivedParameter) == 0) {
         sendSerialMessage(F("RS"), F("TM"), F("Time update"), rtc.now().secondstime());
-    } else if(strcmp("MS", receivedCode) == 0) {
-        sendSerialMessage(F("RS"), F(""), F("Received"), 0);
     }
     
     flushSerialBuffer(2);
