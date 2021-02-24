@@ -170,7 +170,7 @@ void updateEnvironmentSensors() {
     Serial.println(asctime(currentTime));
     Serial.println();
     Serial.print(F("Temperature: "));
-    Serial.print(rtc.getTemperature());
+    Serial.print(temp);
     Serial.println(F(" C"));
     Serial.println();
     Serial.print(F("Free RAM: "));

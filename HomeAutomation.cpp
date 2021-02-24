@@ -196,7 +196,7 @@ void loop() {
     }
     
 // Serial communication
-    if(serialCommunicationTimer(60)) {
+    if(serialCommunicationTimer(30)) {
         sendSerialMessage(F("MS"), F("WF"), F("Wifi signal"), modem.getSignalQuality());
     }
 
