@@ -76,10 +76,12 @@ char const *getSensorDataTypeString(mysensors_data_t type) {
 
 char *createTopic(const uint8_t sensorId, const uint8_t topicType) {
 
-
-    char discovery_prefix[] = "homeassistant";
-    char node_id[] = "0";
-    char config[] = "config";
+    const uint8_t buffer_size = 15;
+    char buffer[buffer_size];
+    const __FlashStringHelper *emptyString = F("");
+    const __FlashStringHelper *discovery_prefix = F("homeassistant");
+    const __FlashStringHelper *node_id = F("0");
+    const __FlashStringHelper *config = F("config");
 
     Sensor sensor = getSensor(sensorId);
     char const *sensorType = getSensorTypeString(sensor.getPresentationType());
@@ -93,15 +95,21 @@ char *createTopic(const uint8_t sensorId, const uint8_t topicType) {
 
     if (topicType == DISCOVERY_TOPIC) { // homeassistant/sensorType/arduino_0/sensorId/config
 
-        strcpy(topic, discovery_prefix);
+        memcpy_P(buffer, discovery_prefix, buffer_size);
+        strcpy(topic, buffer);
+        memcpy_P(buffer, emptyString, buffer_size);
         strcat(topic, "/");
         strcat(topic, sensorType);
         strcat(topic, "/");
-        strcat(topic, node_id);
+        memcpy_P(buffer, node_id, buffer_size);
+        strcat(topic, buffer);
+        memcpy_P(buffer, emptyString, buffer_size);
         strcat(topic, "/");
         strcat(topic, sensor_id);
         strcat(topic, "/");
-        strcat(topic, config);
+        memcpy_P(buffer, config, buffer_size);
+        strcat(topic, buffer);
+        memcpy_P(buffer, emptyString, buffer_size);
 
         return topic;
     } else if (topicType == STATE_TOPIC || topicType == CMD_TOPIC) {
@@ -115,7 +123,9 @@ char *createTopic(const uint8_t sensorId, const uint8_t topicType) {
 
         strcpy(topic, topicPrefix);
         strcat(topic, "/");
-        strcat(topic, node_id);
+        memcpy_P(buffer, node_id, buffer_size);
+        strcat(topic, buffer);
+        memcpy_P(buffer, emptyString, buffer_size);
         strcat(topic, "/");
         strcat(topic, sensor_id);
         strcat(topic, "/");
@@ -133,7 +143,7 @@ char *createTopic(const uint8_t sensorId, const uint8_t topicType) {
 }
 
 char *createPayload(const uint8_t sensorId) {
-    const int buffer_size = 85;
+    const uint8_t buffer_size = 85;
     char buffer[buffer_size];
     const __FlashStringHelper *emptyString = F("");
     const __FlashStringHelper *string1 = F("{\"name\":\"Arduino ");
