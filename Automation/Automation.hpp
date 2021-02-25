@@ -60,7 +60,6 @@ bool updateRelayStateAndSendMessage(const uint8_t sensorId) {
         pinState = relayState;
     }
 
-
     uint8_t newState = loadState(sensorId);
     send(sensorMessages[getIndex(sensorId)].set(newState));
     // char id[4];
@@ -118,9 +117,8 @@ void switchRelay(const uint8_t sensorId) {
             delay(125);
             digitalWrite(relayPin, relayState);
         }
-
     }
-
+    
     myDelay(150);
 
     if (updateRelayStateAndSendMessage(sensorId)) {
@@ -137,7 +135,6 @@ void switchRelay(const uint8_t sensorId) {
         Serial.print(loadState(sensorId));
         Serial.println(F(", Switch unsuccessful!!!"));
     }
-
 }
 
 void updateEnvironmentSensors() {
@@ -180,11 +177,12 @@ void updateEnvironmentSensors() {
     Serial.print(F("WI-FI: "));
     Serial.print(modem.getSignalQuality());
     Serial.println(F(" dB"));
-    Serial.println();
-        
+    Serial.println();  
 }
 
 void resetArduinoMiniMega(int resetPin) {
+    strip.setPixelColor(Mega2Led, strip.Color(25, 25, 0));
+    strip.show();
     pinMode(resetPin, OUTPUT);
     if (resetMiniMega) {
         digitalWrite(resetPin, LOW);

@@ -16,58 +16,58 @@
 char payloadArr[255];
 char topic[50];
 
-char const *getSensorTypeString(mysensors_sensor_t type) {
-    char const *name;
+__FlashStringHelper const *getSensorTypeString(mysensors_sensor_t type) {
+    __FlashStringHelper const *name;
 
     switch (type) {
         case S_BINARY:
-            name = "switch";
+            name = F("switch");
             break;
         case S_INFO:
         case S_TEMP:
         case S_BARO:
         case S_HUM:
         case S_LIGHT_LEVEL:
-            name = "sensor";
+            name = F("sensor");
             break;
         case S_DOOR:
         case S_MOTION:
-            name = "binary_sensor";
+            name = F("binary_sensor");
             break;
         default:
-            name = "unknown";
+            name = F("unknown");
             break;
     }
     return name;
 }
 
-char const *getSensorDataTypeString(mysensors_data_t type) {
-    char const *name;
+__FlashStringHelper const *getSensorDataTypeString(mysensors_data_t type) {
+    __FlashStringHelper const *name;
 
     switch (type) {
         case V_STATUS:
-            name = "Power";
+            name = F("Power");
             break;
         case V_TEXT:
-            name = "Info";
+            name = F("Info");
             break;
         case V_TEMP:
-            name = "Temp";
+            name = F("Temp");
             break;
         case V_PRESSURE:
-            name = "Baro";
+            name = F("Baro");
             break;
         case V_HUM:
-            name = "Hum";
+            name = F("Hum");
             break;
         case V_TRIPPED:
-            name = "Tripp";
+            name = F("Tripp");
             break;
         case V_LEVEL:
-            name = "Lux";
+            name = F("Lux");
             break;
         default:
-            name = "Unknown";
+            name = F("Unknown");
             break;
     }
     return name;
@@ -84,7 +84,7 @@ char *createTopic(const uint8_t sensorId, const uint8_t topicType) {
     const __FlashStringHelper *config = F("config");
 
     Sensor sensor = getSensor(sensorId);
-    char const *sensorType = getSensorTypeString(sensor.getPresentationType());
+    __FlashStringHelper const *sensorType = getSensorTypeString(sensor.getPresentationType());
     uint8_t variableType = static_cast<uint8_t>(sensor.getVariableType());
 
     char variableTypeArray[5];
@@ -99,7 +99,9 @@ char *createTopic(const uint8_t sensorId, const uint8_t topicType) {
         strcpy(topic, buffer);
         memcpy_P(buffer, emptyString, buffer_size);
         strcat(topic, "/");
-        strcat(topic, sensorType);
+        memcpy_P(buffer, sensorType, buffer_size);
+        strcat(topic, buffer);
+        memcpy_P(buffer, emptyString, buffer_size);
         strcat(topic, "/");
         memcpy_P(buffer, node_id, buffer_size);
         strcat(topic, buffer);
@@ -167,8 +169,8 @@ char *createPayload(const uint8_t sensorId) {
     uint8_t presentationType = static_cast<uint8_t>(sensor.getPresentationType());
     uint8_t variableType = static_cast<uint8_t>(sensor.getVariableType());
     uint8_t sensorIndex = getIndex(sensorId) + 1;
-    char const *sensorType = getSensorTypeString(sensor.getPresentationType());
-    char const *sensorDataType = getSensorDataTypeString(sensor.getVariableType());
+    __FlashStringHelper const *sensorType = getSensorTypeString(sensor.getPresentationType());
+    __FlashStringHelper const *sensorDataType = getSensorDataTypeString(sensor.getVariableType());
     char const *description = sensor.getDescription();
 
     char sensor_index[5];
@@ -179,9 +181,15 @@ char *createPayload(const uint8_t sensorId) {
     strcpy(payloadArr, buffer);
     memcpy_P(buffer, emptyString, buffer_size);
 
-    strcat(payloadArr, sensorDataType);
+    memcpy_P(buffer, sensorDataType, buffer_size);
+    strcat(payloadArr, buffer);
+    memcpy_P(buffer, emptyString, buffer_size);
+
     strcat(payloadArr, " ");
-    strcat(payloadArr, sensorType);
+    memcpy_P(buffer, sensorType, buffer_size);
+    strcat(payloadArr, buffer);
+    memcpy_P(buffer, emptyString, buffer_size);
+
     if (variableType == V_STATUS && presentationType == S_BINARY) {
         strcat(payloadArr, " ");
         strcat(payloadArr, sensor_index);
@@ -195,7 +203,9 @@ char *createPayload(const uint8_t sensorId) {
     strcat(payloadArr, buffer);
     memcpy_P(buffer, emptyString, buffer_size);
 
-    strcat(payloadArr, sensorType);
+    memcpy_P(buffer, sensorType, buffer_size);
+    strcat(payloadArr, buffer);
+    memcpy_P(buffer, emptyString, buffer_size);
     strcat(payloadArr, "_");
     strcat(payloadArr, sensor_id);
 

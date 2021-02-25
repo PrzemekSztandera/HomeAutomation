@@ -21,7 +21,6 @@ Adafruit_NeoPixel strip(NUMPIXELS, PIN, NEO_GRB + NEO_KHZ800);
 
 void initializeLedsBefore() {
     strip.begin(); // INITIALIZE NeoPixel strip object (REQUIRED)
-    strip.clear();
     strip.setPixelColor(Mega1Led, strip.Color(25, 0, 0));
     strip.setPixelColor(Mega2Led, strip.Color(25, 0, 0));
     strip.setPixelColor(Led3, strip.Color(25, 0, 0));
@@ -30,9 +29,7 @@ void initializeLedsBefore() {
 }
 
 void initializeLedsSetup() {
-    strip.clear();
     strip.setPixelColor(Mega1Led, strip.Color(25, 25, 0));
-    strip.setPixelColor(Mega2Led, strip.Color(25, 0, 0));
     strip.setPixelColor(Led3, strip.Color(25, 0, 0));
     strip.setPixelColor(Led4, strip.Color(25, 0, 0));
     strip.show();
