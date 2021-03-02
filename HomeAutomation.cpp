@@ -7,10 +7,6 @@
 
 #include <Arduino.h>
 
-/**
-* For MQTT Discovery to work the MQTT_MAX_PACKET_SIZE needs to be increased up to 320
-* in /MySensors/drivers/PubSubClient/PubSubClient.h library
-*/
 // CHILD_ID declaration of sensors
 #define SIGNAL_IN_11 (uint8_t) 11
 #define SIGNAL_IN_12 (uint8_t) 12
@@ -59,7 +55,7 @@
 #define MS_DISCOVERY 2
 
 // Enable serial gateway
-#define MY_GATEWAY_SERIAL
+// #define MY_GATEWAY_SERIAL
 
 // Enable gateway ethernet module type
 #define MY_GATEWAY_W5100
@@ -67,16 +63,15 @@
  // Enable ESP8266 as WIFI modem gateway
 #define MY_GATEWAY_TINYGSM
 #define TINY_GSM_MODEM_ESP8266
-// Use Hardware Serial on Mega, Leonardo, Micro
-#define SerialAT Serial1
 #define MY_GSM_SSID "BTHub6-G83T"
 #define MY_GSM_PSW "UcXJ3Fk4uQXR"
+#define SerialAT Serial1
 
 
 
 #define MY_MAC_ADDRESS 0xDE, 0xAD, 0xBE, 0xEF, 0xFE, 0xED
 // Enable MY_IP_ADDRESS here if you want a static ip address (no DHCP)
-#define MY_IP_ADDRESS 192,168,1,86
+// #define MY_IP_ADDRESS 192,168,1,88
 // If using static ip you need to define Gateway and Subnet address as well
 // #define MY_IP_GATEWAY_ADDRESS 192,168,1,254
 // #define MY_IP_SUBNET_ADDRESS 255,255,255,0
@@ -84,18 +79,22 @@
 
 // #define MY_CONTROLLER_URL_ADDRESS "http://192.168.1.73:8123"
 #define MY_CONTROLLER_IP_ADDRESS 192, 168, 1, 73
-#define MY_GATEWAY_MQTT_CLIENT
 #define MY_PORT 1883
+#define MY_GATEWAY_MQTT_CLIENT
 #define MY_MQTT_USER "HAMqTT"
 #define MY_MQTT_PASSWORD "home&assistantMqTT4"
 #define MY_MQTT_PUBLISH_TOPIC_PREFIX "arduino-out"
 #define MY_MQTT_SUBSCRIBE_TOPIC_PREFIX "arduino-in"
 #define MY_MQTT_CLIENT_ID "arduino-mega"
+/**
+* For MQTT Discovery to work the MQTT_MAX_PACKET_SIZE needs to be increased up to 320
+* in /MySensors/drivers/PubSubClient/PubSubClient.h library
+*/
+#define MQTT_MAX_PACKET_SIZE 320
 
 
 
 #define MY_DEBUG
-#define TRANSPORT_DEBUG
 // #define SETUP_DEBUG
 #define SERIAL2_DEBUG
 #define USE_EXPANDER
@@ -157,15 +156,6 @@ void setup() {
     
     createAndSetButtons();
 
-#ifdef SETUP_DEBUG
-    Serial.print(F("Modem info: "));
-    Serial.println(modem.getModemInfo());
-    Serial.print(F("IP: "));
-    Serial.println(modem.getLocalIP());
-    Serial.print(F("Signal quality: "));
-    printRelaySensorDetails();
-#endif
-
     resetArduinoMiniMega(miniMegaResetPin);
 
     Serial2.begin(SERIAL2_BAUD_RATE);
@@ -197,7 +187,9 @@ void loop() {
     
 // Serial communication
     if(serialCommunicationTimer(30)) {
-        sendSerialMessage(F("MS"), F("WF"), F("Wifi signal"), modem.getSignalQuality());
+        #if defined(MY_GATEWAY_TINYGSM)
+            sendSerialMessage(F("MS"), F("WF"), F("Wifi signal"), modem.getSignalQuality());
+        #endif
     }
 
 //  LEDs  

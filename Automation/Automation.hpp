@@ -174,10 +174,13 @@ void updateEnvironmentSensors() {
     Serial.print(freeRam());
     Serial.println(F(" bytes"));
     Serial.println();
-    Serial.print(F("WI-FI: "));
-    Serial.print(modem.getSignalQuality());
-    Serial.println(F(" dB"));
-    Serial.println();  
+    #if defined(MY_GATEWAY_TINYGSM)
+        Serial.print(F("WI-FI: "));
+        Serial.print(modem.getSignalQuality());
+        Serial.println(F(" dB"));
+        Serial.println();
+    #endif
+      
 }
 
 void resetArduinoMiniMega(int resetPin) {
